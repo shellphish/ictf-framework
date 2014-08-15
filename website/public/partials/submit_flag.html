@@ -1,0 +1,26 @@
+<div class='row-fluid'>
+    <div class='span12'>
+        <form ng-submit="submit()">
+            Stolen a flag? Prove it
+            <div class="input-group">
+
+                <span class='glyphicon glyphicon-flag input-group-addon'>
+                </span>
+                <input type="text" ng-model="flag" name="flag" class='form-control' />
+                <span class="input-group-btn">
+                    <input class='btn btn-default' type="submit" id="submit" value="Submit"/>
+                    </input>
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class='row-fluid' ng-show='result'>
+    <div class='span12'>
+      <div class="alert alert-warning" role="alert">
+          <strong>
+              {{result}}
+          </strong>
+    </div>
+</div>

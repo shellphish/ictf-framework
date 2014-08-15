@@ -1,0 +1,36 @@
+!!!
+%html{'ng-app' => 'ctfApp'}
+  %head
+    %meta{charset: 'utf-8'}
+    %meta{name: "viewport", content: "width=device-width, initial-scale=1"}
+    %link{rel: :stylesheet, type: "text/css", href: "//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"}
+    %link{rel: :stylesheet, type: "text/css", href: "//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"}
+    %base{href: '/'}
+    %script{src: "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"}
+    %script{src: '//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js'}
+    %script{src: "//ajax.googleapis.com/ajax/libs/angularjs/1.2.22/angular.min.js"}
+    %script{src: "//ajax.googleapis.com/ajax/libs/angularjs/1.2.1/angular-route.min.js"}
+    %script{src: '/js/app.js'}
+    %script{src: '/js/controllers.js'}
+
+  %body
+    .container-fluid
+      .row-fluid
+        .btn-group
+          %li.btn
+            %a{href: '#services'}
+              %h3
+                Show Services
+          %li.btn
+            %a{href: '#submit_flag'}
+              %h3
+                Submit Flag
+          %li.btn
+            %a{href: '#scoreboard'}
+              %h3
+                View Scoreboard
+
+      .row-fluid
+        .span12
+          .ng-view
+

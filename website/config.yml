@@ -1,0 +1,11 @@
+name: FantastiCTF!
+api_base_url: http://2c130bb1.ngrok.com
+api_secret: YOUKNOWSOMETHINGYOUSUCK
+teams:
+    148:
+        name: Sheep
+        hashed_password: hi
+    1:
+        name: Hi
+        hashed_password: hi
+

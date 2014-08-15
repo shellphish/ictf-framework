@@ -2,9 +2,7 @@ This script creates the team and organization VMs.
 
 Usage:
   
-    create_vm.py <game_id> team <team_id> root_key.pub team_key.pub [service1 service2 ...]
-    create_vm.py <game_id> org root_key.pub
-
+    create_vm.py <game_id> <num_teams> [service1 service2 ...]
 
 
 It needs:

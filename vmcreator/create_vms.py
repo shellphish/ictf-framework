@@ -3,7 +3,10 @@
 import glob
 import logging
 import os
+import random
 import re
+import shutil
+import string
 import subprocess
 import sys
 import tempfile
@@ -11,6 +14,7 @@ import tempfile
 
 BASE_VM_NAME = "iCTF-base"
 LOG_DIR = "/tmp"
+BUNDLE_OUTPUT_DIR = "/var/www/bundles"    # Make sure not listable!
 
 
 #### General utilities ###################################################################
@@ -34,7 +38,7 @@ def run_cmd(arglist, cmd_name):
         logging.error("")
         raise
 
-def create_gamepath(game_id):
+def gamepath(game_id):
     path = "/game/%d" % game_id
     try: 
         os.makedirs(path)
@@ -43,6 +47,32 @@ def create_gamepath(game_id):
             raise
     return path
 
+def create_ssh_key(secret_file_name):
+    run_cmd(['ssh-keygen','-q','-N','','-C',os.path.basename(secret_file_name),'-f',secret_file_name], "ssh-keygen")
+    with open(secret_file_name+'.pub') as public_key_file:
+        return public_key_file.read()
+
+def bundle(game_id, vm_name, key_name):
+    status("Creating the %s bundle" % vm_name)
+    gamedir = gamepath(game_id)
+    os.chdir(gamedir)
+    files = [
+            vm_name+"/"+vm_name+".vbox",
+            vm_name+"/"+vm_name+"-disk1.vdi",
+            key_name,
+            key_name+".pub"
+            ]
+    for bundle_file in files:
+        assert os.path.isfile(bundle_file)
+    random_string = ''.join(random.choice(string.ascii_letters+string.digits) for _ in range(30))
+    bundle_filename = random_string+"_"+vm_name+".tar.gz"
+    logging.info("Putting the %s bundle in %s", vm_name, bundle_filename)
+    tar_cmdline = ['tar','caf',BUNDLE_OUTPUT_DIR+"/"+bundle_filename]
+    tar_cmdline.extend(files)
+    run_cmd(tar_cmdline, "bundle tar")
+    status("Created the %s bundle" % vm_name)
+    return bundle_filename
+    
 
 
 
@@ -51,7 +81,7 @@ def create_gamepath(game_id):
 def clone_vm(game_id, name):
     assert re.match(r'[a-zA-Z0-9_-]+\Z',name)
     status("Creating VM: {}".format(name))
-    basepath = create_gamepath(game_id)
+    basepath = gamepath(game_id)
     run_cmd(["VBoxManage","clonevm",BASE_VM_NAME,"--name",name,"--basefolder",basepath], "clonevm "+name)
     return basepath+'/'+name
 
@@ -188,7 +218,7 @@ def create_team(game_id, team_id, root_key, team_key, services):
         mountdir_end_config(mntdir,
                 nameserver='10.0.%d.1'%team_id
                 )
-        subprocess.call(["sudo","umount","-l",mntdir+'/dev'])
+        subprocess.call(["sudo","umount",mntdir+'/dev'])
         run_cmd(['sudo','guestunmount',mntdir], "guestunmount")
     except:
         subprocess.call(["sudo","umount","-l",mntdir+'/dev'])
@@ -242,28 +272,33 @@ def create_org(game_id, root_key):
 
 
 if __name__ == '__main__':
-    assert len(sys.argv) >= 3
+    if len(sys.argv) <= 2:
+        print "Usage: {} <game_id> <num_teams> [services...]".format(sys.argv[0])
+        sys.exit(1)
     game_id = int(sys.argv[1])
+    num_teams = int(sys.argv[2])
+    services = sys.argv[3:]
+
     try:
         logging.basicConfig(filename=LOG_DIR+'/game%d_vms.log' % game_id, level=logging.DEBUG, format='%(asctime)s %(message)s')
+        status("Started creating VMs")
+
+        gamedir = gamepath(game_id)
+        root_public_key = create_ssh_key(gamedir+"/root_key")
         
-        if sys.argv[2] == 'team':
-            assert len(sys.argv) >= 6
-            team_id = int(sys.argv[3])
-            with open(sys.argv[4]) as rootkeyfile:
-                root_key = rootkeyfile.read()
-            with open(sys.argv[5]) as teamkeyfile:
-                team_key = teamkeyfile.read()
-            services = sys.argv[6:]
-            create_team(game_id, team_id, root_key, team_key, services)
-        elif sys.argv[2] == 'org':
-            assert len(sys.argv) == 4
-            with open(sys.argv[3]) as rootkeyfile:
-                root_key = rootkeyfile.read()
-            create_org(game_id, root_key) 
-        else:
-            print "Usage: {} game_id (team|org) ...".format(sys.argv[0])
-            sys.exit(1)
+        create_org(game_id, root_public_key)
+
+        for team_id in range(1,num_teams+1):
+            team_public_key = create_ssh_key(gamedir+"/team%d_key"%team_id)
+            create_team(game_id, team_id, root_public_key, team_public_key, services)
+        
+        bundle(game_id, "Organization", "root_key")
+        for team_id in range(1,num_teams+1):
+            bundle(game_id, "Team%d"%team_id, "team%d_key"%team_id)
+
+        status("Cleaning up the build")
+        shutil.rmtree(gamedir)
+
 
     except:
         status("An error occurred. Contact us and report game ID %d" % game_id)

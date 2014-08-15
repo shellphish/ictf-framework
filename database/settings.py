@@ -1,0 +1,4 @@
+DEBUG = False
+MYSQL_DATABASE_USER = "ictf2013"
+MYSQL_DATABASE_PASSWORD = "kothie5ahnguquoo0Did0hohx"
+MYSQL_DATABASE_DB = "ictf2013"

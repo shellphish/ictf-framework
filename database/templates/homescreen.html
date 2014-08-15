@@ -1,0 +1,437 @@
+<!doctype html>
+<head>
+  <title>Database API Documentation</title>
+</head>
+<body>
+  <h1>Documentation for the database API for the 2013 iCTF</h1>
+
+  <p>This page will document the API for the database for the 2013 iCTF</p>
+
+  <h2>Get Current State</h2>
+  <p>Make a request to /state?secret=&lt;secret&gt;</p>
+
+  <p>The JSON response is the following:
+<pre>
+{
+  "state_id": int,
+  "game_id": int,
+  "services": [List of {"service_id": int, "service_name": string, "port": int}],
+  "scripts": [List of {"script_id": int, "is_bundle": (1 | 0) (1 if the script is a bundle, 0 if not), "type": ("exploit"|"benign"|"getflag"|"setflag"), "script_name": string, "service_id": int}]
+  "run_scripts": [List of {"team_id": int (team_id to run scripts against),
+                           "run_list": [Ordered list of int script_ids]}],
+  "state_expire": int (approximate remaining seconds in this tick),
+}
+</pre>
+  </p>
+
+
+  <h2>Get Current Game Info (teams and services)</h2>
+  <p>Make a request to /getgameinfo?secret=&lt;secret&gt;</p>
+
+  <p>The JSON response is the following:
+<pre>
+{
+  "services": [List of {"service_id": int, "service_name": string, "port": int, "flag_id_description": string description of the flag id, "description": string description of the service}],
+  "teams": [List of {"team_id": int, "team_name": string, "country": string, "logo": string (url), "ip_range": string as XXX.XXX.XXX}],
+}
+</pre>
+
+  <h2>Get the Service State</h2>
+  <p>Make a request to /getservicesstate?secret=&lt;secret&gt;</p>
+
+  <p>The JSON response is the following:
+<pre>
+{
+  "teams": [{ "team_id": int,
+              "services": [List of {"service_id": int,
+                                    "service_status": 2, 1, 0, -1 (2 is up, 1 is up but nonfunctional, 0 is down aka refusing connections, -1 not tested)}]
+           }]
+}
+</pre>
+
+  <h2>Get the Service State</h2>
+  <p>Make a request to /getservicesstate/&lt;tickid&gt;?secret=&lt;secret&gt;</p>
+
+  <p>The JSON response is the following:
+<pre>
+{
+  "teams": [{ "team_id": int,
+              "services": [List of {"service_id": int,
+                                    "service_status": 2, 1, 0, -1 (2 is up, 1 is up but nonfunctional, 0 is down aka refusing connections, -1 not tested)}]
+           }]
+}
+</pre>
+
+  <h2>Service Exploits Info</h2>
+  <p>Make a request to /servicestate?secret=&lt;secret&gt;</p>
+
+  <p>The JSON response is the following:
+<pre>
+{
+  "services": [{ "service_id": int,
+                 "service_name": name,
+                 "first_blood": [{"team_id": int, "tick_id": int}],
+                 "teams_exploited": [{"team_id": int, "times_successfully_undetected": int, "times_successfully_exploited": int, "times_unsuccessfully_exploited": int, "times_detected": int, "times_undetected": int}],
+                 "purchased_exploit": [{"team_id": int}],
+                 "overall_detection_rate": int (percentage that is 100-0),
+                 "overall_success_rate": int (percentage that is 100-0),
+                 "service_up_rate": int (percentage that is 100-0)}]
+}
+
+</pre>
+
+
+
+ 
+  <h2>Set a Service's State (up, up_non_functional or down)</h2>
+  <p>2 is up, 1 is up but nonfunctional, and 0 is down.</p>
+  <p>Make a request to /setservicestate/&lt;teamid&gt;/&lt;serviceid&gt;?secret=&lt;secret&gt;&amp;status=(2|1|0)&amp;reason=&lt;why service is up (2), up but non functional (1), or down (0)(you choose)&gt;</p>
+
+  <h2>Add a netflow</h2>
+  <p>Make a request to /addnetflow/&lt;teamid&gt;/&lt;serviceid&gt;?secret=&lt;secret&gt;&amp;session=&lt;session&gt;&amp;script_id=&lt;id of script that generated netflow&gt;&amp;source_ip=&lt;source_ip&gt;&amp;source_port=&lt;source_port&gt;&amp;dest_ip=&lt;dest_ip&gt;&amp;dest_port=&lt;dest_port&gt;&amp;timestamp=&lt;datetime.isoformat()&gt;</p>
+  <p>The JSON response is the following:
+<pre>
+{
+  "id" : int (unique ID of the netflow to refer to it later)
+}
+</pre>
+</p>
+
+  <h2>Get netflows in last N minutes</h2>
+  <p>Make a request to /netflows/&lt;teamid&gt;?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:
+	<pre>
+{
+  "netflows": [ List of { "id" : int (netflow ID, used to mark as malicious),
+                          "source_ip": string,
+                          "source_port": string,
+                          "dest_ip": string,
+                          "dest_port": string,
+                          "created_timestamp": string,
+                          "marked_status": "notmarked" | "correct" | "incorrect"}],
+
+  "netflows_in_last_n_seconds": int (the number of seconds this is for the team)
+}
+	</pre>
+  </p>
+
+  <h2>Mark netflow as malicious</h2>
+  <p>Make a request to /markmalicious/&lt;teamid&gt;/&lt;netflowid&gt;?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:
+  <pre>
+{
+  "result" : "correct" | "incorrect" | "error",
+  "reason" : string,
+}
+  </pre>
+  </p>
+  <p>"points" will only be present if "result" is "correct" or "incorrect".</p>
+  <p>"reason" will only be present if "result" is "error".</p>
+  
+  <h2>Submit a team's exploit</h2>
+  <p>Make a POST request to /submitexploit/&lt;teamid&gt;/&lt;serviceid&gt;?secret=&lt;secret&gt; with the following POST parameters:</p>
+  <pre>
+exploit : the Base64 encoded exploit
+name : name of exploit
+is_bundle : 1 if the exploit is a bundle, 0 if it is not
+  </pre>
+  <p>The JSON response is the following:</p>
+  <pre>
+{
+  "id" : int of exploit id
+}
+  </pre>
+
+  <h2>Say a team's exploit is working</h2>
+  <p>Make a POST request to /exploitworkingstatus/&lt;exploitid&gt;?secret=&lt;secret&gt;</p>
+  
+  With the following parameters:
+
+  <pre>
+is_working : 1 | 0
+feedback : text
+  </pre>
+
+  <h2>Get all scripts</h2>
+
+  <p>Make a request to /allscripts?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "scripts" : [List of {"id" : int,
+                        "type": ("exploit", "benign", "getflag", "setflag"),
+                        "name": NULL if not ours,
+                        "is_ours": (1|0, 1 if the script is ours, 0 if it's an attacker team),
+                        "is_bundle": (1|0, 1 if a bundle, 0 if not),
+                        "feedback": string or NULL,
+                        "team_id" : int or NULL (NULL if it's our exploit), 
+                        "service_id" : int, 
+                        "is_working" : (0, 1, NULL)}]
+}
+</pre>
+
+  <h2>Update a script's payload</h2>
+  <p>Make a POST request to /updatescript/&lt;scriptid&gt;?secret=&lt;secret&gt;</p>
+  <pre>
+script : the script contents
+  </pre>
+
+
+  <h2>Get specific script type</h2>
+  <p>Make a request to /allscripts/&lt;type&gt;?secret=&lt;secret&gt; where &lt;type&gt; is one of "exploit", "benign", "getflag", "getflag"</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "scripts" : [List of {"id" : int,
+                        "type": ("exploit", "benign", "getflag", "setflag"),
+                        "name": NULL if not ours,
+                        "is_ours": (1|0, 1 if the script is ours, 0 if it's an attacker team),
+                        "is_bundle": (1|0, 1 if a bundle, 0 if not),
+                        "feedback": string or NULL,
+                        "team_id" : int or NULL (NULL if it's our exploit), 
+                        "service_id" : int, 
+                        "is_working" : (0, 1, NULL)}]
+}
+</pre>
+
+  <h2>Get working exploits</h2>
+  <p>Make a request to /workingexploits/?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "scripts" : [List of {"id" : int,
+                        "type": ("exploit", "benign", "getflag", "setflag"),
+                        "is_ours": (1|0, 1 if the script is ours, 0 if it's an attacker team),
+                        "is_bundle": (1|0, 1 if a bundle, 0 if not),
+                        "team_id" : int or NULL (NULL if it's our exploit), 
+                        "service_id" : int, 
+                        "is_working" : (0, 1, NULL)}]
+}
+</pre>
+
+  
+
+  <h2>Get specific script payload</h2>
+
+  <p>Make a request to /script/&lt;script_id&gt;?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:</p>
+  <pre>
+{
+  "payload" : string Base64 encoded payload,
+  "id" : int,
+  "type": ("exploit", "benign", "getflag", "setflag"),
+  "name": NULL if not ours,
+  "is_ours": (1|0, 1 if the script is ours, 0 if it's an attacker team),
+  "is_bundle": (1|0, 1 if a bundle, 0 if not),
+  "team_id" : int or NULL (NULL if it's our exploit), 
+  "service_id" : int, 
+  "is_working" : (0, 1, NULL)}]
+
+}
+  </pre>
+
+<!--  <h2>Set call interval</h2>
+  <p>Make a request to /setcallinterval/&lt;scriptid&gt;?secret=&lt;secret&gt;&amp;call_interval=&lt;callinterval&gt;&amp;call_interval_sd=&lt;callintervalsd&gt; where &lt;callinterval&gt; is an int in seconds and &lt;callintervalsd&gt; float of the standard deviation of randomness that is introducted to call_interval</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "result" : "great success",
+}
+</pre>
+
+-->  
+
+  <h2>Result of running a team's exploit</h2>
+  
+  <p>Make a request to /ranexploit/&lt;scriptid&gt;?secret=&lt;secret&gt;&amp;defending_team=&lt;teamid&gt;&amp;is_attack_success=(1|0)</p>
+
+  <h2>Result of running a script</h2>
+  <p>Make a request to /ranscript/&lt;scriptid&gt;?secret=&lt;secret&gt;&amp;team_id=&lt;teamid&gt;&amp;error=&lt;error&gt;&amp;error_msg=&lt;message, can be NULL&gt;</p>
+
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "result" : "great success",
+}
+</pre>
+
+  <h2>Get results for running a script</h2>
+  <p>Make a request to /scriptresults/&lt;scriptid&gt;?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "runs" : [List of {"id" : int,
+                         "defending_team_id": int,
+                         "error" : int (0 == success, -1 == service was down, >0 service up but non-functional)
+                         "error_msg" : int or NULL (NULL if it's our exploit),
+                         "created_on" : datetime}]
+}
+</pre>
+
+
+  
+
+  <h2>Get untested exploits</h2>
+  
+  <p>Make a request to /nontestedexploits?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "exploits" : [List of {"id" : int,
+                         "name": string,
+                         "type": ("exploit", "benign", "getflag", "setflag"),
+                         "is_ours": (1|0, 1 if the script is ours, 0 if it's an attacker team),
+                         "is_bundle": (1|0, 1 if a bundle, 0 if not),
+                         "team_id" : int or NULL (NULL if it's our exploit), 
+                         "service_id" : int}],
+}
+</pre>
+
+  <h2>Get New Flag</h2>
+  <p>Make a request to /newflag/&lt;teamid&gt;/&lt;serviceid&gt;?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "flag" : string,
+}
+</pre>
+
+  <h2>Set cookie and flag id</h2>
+  <p>Make a request to /setcookieandflagid/&lt;flag&gt;?flag_id=&lt;flagid&gt;&amp;cookie=&lt;cookie&gt;&amp;secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "result" : "great success",
+}
+</pre>
+
+  <h2>Get current flag, flag_id, cookie</h2>
+  <p>Make a request to /getlatestflagandcookie/&lt;teamid&gt;/&lt;serviceid&gt;?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "flag" : string (current flag),
+  "cookie" : string (current cookie),
+  "flag_id" : string (current flag id),
+}
+</pre>  
+
+
+  <h2>Get all the merch for sale</h2>
+  <p>Make a request to /merch/?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "merch" :  [{"id" : int,
+               "name": string,
+               "description" : string,
+               "min_bid": int,
+               "num_winners" : int,
+               "max_wins" : int,
+               "extra_info": "exploit" | "team" | null}]
+}
+</pre>
+
+  <h2>Get all of the teams merch history</h2>
+  <p>Make a request to /teammerch/?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "teams_merch" : [{"team_id" : int,
+                   "num_wins": [{"merch_id" : int, "wins": int}],
+                   "credits" : int}]
+}
+</pre>
+
+  <h2>Get all of the merch that was won</h2>
+  <p>Make a request to /get_won_merch/&lt;team_id&gt;?secret=&lt;secret&gt;</p>
+
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "exploits" : [list of script_ids that were purchased],
+  "attack_netflows" : [list of attack netflow ids that were purchased]
+}
+</pre>
+
+  <h2>Get the bids from ticks</h2>
+  <p>Make a request to /tickmerch/&lt;tickid&gt;?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "tick_info" : [ {"team_id" : int,
+                   "merch_id" : int,
+                   "bid" : int,
+                   "is_successful": bool,
+                   "message": string,
+                   "extra_info": string,
+                   "extra_info_parsed": string}]
+}
+</pre>  
+
+  <h2>Get the levels of the network</h2>
+  <p>Make a request to /levels?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "levels" : [ {"level_id" : int (1-4),
+                "level_name" : string,
+                "nodes" : [ Ordered list of strings that are the names of the nodes. The order in the list is the order of the node ],
+                "services" : [ { "service_id": int,
+                                 "name" : string,
+                                 "nodes": [ List of node names that the service is associated with in this level ] }],
+                }]
+}
+</pre>  
+
+
+  <h2>Get the state of the levels</h2>
+  <p>Make a request to /levelstate?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following:</p>
+<pre>
+{
+  "level_state" : [ {"level_id" : int (1-4),
+                     "is_waiting" : (1|0, 1 is the level is active but waiting for someone else to join, 0 otherwise),
+                     "active_node" : string (the name of the active node) | null if no node is active,
+                     "teams": [List of {"team_id": int, "resources": int, "credits": int }],
+                    }]
+}
+</pre>  
+
+  <h2>Get the state of the levels</h2>
+  <p>Make a request to /levelstate/&lt;tickid&gt;?secret=&lt;secret&gt;</p>
+  <p>The JSON response is the following information for the specific tick:</p>
+<pre>
+{
+  "level_state" : [ {"level_id" : int (1-4),
+                     "is_waiting" : (1|0, 1 is the level is active but waiting for someone else to join, 0 otherwise),
+                     "active_node" : string (the name of the active node) | null if no node is active,
+                     "teams": [List of {"team_id": int, "resources": int, "credits": int }],
+                    }]
+}
+</pre>
+
+  <h2>Get the attacks for tick</h2>                                                                                                                                                                      
+  <p>Make a request to /attack/&lt;tickid&gt;?secret=&lt;secret&gt;</p>                                                                                                                                 
+  <p>The JSON response is the following information for the specific tick:</p>                                                                                                                              
+<pre>                                                                                                                                                                                                       
+{                                                                                                                                                                                                           
+  "attacks" : [ { "attacker_team_id" : int,
+                  "defender_team_id" : int,
+                  "service_id" : int,
+                  "was_successful": (1|0),
+                  "was_detected" : (1|0),
+                  "num_times_attacker_attacked_defender": int,
+                  "num_times_attacker_successfully_attacked_defender": int,
+                  "num_times_defender_attacked_attacker": int,
+                  "num_times_defender_successfully_attacked_attacker": int,
+                  "num_times_defender_detected": int,
+                  "num_times_attacker_detected": int
+                }]                                                                                                                                                                                      
+}                                                                                                                                                                                                           
+</pre>    
+
+
+
+  
+</body>

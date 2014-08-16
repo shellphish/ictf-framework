@@ -18,12 +18,6 @@ create table game (id int);
 
 create table teams (id int not null auto_increment, primary key(id),
 	   		 	   	team_name varchar(256) not null, unique key(id),
-					team_size int(11),
-					team_country varchar(256),
-					team_address varchar(256),
-					team_logo varchar(2048),
-					university_name varchar(256),
-					university_url varchar(256),
 					ip_range varchar(24) not null,
 					created_on varchar(30) not null);
 					

@@ -1,8 +1,11 @@
 #!/usr/bin/env python2.7
 
+import base64
 import glob
+import json
 import logging
 import os
+import requests
 import random
 import re
 import shutil
@@ -10,6 +13,8 @@ import string
 import subprocess
 import sys
 import tempfile
+sys.path.insert(0,"/var/www/framework")
+import secrets
 
 
 BASE_VM_NAME = "iCTF-base"
@@ -19,9 +24,11 @@ BUNDLE_OUTPUT_DIR = "/var/www/bundles"    # Make sure not listable!
 
 #### General utilities ###################################################################
 
-def status(status_msg):
+def status(game_hash, status_msg):
     logging.info("Status: %s", status_msg)
     print status_msg
+    if status_msg in ['READY','CONFIRMED','PENDING']:
+        requests.post("http://ictf.cs.ucsb.edu/framework/ctf/status/"+game_hash+"/"+status_msg+"?secret="+secrets.API_SECRET)
 
 def run_cmd(arglist, cmd_name):
     logging.debug("Running %s (%s)", cmd_name, ' '.join(arglist))
@@ -38,8 +45,8 @@ def run_cmd(arglist, cmd_name):
         logging.error("")
         raise
 
-def gamepath(game_id):
-    path = "/game/%d" % game_id
+def gamepath(game_hash):
+    path = "/game/"+game_hash
     try: 
         os.makedirs(path)
     except OSError:
@@ -52,9 +59,13 @@ def create_ssh_key(secret_file_name):
     with open(secret_file_name+'.pub') as public_key_file:
         return public_key_file.read()
 
-def bundle(game_id, vm_name, key_name):
-    status("Creating the %s bundle" % vm_name)
-    gamedir = gamepath(game_id)
+def read_service_script(path):
+    with open(path) as script_file:
+        return base64.b64encode(script_file.read())
+
+def bundle(game_hash, vm_name, key_name, team_hash):
+    status(game_hash, "Creating the %s bundle" % vm_name)
+    gamedir = gamepath(game_hash)
     os.chdir(gamedir)
     files = [
             vm_name+"/"+vm_name+".vbox",
@@ -65,12 +76,12 @@ def bundle(game_id, vm_name, key_name):
     for bundle_file in files:
         assert os.path.isfile(bundle_file)
     random_string = ''.join(random.choice(string.ascii_letters+string.digits) for _ in range(30))
-    bundle_filename = random_string+"_"+vm_name+".tar.gz"
+    bundle_filename = team_hash+".tar.gz"
     logging.info("Putting the %s bundle in %s", vm_name, bundle_filename)
     tar_cmdline = ['tar','caf',BUNDLE_OUTPUT_DIR+"/"+bundle_filename]
     tar_cmdline.extend(files)
     run_cmd(tar_cmdline, "bundle tar")
-    status("Created the %s bundle" % vm_name)
+    status(game_hash, "Created the %s bundle" % vm_name)
     return bundle_filename
     
 
@@ -78,10 +89,10 @@ def bundle(game_id, vm_name, key_name):
 
 #### General VM interaction ##################################################################
 
-def clone_vm(game_id, name):
+def clone_vm(game_hash, name):
     assert re.match(r'[a-zA-Z0-9_-]+\Z',name)
-    status("Creating VM: {}".format(name))
-    basepath = gamepath(game_id)
+    status(game_hash, "Creating VM: {}".format(name))
+    basepath = gamepath(game_hash)
     run_cmd(["VBoxManage","clonevm",BASE_VM_NAME,"--name",name,"--basefolder",basepath], "clonevm "+name)
     return basepath+'/'+name
 
@@ -181,11 +192,11 @@ def mountdir_install_deb(mntdir, deb_path):
 
 #### VM creation ############################################################################ 
 
-def create_team(game_id, team_id, root_key, team_key, services):
+def create_team(game_hash, team_id, root_key, team_key, services):
     # XXX: see also create_org
     assert team_id < 200
-    vmdir = clone_vm(game_id, "Team%d"%team_id)
-    status("Configuring the VM for Team %d" % team_id)
+    vmdir = clone_vm(game_hash, "Team%d"%team_id)
+    status(game_hash, "Configuring the VM for Team %d" % team_id)
     os.chdir(vmdir)
 
     # VirtualBox internal network: teamXXX
@@ -209,12 +220,12 @@ def create_team(game_id, team_id, root_key, team_key, services):
                 )
         mountdir_bash(mntdir, "apt-get -qq install sl")
 
-        status("Setting up the services for Team %d" % team_id)
+        status(game_hash, "Setting up the services for Team %d" % team_id)
         for service in services:
             assert re.match(r'[a-zA-Z0-9_-]+\Z',service)
             mountdir_install_deb(mntdir, '/services/%s.deb' % service)
 
-        status("Finalizing the VM for Team %d" % team_id)
+        status(game_hash, "Finalizing the VM for Team %d" % team_id)
         mountdir_end_config(mntdir,
                 nameserver='10.0.%d.1'%team_id
                 )
@@ -226,10 +237,10 @@ def create_team(game_id, team_id, root_key, team_key, services):
         raise
         
 
-def create_org(game_id, root_key):
+def create_org(game_hash, root_key, services):
     # XXX: see also create_team
-    vmdir = clone_vm(game_id, "Organization")
-    status("Configuring the organization VM")
+    vmdir = clone_vm(game_hash, "Organization")
+    status(game_hash, "Configuring the organization VM")
     os.chdir(vmdir)
 
     # VirtualBox internal network: org
@@ -252,13 +263,29 @@ def create_org(game_id, root_key):
                 team_key="(disabled)"
                 )
 
-        status("Setting up the organization DB, scorebot, etc.")
-        mountdir_copydir(mntdir, "/org", "/org")
-        for scriptpath in glob.glob("/org/*.sh"):
-            scriptname = os.path.basename(scriptpath)
-            mountdir_bash(mntdir, "bash /org/"+scriptname)
+        status(game_hash, "Setting up the organization DB, scorebot, etc.")
 
-        status("Finalizing the organization VM")
+        infos = []
+        for service_name in services:
+            os.chdir("/services/"+service_name)
+            with open("info.json") as jsonfile:
+                info = json.load(jsonfile)
+                info['getflag'] = read_service_script(info['getflag'])
+                info['setflag'] = read_service_script(info['setflag'])
+                info['benign'] = [ read_service_script(b) for b in info['benign'] ]
+                infos.append(info)
+        print "TODO: pass to reset_db:", json.dumps(infos, ensure_ascii=False, indent=1)
+
+
+
+        print "TODO"
+        #mountdir_copydir(mntdir, "/org", "/org")
+        #for scriptpath in glob.glob("/org/*.sh"):
+        #    scriptname = os.path.basename(scriptpath)
+        #    mountdir_bash(mntdir, "bash /org/"+scriptname)
+
+
+        status(game_hash, "Finalizing the organization VM")
         mountdir_end_config(mntdir,
                 nameserver='10.0.0.1'
                 )
@@ -272,35 +299,47 @@ def create_org(game_id, root_key):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) <= 2:
-        print "Usage: {} <game_id> <num_teams> [services...]".format(sys.argv[0])
+    if len(sys.argv) != 2:
+        print "Usage: {} <game_hash>".format(sys.argv[0])
         sys.exit(1)
-    game_id = int(sys.argv[1])
-    num_teams = int(sys.argv[2])
-    services = sys.argv[3:]
-
+    game_hash = sys.argv[1]
     try:
-        logging.basicConfig(filename=LOG_DIR+'/game%d_vms.log' % game_id, level=logging.DEBUG, format='%(asctime)s %(message)s')
-        status("Started creating VMs")
+        logging.basicConfig(filename=LOG_DIR+'/game%s_vms.log' % game_hash, level=logging.DEBUG, format='%(asctime)s %(message)s')
+        status(game_hash, "Started creating VMs")
 
-        gamedir = gamepath(game_id)
+        assert re.match(r'[a-zA-Z0-9]+\Z',game_hash)
+        game = requests.get("http://ictf.cs.ucsb.edu/framework/ctf/"+game_hash).json()
+        status(game_hash, "PENDING")
+
+        teams = [ t['hash'] for t in game['teams'] ]
+        services = [ s['name'] for s in game['services'] ]
+        logging.info("Teams: %s", repr(teams))
+        logging.info("Services: %s", repr(services))
+        assert game['num_teams'] == len(game['teams'])
+        assert game['num_teams'] == len(teams)
+        assert game['num_services'] == len(game['services'])
+        assert game['num_services'] == len(services)
+
+        gamedir = gamepath(game_hash)
         root_public_key = create_ssh_key(gamedir+"/root_key")
         
-        create_org(game_id, root_public_key)
+        create_org(game_hash, root_public_key, services)
 
-        for team_id in range(1,num_teams+1):
+        for team_id in range(len(teams)):
             team_public_key = create_ssh_key(gamedir+"/team%d_key"%team_id)
-            create_team(game_id, team_id, root_public_key, team_public_key, services)
+            create_team(game_hash, team_id, root_public_key, team_public_key, services)
         
-        bundle(game_id, "Organization", "root_key")
-        for team_id in range(1,num_teams+1):
-            bundle(game_id, "Team%d"%team_id, "team%d_key"%team_id)
+        bundle(game_hash, "Organization", "root_key", game_hash)
+        for team_id in range(len(teams)):
+            team_hash = teams[team_id]
+            bundle(game_hash, "Team%d"%team_id, "team%d_key"%team_id, team_hash)
 
-        status("Cleaning up the build")
+        status(game_hash, "Cleaning up the build")
         shutil.rmtree(gamedir)
 
+        status(game_hash, "READY")
 
     except:
-        status("An error occurred. Contact us and report game ID %d" % game_id)
+        status(game_hash, "An error occurred. Contact us and report game ID %s" % game_hash)
         logging.exception("Exception")
         raise

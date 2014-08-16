@@ -25,8 +25,10 @@ ctfControllers.controller('FlagCtrl', ['$scope', '$http',
 
 ctfControllers.controller('ScoreboardCtrl', ['$scope', '$http',
   function ($scope, $http) {
-      $http.get('/scoreboard').success(function(data) {
-          $scope.scoreboard = data;
+      $http.get('/scores').success(function(data) {
+          $scope.scores = Object.keys(data).map(function(key) {
+              return {"team_name" : key, "score" : data[key] }
+            });
       });
   }]);
 

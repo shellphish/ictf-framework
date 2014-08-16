@@ -11,6 +11,7 @@ configure do
   set :name, CONFIG['name'] || 'CTF'
   set :author, 'Luca Invernizzi <luca@lucainvernizzi.net>'
   set :haml, {format: :html5}
+  enable :sessions
 end
 # -----------------------------------------------------------------------------
 
@@ -26,10 +27,10 @@ helpers do
   def authorized?
     @auth ||=  Rack::Auth::Basic::Request.new(request.env)
     return false unless @auth.provided? and @auth.basic? and @auth.credentials
-    @team_id = CONFIG['teams'].select do |team_id, team_data|
+    session['team_id'] = CONFIG['teams'].select do |team_id, team_data|
       team_data['name'] == @auth.credentials[0] && team_data['hashed_password'] == @auth.credentials[1]
     end.map{|team_id, team_data| team_id}.first
-    !@team_id.nil?
+    !session['team_id'].nil?
   end
 end
 # -----------------------------------------------------------------------------
@@ -50,13 +51,13 @@ class Game
     # Retrieve all the flag ids in a team_id => {service_id => flag_id} Hash
     team_flag_ids = self.class.get('/getlatestflagids')["flag_ids"]
     # A team should not know its own flag id
-    team_flag_ids.reject!{|team_id| team_id == @team_id.to_s}
+    team_flag_ids.reject!{|team_id| team_id.to_i == @team_id}
     # Reorganize so that the Hash is service_id => {team_id => flag_id}
     service_flag_ids = team_flag_ids.each_with_object(Hash.new) do |team_data, h|
       team_id, team_flags = team_data
       (team_flags || {}).each do |service_id, flag_id|
-        h[service_id] ||= []
-        h[service_id] << {team_id: team_id, flag_id: flag_id}
+        h[service_id.to_i] ||= []
+        h[service_id.to_i] << {team_id: team_id.to_i, flag_id: flag_id}
       end
     end
     # Fetch the services description, merge with the flag ids, and return  
@@ -68,7 +69,7 @@ class Game
          description: s['description'],
          flag_id: {
            description: s['flag_id_description'],
-           flag_ids: service_flag_ids[s['service_id'].to_s]
+           flag_ids: service_flag_ids[s['service_id'].to_i]
          } 
        }
      ]
@@ -79,10 +80,26 @@ class Game
     self.class.get("/submitflag/#{@team_id}/#{flag}")
   end
 
+  def teams
+    return @teams if defined? @teams
+    @teams = Hash[self.class.get('/getgameinfo')['teams'].map do |team|
+      [team['team_id'].to_i, team]
+    end]
+  end
+
+  def scores
+    Hash[self.class.get('/scores')['scores'].map do |team_id, score|
+      team = teams[team_id.to_i]
+      next if team.nil?
+      [team['team_name'], score]
+    end]
+  end
+
 end
 
 def game
-  Game.new(@team_id)
+  return @game if defined? @game
+  @game = Game.new(session['team_id'])
 end
 #-----------------------------------------------------------------------------
 
@@ -100,7 +117,15 @@ get '/services' do
 end
 
 get '/config' do
-  respond_with name: CONFIG['name'] || 'CTF'
+  protected!
+  respond_with({
+    ctf_name: CONFIG['name'] || 'CTF',
+    team_name: game.teams[session['team_id']]['team_name']
+  })
+end
+
+get '/scores' do
+  respond_with game.scores
 end
 
 post '/flag' do

@@ -1,10 +1,14 @@
 <div class='row-fluid'>
     <div class='span4'>
         <p>
-        Welcome to
+        Welcome
+        <span ng-show='config.team_name'>
+            , {{config.team_name}}, 
+        </span>
+        to
         </p>
         <h1 class='text-center'>
-            {{config.name}}
+            {{config.ctf_name}}
         </h1>
     </div>
 </div>

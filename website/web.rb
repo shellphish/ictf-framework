@@ -3,6 +3,7 @@ require 'sinatra/contrib'
 require 'yaml'
 require 'httparty'
 require 'haml'
+require 'securerandom'
 
 # - CONFIGURATION -------------------------------------------------------------
 configure do
@@ -12,6 +13,7 @@ configure do
   set :author, 'Luca Invernizzi <luca@lucainvernizzi.net>'
   set :haml, {format: :html5}
   enable :sessions
+  set session_secret: SecureRandom.hex
 end
 # -----------------------------------------------------------------------------
 

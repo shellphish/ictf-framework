@@ -94,7 +94,7 @@ def create_all_services_and_scripts(c, db, services_info):
                     authors_string = ", ".join(service_info['authors'])
                 description = service_info.get('service_description', "")
                 flag_id_description = service_info.get('flag_id_description', "")
-                service_id = create_service(service_info['id'], service_info['name'], service_info['port'], authors_string, description, flag_id_description, c, db)
+                service_id = create_service(service_info['name'], service_info['port'], authors_string, description, flag_id_description, c, db)
 
                 create_script(service_id, 'getflag', service_info['getflag'], c, db)
                 create_script(service_id, 'setflag', service_info['setflag'], c, db)
@@ -106,11 +106,11 @@ def create_all_services_and_scripts(c, db, services_info):
             print "service dir " + possible + " has wrong info.json" + str(e)
 
 
-def create_service(id, name, port, authors, description, flag_id_description, c, db):
+def create_service(name, port, authors, description, flag_id_description, c, db):
     db.ping()
     
-    c.execute("""insert into services (id, name, port, authors, description, flag_id_description, created_on) values (%s, %s, %s, %s, %s, %s, %s)""",
-              (id, name, port, authors, description, flag_id_description, datetime.now().isoformat()))
+    c.execute("""insert into services (name, port, authors, description, flag_id_description, created_on) values (%s, %s, %s, %s, %s, %s)""",
+              (name, port, authors, description, flag_id_description, datetime.now().isoformat()))
     
     return db.insert_id()
 

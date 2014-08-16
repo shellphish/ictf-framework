@@ -17,9 +17,9 @@ from datetime import datetime, timedelta
 from settings import MYSQL_DATABASE_USER, MYSQL_DATABASE_PASSWORD, MYSQL_DATABASE_DB
 
 
-TICK_TIME_IN_SECONDS = 50
+TICK_TIME_IN_SECONDS = 180
 
-NUMBER_OF_BENIGN_SCRIPTS = 3
+NUMBER_OF_BENIGN_SCRIPTS = 2
 NUMBER_OF_GET_SET_FLAG_COMBOS = 1
 
 def main():
@@ -51,7 +51,7 @@ def main():
 
         print "tick", tick_id
 
-        num_benign_scripts = random.randint(max(1, NUMBER_OF_BENIGN_SCRIPTS - 2), NUMBER_OF_BENIGN_SCRIPTS + 2)
+        num_benign_scripts = random.randint(max(1, NUMBER_OF_BENIGN_SCRIPTS - 1), NUMBER_OF_BENIGN_SCRIPTS + 1)
 
 
         # Decide what scripts to run against each team

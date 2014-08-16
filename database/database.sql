@@ -132,9 +132,6 @@ create table flag_submission (id int not null auto_increment, primary key(id),
 create table ticks (id int not null auto_increment, primary key(id),
 	                time_to_change varchar(30) not null,
 	   		 	    created_on varchar(30) not null,
-					is_first_of_round tinyint(1) not null,
-					key(is_first_of_round),
-					key(created_on),
-					key(is_first_of_round, created_on));
+					key(created_on));
 
 commit;

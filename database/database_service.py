@@ -85,7 +85,7 @@ def get_game_info():
 
     c = mysql.get_db().cursor()
     result = {}
-    c.execute("""select id as team_id, team_name, team_logo as logo, team_country as country, ip_range from teams""");
+    c.execute("""select id as team_id, team_name, ip_range from teams""");
     result['teams'] = c.fetchall()
 
     c.execute("""select id as service_id, name as service_name, port, flag_id_description, description from services""");

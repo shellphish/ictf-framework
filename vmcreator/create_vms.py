@@ -300,6 +300,13 @@ teams:
             website_config += "    hashed_password: %s\n" % teams[team_id]['password']
         mountdir_writefile(mntdir, '/opt/website/config.yml', website_config)
         
+        mountdir_copydir(mntdir, "/org/scorebot/", "/opt/scorebot")
+        team_ips = []
+        for team_id in range(len(teams)):
+            team_ips.append({'team_id': team_id, 'ip': '10.7.%d.2'%team_id})
+        scorebot_config = json.dumps(team_ips, indent=1)
+        mountdir_writefile(mntdir, '/opt/scorebot/team_list.json', scorebot_config)
+        
         mountdir_writefile(mntdir, "/opt/first_setup.sh", """#!/bin/bash
 
 echo "Doing the first-run setup of the organization services"
@@ -310,7 +317,6 @@ set -e
 cd /opt/database
 python reset_db.py %d
 cp ctf-database.conf /etc/init
-cp gamebot.conf /etc/init
 start ctf-database
 
 cd /opt/website
@@ -318,7 +324,14 @@ cd /opt/website
 cp website.conf /etc/init
 start website
 
-echo "Done with the first setup!"
+cd /opt/scorebot
+cp scorebot.conf /etc/init
+start scorebot
+
+cp gamebot.conf /etc/init
+echo "manual" > /etc/init/gamebot.override
+
+echo "Done with the first setup! Check that everything is working and start your CTF!"
 
 """ % len(teams))
 

@@ -223,6 +223,7 @@ def create_team(game_hash, team_id, root_key, team_key, services):
                 )
         mountdir_bash(mntdir, "passwd --lock root")
         mountdir_bash(mntdir, "passwd --lock ictf")
+        mountdir_writefile(mntdir, "/etc/sysctl.d/90-no-aslr.conf", "kernel.randomize_va_space = 0")
 
         status(game_hash, "Setting up the services for Team %d" % team_id)
         for service in services:

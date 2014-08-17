@@ -290,9 +290,10 @@ def create_org(game_hash, root_key, game_name, teams, services):
         mountdir_copydir(mntdir, "/org/website/", "/opt/website")
         website_config = """name: %s
 api_base_url: http://127.0.0.1:5000
-api_secret: %s
+api_secret: YOUKNOWSOMETHINGYOUSUCK
 teams:
-""" % (game_name, ''.join(random.choice(string.ascii_letters+string.digits) for _ in range(30)))
+""" % game_name
+#""" % (game_name, ''.join(random.choice(string.ascii_letters+string.digits) for _ in range(30)))
         for team_id in range(len(teams)):
             assert re.match(r'[a-zA-Z0-9]+\Z',teams[team_id]['name'])
             assert re.match(r'[a-zA-Z0-9]+\Z',teams[team_id]['password'])

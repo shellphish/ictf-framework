@@ -14,6 +14,7 @@ configure do
   set :haml, {format: :html5}
   enable :sessions
   set session_secret: SecureRandom.hex
+  set :environment, :production
 end
 # -----------------------------------------------------------------------------
 

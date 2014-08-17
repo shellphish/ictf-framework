@@ -15,7 +15,7 @@ logging.getLogger('tornado').addHandler(handler)
 logging.getLogger(__name__).addHandler(handler)
 
 http_server = HTTPServer(WSGIContainer(app))
-http_server.bind(port=5000)
+http_server.bind(port=5000, address="127.0.0.1")
 http_server.start(0)
 ioloop = IOLoop.instance()
 autoreload.start(ioloop)

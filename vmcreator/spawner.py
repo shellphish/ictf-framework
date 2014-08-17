@@ -11,9 +11,9 @@ import secrets
 while True:
     try:
         games = requests.get('http://ictf.cs.ucsb.edu/framework/ctf/pending?secret='+secrets.API_SECRET).json()
-        if len(games):
-            print "Spawning the creator for", games[0]
-            os.spawnl("./create_vms.py", games[0])
+        if 'ctf_hash' in games:
+            print "Spawning the creator for", games['ctf_hash']
+            os.spawnl("./create_vms.py", games['ctf_hash'])
     except:
         print "Exception while getting the pending CTF or spawning its creation!"
     time.sleep(30)

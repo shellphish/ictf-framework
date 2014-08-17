@@ -170,16 +170,11 @@ UseDNS no
 """
     )
 
-    # General reset, set to run /opt/first_setup.sh 
+    # General reset 
     mountdir_bash(mntdir, "rm -rf /var/cache/apt/*")
     mountdir_bash(mntdir, "rm -f /etc/ssh/ssh_host*")
     mountdir_writefile(mntdir, '/etc/rc.local', """#!/bin/sh -e
 dpkg-reconfigure openssh-server
-if [ ! -f /opt/did_first_setup ]; then
-    if [ -x /opt/first_setup.sh ]; then
-        /opt/first_setup.sh;
-    fi
-fi
 exit 0""")
     mountdir_bash(mntdir, "chmod a+x /etc/rc.local")
 
@@ -310,21 +305,21 @@ teams:
 
 echo "Doing the first-run setup of the organization services"
 
-echo "Setting up the ctf database..."
+set -x
+set -e
+
 cd /opt/database
 python reset_db.py %d
 cp ctf-database.conf /etc/init
 cp gamebot.conf /etc/init
 start ctf-database
 
-echo "Setting up the website..."
 cd /opt/website
 ./install.sh
 cp website.conf /etc/init
 start website
 
 echo "Done with the first setup!"
-touch /opt/did_first_setup
 
 """ % len(teams))
 
@@ -332,9 +327,10 @@ touch /opt/did_first_setup
         mountdir_writefile(mntdir, "/etc/issue", """
 Organization VM (root password: ictf)
 
-1. Configure the network of this VM to expose it to the Internet
-2. Expose the website to the public with a command like "iptables -t nat -I PREROUTING --src 0/0 --dst <THE_SITE_IP> -p tcp --dport 80 -j REDIRECT --to-ports 4567"
-3. To start the CTF run 'start gamebot'
+1. Do the first configuration by running /opt/first_setup.sh
+2. Configure the network of this VM to expose it to the Internet
+3. Expose the website to the public (see /opt/website/iptables.sh)
+4. To start the CTF run 'start gamebot'
 
 """)
         mountdir_bash(mntdir, "chmod a+x /opt/first_setup.sh")

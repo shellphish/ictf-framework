@@ -7,11 +7,11 @@ Usage:
 
 It needs:
 
+ - the base VMs as setup (base Ubuntu with no resolvconf and preinstalled dependencies)
  - **sudo access** (so it can guestmount and chroot)
- - the services as `/services/name.deb`
- - the organization VM setup scripts as `/org/a_script.sh`, `/org/another_script.sh`, etc. (Note: all files in /org will be copied to /org on the VM)
- - ability to write in `/game/`
+ - the services as `/services/name.deb` and `/services/name/info.json` (and their scripts)
+ - the organization VM setup scripts as `/org/` (see create\_vms.py)
+ - ability to write in `/game/` and `/var/www/bundles`
  - ability to use qemu-kvm
  - libguestfs-tools (run 'update-guestfs-appliance' if necessary)
- - virtualbox
- - gdebi-core (on the VM)
+ - virtualbox (VBoxManage)

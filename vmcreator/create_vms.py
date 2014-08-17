@@ -17,7 +17,6 @@ sys.path.insert(0,"/var/www/framework")
 import secrets
 
 
-BASE_VM_NAME = "iCTF-base"
 LOG_DIR = "/tmp"
 BUNDLE_OUTPUT_DIR = "/var/www/bundles"    # Make sure not listable!
 
@@ -75,7 +74,6 @@ def bundle(game_hash, vm_name, key_name, team_hash):
             ]
     for bundle_file in files:
         assert os.path.isfile(bundle_file)
-    random_string = ''.join(random.choice(string.ascii_letters+string.digits) for _ in range(30))
     bundle_filename = team_hash+".tar.gz"
     logging.info("Putting the %s bundle in %s", vm_name, bundle_filename)
     tar_cmdline = ['tar','caf',BUNDLE_OUTPUT_DIR+"/"+bundle_filename]
@@ -89,11 +87,11 @@ def bundle(game_hash, vm_name, key_name, team_hash):
 
 #### General VM interaction ##################################################################
 
-def clone_vm(game_hash, name):
+def clone_vm(game_hash, base_vm, name):
     assert re.match(r'[a-zA-Z0-9_-]+\Z',name)
     status(game_hash, "Creating VM: {}".format(name))
     basepath = gamepath(game_hash)
-    run_cmd(["VBoxManage","clonevm",BASE_VM_NAME,"--name",name,"--basefolder",basepath], "clonevm "+name)
+    run_cmd(["VBoxManage","clonevm",base_vm,"--name",name,"--basefolder",basepath], "clonevm "+name)
     return basepath+'/'+name
 
 def mountdir_copyfile(mntdir, frompath, topath):
@@ -113,18 +111,23 @@ def mountdir_bash(mntdir, bash_cmd):
     run_cmd(['sudo','chroot',mntdir,'/bin/bash','-c',bash_cmd], "cmd in mounted dir")
 
 
-def mountdir_start_config(mntdir, ip, netmask, gw, hostname, root_key, team_key):
+def mountdir_start_config(mntdir, ip, netmask, gw, hostname, root_key, team_key, has_nat=False):
     # Network config
-    mountdir_writefile(mntdir,'/etc/network/interfaces', """
+    interfaces ="""
 auto lo
 iface lo inet loopback
 auto eth0
 iface eth0 inet static
     address %s
     netmask %s
-    gateway %s
-""" % (ip, netmask, gw)
-    )
+""" % (ip, netmask)
+    if has_nat:
+        assert gw is None
+        interfaces += '\n    up ip r add 10.7.0.0/16 via 10.7.254.1\n'
+        interfaces += '\nauto eth1\niface eth1 inet dhcp\n'
+    else:
+        interfaces += "    gateway %s\n" % gw
+    mountdir_writefile(mntdir,'/etc/network/interfaces', interfaces)
     mountdir_writefile(mntdir,'/etc/hostname', hostname)
     
     # Login config
@@ -167,10 +170,17 @@ UseDNS no
 """
     )
 
-    # General reset
+    # General reset, set to run /opt/first_setup.sh 
     mountdir_bash(mntdir, "rm -rf /var/cache/apt/*")
     mountdir_bash(mntdir, "rm -f /etc/ssh/ssh_host*")
-    mountdir_writefile(mntdir, '/etc/rc.local', '#!/bin/sh -e\ndpkg-reconfigure openssh-server\nexit 0')
+    mountdir_writefile(mntdir, '/etc/rc.local', """#!/bin/sh -e
+dpkg-reconfigure openssh-server
+if [ ! -f /opt/did_first_setup ]; then
+    if [ -x /opt/first_setup.sh ]; then
+        /opt/first_setup.sh;
+    fi
+fi
+exit 0""")
     mountdir_bash(mntdir, "chmod a+x /etc/rc.local")
 
     # Set a DNS server that works when chrooted in
@@ -195,7 +205,7 @@ def mountdir_install_deb(mntdir, deb_path):
 def create_team(game_hash, team_id, root_key, team_key, services):
     # XXX: see also create_org
     assert team_id < 200
-    vmdir = clone_vm(game_hash, "Team%d"%team_id)
+    vmdir = clone_vm(game_hash, "iCTF-base", "Team%d"%team_id)
     status(game_hash, "Configuring the VM for Team %d" % team_id)
     os.chdir(vmdir)
 
@@ -203,7 +213,7 @@ def create_team(game_hash, team_id, root_key, team_key, services):
     # Note: the VM *must* be configured to use the 'intnet' internal network
     with open("Team%d.vbox"%team_id) as vboxfile:
         assert vboxfile.read().count("intnet") == 1
-    run_cmd(['sed','-i','s/intnet/team%d/'%team_id,"Team%d.vbox"%team_id], "sed replace intnet")
+    run_cmd(['sed','-i','s/intnet/team%d/g'%team_id,"Team%d.vbox"%team_id], "sed replace intnet")
 
     mntdir = vmdir+"/mnt"
     os.mkdir(mntdir)
@@ -211,14 +221,15 @@ def create_team(game_hash, team_id, root_key, team_key, services):
     try:
         run_cmd(['sudo','mount','--bind','/dev',mntdir+'/dev'], "dev bind")
         mountdir_start_config(mntdir,
-                ip='10.0.%d.2'%team_id,
+                ip='10.7.%d.2'%team_id,
                 netmask='255.255.255.0',
-                gw='10.0.%d.1'%team_id,
+                gw='10.7.%d.1'%team_id,
                 hostname="team%d"%team_id,
                 root_key=root_key,
                 team_key=team_key
                 )
-        mountdir_bash(mntdir, "apt-get -qq install sl")
+        mountdir_bash(mntdir, "passwd --lock root")
+        mountdir_bash(mntdir, "passwd --lock ictf")
 
         status(game_hash, "Setting up the services for Team %d" % team_id)
         for service in services:
@@ -227,7 +238,7 @@ def create_team(game_hash, team_id, root_key, team_key, services):
 
         status(game_hash, "Finalizing the VM for Team %d" % team_id)
         mountdir_end_config(mntdir,
-                nameserver='10.0.%d.1'%team_id
+                nameserver='10.7.%d.1'%team_id
                 )
         subprocess.call(["sudo","umount",mntdir+'/dev'])
         run_cmd(['sudo','guestunmount',mntdir], "guestunmount")
@@ -237,17 +248,17 @@ def create_team(game_hash, team_id, root_key, team_key, services):
         raise
         
 
-def create_org(game_hash, root_key, services):
+def create_org(game_hash, root_key, game_name, teams, services):
     # XXX: see also create_team
-    vmdir = clone_vm(game_hash, "Organization")
+    vmdir = clone_vm(game_hash, "Organization-base", "Organization")
     status(game_hash, "Configuring the organization VM")
     os.chdir(vmdir)
 
     # VirtualBox internal network: org
     # Note: the VM *must* be configured to use the 'intnet' internal network
     with open("Organization.vbox") as vboxfile:
-        assert vboxfile.read().count("intnet") == 1
-    run_cmd(['sed','-i','s/intnet/org/',"Organization.vbox"], "sed replace intnet")
+        assert vboxfile.read().count("intnet") >= 1
+    run_cmd(['sed','-i','s/intnet/org/g',"Organization.vbox"], "sed replace intnet")
 
     mntdir = vmdir+"/mnt"
     os.mkdir(mntdir)
@@ -255,16 +266,20 @@ def create_org(game_hash, root_key, services):
     try:
         run_cmd(['sudo','mount','--bind','/dev',mntdir+'/dev'], "dev bind")
         mountdir_start_config(mntdir,
-                ip='10.0.0.10',
+                ip='10.7.254.10',
                 netmask='255.255.255.0',
-                gw='10.0.0.1',
+                gw=None,
                 hostname="org",
                 root_key=root_key,
-                team_key="(disabled)"
+                team_key="(disabled)",
+                has_nat=True
                 )
+        mountdir_bash(mntdir, "passwd --lock ictf")
 
-        status(game_hash, "Setting up the organization DB, scorebot, etc.")
+        status(game_hash, "Configuring the organization DB, website, bots...")
 
+
+        mountdir_copydir(mntdir, "/org/database/", "/opt/database")
         infos = []
         for service_name in services:
             os.chdir("/services/"+service_name)
@@ -274,20 +289,59 @@ def create_org(game_hash, root_key, services):
                 info['setflag'] = read_service_script(info['setflag'])
                 info['benign'] = [ read_service_script(b) for b in info['benign'] ]
                 infos.append(info)
-        print "TODO: pass to reset_db:", json.dumps(infos, ensure_ascii=False, indent=1)
+        combined_info_json = json.dumps(infos, ensure_ascii=False, indent=1)
+        mountdir_writefile(mntdir, "/opt/database/combined_info.json", combined_info_json)
+
+        mountdir_copydir(mntdir, "/org/website/", "/opt/website")
+        website_config = """name: %s
+api_base_url: http://127.0.0.1:5000
+api_secret: %s
+teams:
+""" % (game_name, ''.join(random.choice(string.ascii_letters+string.digits) for _ in range(30)))
+        for team_id in range(len(teams)):
+            assert re.match(r'[a-zA-Z0-9]+\Z',teams[team_id]['name'])
+            assert re.match(r'[a-zA-Z0-9]+\Z',teams[team_id]['password'])
+            website_config += "  %d:\n" % team_id
+            website_config += "    name: %s\n" % teams[team_id]['name']
+            website_config += "    hashed_password: %s\n" % teams[team_id]['password']
+        mountdir_writefile(mntdir, '/opt/website/config.yml', website_config)
+        
+        mountdir_writefile(mntdir, "/opt/first_setup.sh", """#!/bin/bash
+
+echo "Doing the first-run setup of the organization services"
+
+echo "Setting up the ctf database..."
+cd /opt/database
+python reset_db.py %d
+cp ctf-database.conf /etc/init
+cp gamebot.conf /etc/init
+start ctf-database
+
+echo "Setting up the website..."
+cd /opt/website
+./install.sh
+cp website.conf /etc/init
+start website
+
+echo "Done with the first setup!"
+touch /opt/did_first_setup
+
+""" % len(teams))
 
 
+        mountdir_writefile(mntdir, "/etc/issue", """
+Organization VM (root password: ictf)
 
-        print "TODO"
-        #mountdir_copydir(mntdir, "/org", "/org")
-        #for scriptpath in glob.glob("/org/*.sh"):
-        #    scriptname = os.path.basename(scriptpath)
-        #    mountdir_bash(mntdir, "bash /org/"+scriptname)
+1. Configure the network of this VM to expose it to the Internet
+2. Expose the website to the public with a command like "iptables -t nat -I PREROUTING --src 0/0 --dst <THE_SITE_IP> -p tcp --dport 80 -j REDIRECT --to-ports 4567"
+3. To start the CTF run 'start gamebot'
 
+""")
+        mountdir_bash(mntdir, "chmod a+x /opt/first_setup.sh")
 
         status(game_hash, "Finalizing the organization VM")
         mountdir_end_config(mntdir,
-                nameserver='10.0.0.1'
+                nameserver='10.7.254.1'
                 )
         subprocess.call(["sudo","umount","-l",mntdir+'/dev'])
         run_cmd(['sudo','guestunmount',mntdir], "guestunmount")
@@ -311,19 +365,23 @@ if __name__ == '__main__':
         game = requests.get("http://ictf.cs.ucsb.edu/framework/ctf/"+game_hash).json()
         status(game_hash, "PENDING")
 
-        teams = [ t['hash'] for t in game['teams'] ]
+        game_name = game['name'];
+        assert re.match(r'[a-zA-Z0-9]+\Z',game_name)
+        teams = game['teams']
         services = [ s['name'] for s in game['services'] ]
+        logging.info("Name: %s", game_name)
         logging.info("Teams: %s", repr(teams))
         logging.info("Services: %s", repr(services))
         assert game['num_teams'] == len(game['teams'])
         assert game['num_teams'] == len(teams)
         assert game['num_services'] == len(game['services'])
         assert game['num_services'] == len(services)
+        assert len(teams) < 200 # Avoid an IP conflict with the organization VM (10.7.254.10)
 
         gamedir = gamepath(game_hash)
         root_public_key = create_ssh_key(gamedir+"/root_key")
         
-        create_org(game_hash, root_public_key, services)
+        create_org(game_hash, root_public_key, game_name, teams, services)
 
         for team_id in range(len(teams)):
             team_public_key = create_ssh_key(gamedir+"/team%d_key"%team_id)
@@ -331,7 +389,7 @@ if __name__ == '__main__':
         
         bundle(game_hash, "Organization", "root_key", game_hash)
         for team_id in range(len(teams)):
-            team_hash = teams[team_id]
+            team_hash = teams[team_id]['hash']
             bundle(game_hash, "Team%d"%team_id, "team%d_key"%team_id, team_hash)
 
         status(game_hash, "Cleaning up the build")

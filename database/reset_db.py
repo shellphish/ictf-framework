@@ -135,6 +135,7 @@ if __name__ == "__main__":
 
     # now, read the serialized version of the service_infos
 
-    services_info = json.load(sys.stdin)
+    with open("/opt/database/combined_info.json") as f:
+        services_info = json.load(f)
 
     print init_database(num_teams, services_info)

@@ -55,7 +55,7 @@ except Exception as e:
     print e
     pass
 
-logging.basicConfig(filename=LOG_PATH,level=logging.INFO,
+logging.basicConfig(filename=LOG_PATH,level=logging.WARNING,
                              format='%(asctime)s, %(name)s, %(levelname)s, %(message)s', 
                              datefmt='%m/%d/%Y %H:%M:%S')
 
@@ -87,7 +87,7 @@ class DBClient:
             url = 'http://%s/state?secret=%s'%(self.host,self.pwd)
             r = urllib.urlopen(url).read()
             ret = json.loads(r)
-            #self.log.info('Game state returned: %s'%(str(ret)))
+            self.log.info('Game state returned: %s'%(str(ret)))
             return ret
         except Exception as e:
             self.log.error(ERROR_DB[1]+' get_state(): Exception: '+str(e)+'. Response: '+r)

@@ -1,12 +1,10 @@
 #!/usr/bin/env python2.7
 
 import base64
-import glob
 import json
 import logging
 import os
 import requests
-import random
 import re
 import shutil
 import string
@@ -225,6 +223,7 @@ def create_team(game_hash, team_id, root_key, team_key, services):
                 )
         mountdir_bash(mntdir, "passwd --lock root")
         mountdir_bash(mntdir, "passwd --lock ictf")
+        mountdir_writefile(mntdir, "/etc/sysctl.d/90-no-aslr.conf", "kernel.randomize_va_space = 0")
 
         status(game_hash, "Setting up the services for Team %d" % team_id)
         for service in services:
@@ -293,10 +292,9 @@ api_base_url: http://127.0.0.1:5000
 api_secret: YOUKNOWSOMETHINGYOUSUCK
 teams:
 """ % game_name
-#""" % (game_name, ''.join(random.choice(string.ascii_letters+string.digits) for _ in range(30)))
         for team_id in range(len(teams)):
-            assert re.match(r'[a-zA-Z0-9]+\Z',teams[team_id]['name'])
-            assert re.match(r'[a-zA-Z0-9]+\Z',teams[team_id]['password'])
+            assert re.match(r'[a-zA-Z0-9 _-]+\Z',teams[team_id]['name'])
+            assert re.match(r'[a-zA-Z0-9 _-]+\Z',teams[team_id]['password'])
             website_config += "  %d:\n" % team_id
             website_config += "    name: %s\n" % teams[team_id]['name']
             website_config += "    hashed_password: %s\n" % teams[team_id]['password']
@@ -363,7 +361,7 @@ if __name__ == '__main__':
         status(game_hash, "PENDING")
 
         game_name = game['name'];
-        assert re.match(r'[a-zA-Z0-9]+\Z',game_name)
+        assert re.match(r'[a-zA-Z0-9 _-]+\Z',game_name)
         teams = game['teams']
         services = [ s['name'] for s in game['services'] ]
         logging.info("Name: %s", game_name)

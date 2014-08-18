@@ -4,15 +4,11 @@
 # you got from the organizers. After installing, your box routes your requests
 # to the vulnerable boxes.
 
-# We assume OpenVPN is installed already.
+apt-get -y install openvpn
 
 echo "Enabling IPv4 forwarding"
 sysctl -w net.ipv4.ip_forward=1
 
-tar -xf concentrator.tgz -C /etc/openvpn/
+tar -xf team${TEAMID}.tgz -C /etc/openvpn/
 
-service openvpn restart ictf-in-a-box
-
-for ${TEAM} in ${TEAMS}; do
-    route add 10.7.${TEAM}.2 dev eth1
-done
+service openvpn restart ${TEAMID}

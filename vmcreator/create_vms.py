@@ -24,7 +24,7 @@ BUNDLE_OUTPUT_DIR = "/var/www/bundles"    # Make sure not listable!
 def status(game_hash, status_msg):
     logging.info("Status: %s", status_msg)
     print status_msg
-    if status_msg in ['READY','CONFIRMED','PENDING']:
+    if status_msg in ['READY','CONFIRMED','PENDING','ERROR']:
         requests.post("http://ictf.cs.ucsb.edu/framework/ctf/status/"+game_hash+"/"+status_msg+"?secret="+secrets.API_SECRET)
 
 def run_cmd(arglist, cmd_name):
@@ -406,5 +406,6 @@ if __name__ == '__main__':
 
     except:
         status(game_hash, "An error occurred. Contact us and report game ID %s" % game_hash)
+        status(game_hash, "ERROR")
         logging.exception("Exception")
         raise

@@ -315,6 +315,8 @@ set -x
 set -e
 
 cd /opt/database
+cp gamebot.conf /etc/init
+echo "manual" > /etc/init/gamebot.override
 python reset_db.py %d
 cp ctf-database.conf /etc/init
 start ctf-database
@@ -327,9 +329,6 @@ start website
 cd /opt/scorebot
 cp scorebot.conf /etc/init
 start scorebot
-
-cp gamebot.conf /etc/init
-echo "manual" > /etc/init/gamebot.override
 
 echo "Done with the first setup! Check that everything is working and start your CTF!"
 

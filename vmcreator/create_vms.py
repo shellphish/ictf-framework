@@ -109,7 +109,7 @@ def mountdir_bash(mntdir, bash_cmd):
     run_cmd(['sudo','chroot',mntdir,'/bin/bash','-c',bash_cmd], "cmd in mounted dir")
 
 
-def mountdir_start_config(mntdir, ip, netmask, gw, hostname, root_key, team_key, has_nat=False):
+def mountdir_start_config(mntdir, ip, netmask, hostname, root_key, team_key, has_nat=False):
     # Network config
     interfaces ="""
 auto lo
@@ -120,11 +120,7 @@ iface eth0 inet static
     netmask %s
 """ % (ip, netmask)
     if has_nat:
-        assert gw is None
-        interfaces += '\n    up ip r add 10.7.0.0/16 via 10.7.254.1\n'
         interfaces += '\nauto eth1\niface eth1 inet dhcp\n'
-    else:
-        interfaces += "    gateway %s\n" % gw
     mountdir_writefile(mntdir,'/etc/network/interfaces', interfaces)
     mountdir_writefile(mntdir,'/etc/hostname', hostname)
 
@@ -181,9 +177,9 @@ exit 0""")
     mountdir_bash(mntdir,'rm -f /etc/resolv.conf')
     mountdir_writefile(mntdir,'/etc/resolv.conf', 'nameserver 8.8.8.8')
 
-def mountdir_end_config(mntdir, nameserver):
-    # Set the real DNS server
-    mountdir_writefile(mntdir,'/etc/resolv.conf', 'nameserver '+nameserver)
+def mountdir_end_config(mntdir):
+    # No DNS server in this version, unless provided by dhcp
+    mountdir_writefile(mntdir,'/etc/resolv.conf', '')
 
 def mountdir_install_deb(mntdir, deb_path):
     deb_filename = os.path.basename(deb_path)
@@ -206,7 +202,7 @@ def create_team(game_hash, team_id, root_key, team_key, services):
     # Note: the VM *must* be configured to use the 'intnet' internal network
     with open("Team%d.vbox"%team_id) as vboxfile:
         assert vboxfile.read().count("intnet") == 1
-    run_cmd(['sed','-i','s/intnet/team%d/g'%team_id,"Team%d.vbox"%team_id], "sed replace intnet")
+    run_cmd(['sed','-i','s/intnet/ictf/g',"Team%d.vbox"%team_id], "sed replace intnet")
 
     mntdir = vmdir+"/mnt"
     os.mkdir(mntdir)
@@ -215,8 +211,7 @@ def create_team(game_hash, team_id, root_key, team_key, services):
         run_cmd(['sudo','mount','--bind','/dev',mntdir+'/dev'], "dev bind")
         mountdir_start_config(mntdir,
                 ip='10.7.%d.2'%team_id,
-                netmask='255.255.255.0',
-                gw='10.7.%d.1'%team_id,
+                netmask='255.255.0.0',
                 hostname="team%d"%team_id,
                 root_key=root_key,
                 team_key=team_key
@@ -231,9 +226,7 @@ def create_team(game_hash, team_id, root_key, team_key, services):
             mountdir_install_deb(mntdir, '/services/%s.deb' % service)
 
         status(game_hash, "Finalizing the VM for Team %d" % team_id)
-        mountdir_end_config(mntdir,
-                nameserver='10.7.%d.1'%team_id
-                )
+        mountdir_end_config(mntdir)
         subprocess.call(["sudo","umount",mntdir+'/dev'])
         run_cmd(['sudo','guestunmount',mntdir], "guestunmount")
     except:
@@ -255,7 +248,7 @@ def create_org(game_hash, game_name, teams, services, root_keyfile):
     # Note: the VM *must* be configured to use the 'intnet' internal network
     with open("Organization.vbox") as vboxfile:
         assert vboxfile.read().count("intnet") >= 1
-    run_cmd(['sed','-i','s/intnet/org/g',"Organization.vbox"], "sed replace intnet")
+    run_cmd(['sed','-i','s/intnet/ictf/g',"Organization.vbox"], "sed replace intnet")
 
     mntdir = vmdir+"/mnt"
     os.mkdir(mntdir)
@@ -264,8 +257,7 @@ def create_org(game_hash, game_name, teams, services, root_keyfile):
         run_cmd(['sudo','mount','--bind','/dev',mntdir+'/dev'], "dev bind")
         mountdir_start_config(mntdir,
                 ip='10.7.254.10',
-                netmask='255.255.255.0',
-                gw=None,
+                netmask='255.255.0.0',
                 hostname="org",
                 root_key=root_public_key,
                 team_key="(disabled)",
@@ -355,9 +347,7 @@ Note: You can login to TeamX's VM via ssh root@10.7.X.2.
         mountdir_bash(mntdir, "chmod a+x /opt/first_setup.sh")
 
         status(game_hash, "Finalizing the organization VM")
-        mountdir_end_config(mntdir,
-                nameserver='10.7.254.1'
-                )
+        mountdir_end_config(mntdir)
         subprocess.call(["sudo","umount","-l",mntdir+'/dev'])
         run_cmd(['sudo','guestunmount',mntdir], "guestunmount")
     except:

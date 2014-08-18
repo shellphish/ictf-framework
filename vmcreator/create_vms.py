@@ -242,11 +242,14 @@ def create_team(game_hash, team_id, root_key, team_key, services):
         raise
 
 
-def create_org(game_hash, root_key, game_name, teams, services):
+def create_org(game_hash, game_name, teams, services, root_keyfile):
     # XXX: see also create_team
     vmdir = clone_vm(game_hash, "Organization-base", "Organization")
     status(game_hash, "Configuring the organization VM")
     os.chdir(vmdir)
+
+    with open(root_keyfile) as f: root_private_key = f.read()
+    with open(root_keyfile+".pub") as f: root_public_key = f.read()
 
     # VirtualBox internal network: org
     # Note: the VM *must* be configured to use the 'intnet' internal network
@@ -264,11 +267,15 @@ def create_org(game_hash, root_key, game_name, teams, services):
                 netmask='255.255.255.0',
                 gw=None,
                 hostname="org",
-                root_key=root_key,
+                root_key=root_public_key,
                 team_key="(disabled)",
                 has_nat=True
                 )
         mountdir_bash(mntdir, "passwd --lock ictf")
+        mountdir_bash(mntdir, "mkdir -p /root/.ssh")
+        mountdir_writefile(mntdir, "/root/.ssh/id_rsa", root_private_key)
+        mountdir_writefile(mntdir, "/root/.ssh/id_rsa.pub", root_public_key)
+
 
         status(game_hash, "Configuring the organization DB, dashboard, bots...")
 
@@ -342,6 +349,8 @@ Organization VM (root password: ictf)
 2. Configure the network of this VM to expose it to the Internet
 4. To start the CTF run 'start gamebot'
 
+Note: You can login to TeamX's VM via ssh root@10.7.X.2.
+
 """)
         mountdir_bash(mntdir, "chmod a+x /opt/first_setup.sh")
 
@@ -388,7 +397,7 @@ if __name__ == '__main__':
         gamedir = gamepath(game_hash)
         root_public_key = create_ssh_key(gamedir+"/root_key")
 
-        create_org(game_hash, root_public_key, game_name, teams, services)
+        create_org(game_hash, game_name, teams, services, gamedir+"/root_key")
 
         for team_id in range(1,len(teams)):
             team_public_key = create_ssh_key(gamedir+"/team%d_key"%team_id)

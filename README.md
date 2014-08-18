@@ -14,6 +14,10 @@ This is the central database that tracks the game state. It runs on the Organize
 
 The scorebot runs on the central database, updates flags on the vulnerable services, and checks that these flags are accessible.
 
+## Router
+
+This directory contains routing configuration for the central organizer/scorebot VM.
+
 ## Dashboard
 
 This is the CTF dashboard, showing the scoreboard and allowing players to submit flags.
@@ -21,6 +25,10 @@ This is the CTF dashboard, showing the scoreboard and allowing players to submit
 ## VM Creator
 
 This is the VM creater that is used by http://ictf.cs.ucsb.edu/framework to create organizer and team VMs.
+
+## Services
+
+The iCTF Framework includes a standard format for creating services. Services live in the services/ directory.
 
 ## Further Information
 

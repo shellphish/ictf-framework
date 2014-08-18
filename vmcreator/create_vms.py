@@ -332,7 +332,7 @@ start scorebot
 
 echo "Done with the first setup! Check that everything is working and start your CTF!"
 
-""" % len(teams))
+""" % len(teams)-1)
 
 
         mountdir_writefile(mntdir, "/etc/issue", """
@@ -381,8 +381,7 @@ if __name__ == '__main__':
         logging.info("Name: %s", game_name)
         logging.info("Teams: %s", repr(teams))
         logging.info("Services: %s", repr(services))
-        assert game['num_teams'] == len(game['teams'])
-        assert game['num_teams'] == len(teams)
+        assert game['num_teams'] == len(teams)-1         # 1-based now
         assert game['num_services'] == len(game['services'])
         assert game['num_services'] == len(services)
         assert len(teams) < 200 # Avoid an IP conflict with the organization VM (10.7.254.10)

@@ -24,7 +24,7 @@ BUNDLE_OUTPUT_DIR = "/var/www/bundles"    # Make sure not listable!
 def status(game_hash, status_msg):
     logging.info("Status: %s", status_msg)
     print status_msg
-    if status_msg in ['READY','CONFIRMED','PENDING']:
+    if status_msg in ['READY','CONFIRMED','PENDING','ERROR']:
         requests.post("http://ictf.cs.ucsb.edu/framework/ctf/status/"+game_hash+"/"+status_msg+"?secret="+secrets.API_SECRET)
 
 def run_cmd(arglist, cmd_name):
@@ -270,7 +270,7 @@ def create_org(game_hash, root_key, game_name, teams, services):
                 )
         mountdir_bash(mntdir, "passwd --lock ictf")
 
-        status(game_hash, "Configuring the organization DB, website, bots...")
+        status(game_hash, "Configuring the organization DB, dashboard, bots...")
 
 
         mountdir_copydir(mntdir, "/org/database/", "/opt/database")
@@ -286,7 +286,7 @@ def create_org(game_hash, root_key, game_name, teams, services):
         combined_info_json = json.dumps(infos, ensure_ascii=False, indent=1)
         mountdir_writefile(mntdir, "/opt/database/combined_info.json", combined_info_json)
 
-        mountdir_copydir(mntdir, "/org/website/", "/opt/website")
+        mountdir_copydir(mntdir, "/org/dashboard/", "/opt/dashboard")
         website_config = """name: %s
 api_base_url: http://127.0.0.1:5000
 api_secret: YOUKNOWSOMETHINGYOUSUCK
@@ -298,7 +298,7 @@ teams:
             website_config += "  %d:\n" % team_id
             website_config += "    name: %s\n" % teams[team_id]['name']
             website_config += "    hashed_password: %s\n" % teams[team_id]['password']
-        mountdir_writefile(mntdir, '/opt/website/config.yml', website_config)
+        mountdir_writefile(mntdir, '/opt/dashboard/config.yml', website_config)
         
         mountdir_copydir(mntdir, "/org/scorebot/", "/opt/scorebot")
         team_ips = []
@@ -321,10 +321,10 @@ python reset_db.py %d
 cp ctf-database.conf /etc/init
 start ctf-database
 
-cd /opt/website
+cd /opt/dashboard
 ./install.sh
-cp website.conf /etc/init
-start website
+cp dashboard.conf /etc/init
+start dashboard
 
 cd /opt/scorebot
 cp scorebot.conf /etc/init
@@ -406,5 +406,6 @@ if __name__ == '__main__':
 
     except:
         status(game_hash, "An error occurred. Contact us and report game ID %s" % game_hash)
+        status(game_hash, "ERROR")
         logging.exception("Exception")
         raise

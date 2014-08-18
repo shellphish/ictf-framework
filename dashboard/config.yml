@@ -1,5 +1,5 @@
 name: FantastiCTF!
-api_base_url: http://2c130bb1.ngrok.com
+api_base_url: http://127.0.0.1:5000
 api_secret: YOUKNOWSOMETHINGYOUSUCK
 teams:
     148:

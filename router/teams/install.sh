@@ -6,9 +6,8 @@
 
 apt-get -y install openvpn
 
-echo "Enabling IPv4 forwarding"
-sysctl -w net.ipv4.ip_forward=1
-
 tar -xf team${TEAMID}.tgz -C /etc/openvpn/
 
 service openvpn restart ${TEAMID}
+
+source $(dirname $0)/start.sh

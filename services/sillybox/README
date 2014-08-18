@@ -1,0 +1,54 @@
+ Sillybox service
+ ----------------
+
+ Your engineers need computing power - lots of it! If you listened to them,
+ you'd have to buy each of them a new machine every month! I asked if they
+ can enrich uranium with them, but they said the rotating things inside are
+ just to keep them cool - what a stupid waste, a ton of money to buy useless
+ fans.
+
+ But you are smart, you attached a fan to each of your centrifuges - boom, now
+ they have to enrich more uranium if they want the fans to work! Genius!
+
+ There is just a little problem, now you have to run everything on top of your
+ centrifuges. But these engineers are so stupid! You are right, you can't
+ trust them. And you did the right thing, calling me at SillyEngineers Inc.!
+
+
+ So here is the security solution you asked me to build:
+
+    - Your engineers connect to sillybox_spawner and send their precompiled
+      programs to do whatever they need.
+      Packet format: password len byte | password | raw binary code
+
+    - I limit what they can do in a single program. No time and network
+      hogging! And no stupid tricks. Want more time? Send more programs.
+      I wrote a time enforcer in sillybox_timekiller.
+
+    - But they said they need long computations! So annoying. But fine, I made
+      it so they can store temporary results and load them later. Apparently
+      this is important, otherwise your operation stops. And that's bad.
+    - But no copying from others! Everyone must send a password, and I made it
+      so you can read files only if you know the password.
+
+    - They also said they need to use system resources normally, so I left
+      them almost free. As long as they are not using tricks to steal data or
+      increase their allotted running time, you should not try to limit them
+      too much: let them do their job if they are benign, otherwise you risk
+      problems! Also, don't take out the standard libc stuff, engineers can
+      use it if they wish - but figuring out how to use it from their raw code
+      is their problem, not yours :)
+
+    - File I/O that is not password-protected must definitely be prohibited,
+      like all limit-escaping tricks.
+
+
+ It's a perfect system, right?
+
+ Even if your enemies run programs on your system, they cannot copy!
+ I bet you could even be the new Amazon cloud and no one will steal your data!
+
+ Signed:
+ Me, an engineer that never makes mistake, like never ever, like if I did you
+ could destroy an uranium enrichment plant sitting in an armchair at home, and
+ seriously, that's like, impossible, right?

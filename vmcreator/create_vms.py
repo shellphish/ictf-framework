@@ -292,7 +292,7 @@ api_base_url: http://127.0.0.1:5000
 api_secret: YOUKNOWSOMETHINGYOUSUCK
 teams:
 """ % game_name
-        for team_id in range(1,len(teams)+1):
+        for team_id in range(1,len(teams)):
             assert re.match(r'[a-zA-Z0-9 _-]+\Z',teams[team_id]['name'])
             assert re.match(r'[a-zA-Z0-9 _-]+\Z',teams[team_id]['password'])
             website_config += "  %d:\n" % team_id
@@ -302,7 +302,7 @@ teams:
         
         mountdir_copydir(mntdir, "/org/scorebot/", "/opt/scorebot")
         team_ips = []
-        for team_id in range(1,len(teams)+1):
+        for team_id in range(1,len(teams)):
             team_ips.append({'team_id': team_id, 'ip': '10.7.%d.2'%team_id})
         scorebot_config = json.dumps(team_ips, indent=1)
         mountdir_writefile(mntdir, '/opt/scorebot/team_list.json', scorebot_config)
@@ -332,7 +332,7 @@ start scorebot
 
 echo "Done with the first setup! Check that everything is working and start your CTF!"
 
-""" % len(teams)-1)
+""" % (len(teams)-1))
 
 
         mountdir_writefile(mntdir, "/etc/issue", """
@@ -391,12 +391,12 @@ if __name__ == '__main__':
         
         create_org(game_hash, root_public_key, game_name, teams, services)
 
-        for team_id in range(1,len(teams)+1):
+        for team_id in range(1,len(teams)):
             team_public_key = create_ssh_key(gamedir+"/team%d_key"%team_id)
             create_team(game_hash, team_id, root_public_key, team_public_key, services)
         
         bundle(game_hash, "Organization", "root_key", game_hash)
-        for team_id in range(1,len(teams)+1):
+        for team_id in range(1,len(teams)):
             team_hash = teams[team_id]['hash']
             bundle(game_hash, "Team%d"%team_id, "team%d_key"%team_id, team_hash)
 

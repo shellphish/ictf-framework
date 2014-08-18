@@ -1,0 +1,13 @@
+{
+  "name":"temperature",
+  "authors":["gianluca"],
+  "port":56098,
+  "getflag":"getflag.py",
+  "setflag":"setflag.py",
+  "benign":["benign.py"],
+  "exploit":["exploit.py"],
+  "is_working":1,
+  "flag_id_description" : "Date in the format YYYY/MM/DD",
+  "service_description" : "Temperature service. Logs temperatures detected in various parts of the world. These recordings will then be used for amazingly secret intelligence actions",
+  "id": 9
+}

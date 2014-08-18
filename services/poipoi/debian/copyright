@@ -1,0 +1,8 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: poipoi
+Source: <http://ictf.cs.ucsb.edu>
+
+Files: *
+Copyright: 2013 The Regents of the University of California
+License: All rights reserved
+

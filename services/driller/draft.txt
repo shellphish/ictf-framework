@@ -1,0 +1,23 @@
+Global Driller
+
+Default admin account: GlobalDrillerCompany/demo
+Create an account (non-admin): Account name, password (SHA-1'ed with a salt), (ID, creator ID)
+Modify account info: (If you are admin) identity, password
+Create a new spot: Guid, Location, Country
+Create a new driller: Guid, location, nickname
+List spots and drillers
+(Admin) List all spots and drillers
+Drill: meters
+
+Vulnerabilities:
+# Default admin account
+# Backdoor account: If the prefix is "ILoveCat", then it will become an admin
+# Password comparison: Only compares the first unsigned char
+# Identity check is lame. (0 means normal user, otherwise are admins)
+# Pointer overwritten. Global drilling count has an overlap with the global user pointer (they are all static). Global user vector pointer could be rewritten to global spot vector pointer
+
+Data persistance:
+SQLite
+
+Dependencies:
+SQLite

@@ -1,0 +1,14 @@
+{
+  "name" : "tattletale",
+  "authors" : ["patch", "kmac"],
+  "flag_id_description" : "the flag_id for this service is the room you work",
+  "service_description" : 
+      "You scored a couple contracting jobs at another team's intelligence agency. They have many secrets. You and your team must leak data to the public to achieve enough political impact to hinder their operations. You and your team must rendevous with one of our agents on the inside. Show up for work and see if you can find a way to exfiltrate data!",
+  "port" : 13007, 
+  "getflag" : "getflag.py",
+  "setflag" : "setflag.py",
+  "benign" : ["benign.py"],
+  "exploit" : ["exploit.py"],
+  "is_working" : 1,
+  "id": 8
+}

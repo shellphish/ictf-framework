@@ -1,0 +1,13 @@
+{
+	"name" : "driller",
+    "authors" : ["Fish"],
+    "flag_id_description" : "Please use name of the spot as flag ID.",
+    "service_description" : "In the awesome old days, everyone could freely setup their own uranium mine around the globe -- as long as they have enough money to bribe those governments. However, some great guys saw the great opportunity beneath, and they set up their own evil enterprise! Here it is, Global Drillers Enterprise Ltd. Their sweet dream, and your nightmare! With seamless cooperation with most countries, now you have to buy their service, select a spot and choose a driller, before you make any penny from uranium mines. To show their kind and mercy, you are offered an Autocratic version of their service, which is protected by the notorious cyber army named ****** (Access Denied). The binary is protected by some lame stuff. Anyways, you have no other choice. Get prepared, crack the service, and get their flags!",
+	"port" : 9091,
+	"getflag" : "scripts/getflag.py",
+	"setflag" : "scripts/setflag.py",
+	"benign" : ["scripts/benign.py"],
+	"exploit" : ["scripts/exploit.py"],
+	"is_working" : 1,
+	"id": 2
+}

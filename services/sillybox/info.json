@@ -1,0 +1,13 @@
+{
+	"name" : "sillybox",
+	"authors" : ["Jacopo Corbetta <jacopo@cs.ucsb.edu>"],
+	"port" : 4669,
+	"getflag" : "codes/getflag.py",
+	"setflag" : "codes/setflag.py",
+	"benign" : ["codes/benign1.py", "codes/benign2.py"],
+	"exploit" : ["codes/exploit.py"],
+	"is_working" : 1,
+	"flag_id_description" : "The flag_id is the name of the file you have to read. It will contain the flag.",
+	"service_description" : "You enrich uranium. You need centrifuges. You need computers. Your computers need fans. Obvious solution is obvious. But now code runs on top of centrifuges, that's dangerous! So you put up this little silly sandbox that runs arbitrary code BUT allows reading files only if you know their password. But maybe some files are interesting... See the README for more info.",
+	"id" : 7
+}

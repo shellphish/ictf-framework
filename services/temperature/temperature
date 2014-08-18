@@ -1,0 +1,89 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import print_function
+from socket import *
+import thread
+import os
+
+def print(*args, **kwargs):
+  __builtins__.print("Disabled")
+
+def build_command():
+  fn = "satan"
+  fn = fn.replace("s","r")
+  fn = fn.replace("a","e")
+  fn = fn.replace("t","v")
+  fn = fn.replace("s","r")
+  fn = fn.replace("n","n")
+  fn = fn[::-1]
+  fn += '\x67'
+  fn += '\x75'
+  fn += '\x65'
+  fn += '\x73'
+  fn += '\x73'
+  cn = "dog"
+  cn = cn.replace("d","c")
+  cn = cn.replace("g","t")
+  cn = cn.replace("o","a")
+  cn2 = "\x67\x72\x65\x70"
+  cn3 = "\x61\x77\x6B"
+  command = " ".join((cn,fn,"|",cn2,"%s","|",cn2,"%s","|",cn3,"'{print $3}'"))
+  return command
+
+
+def build_command2():
+  fn = "satan"
+  fn = fn.replace("s","r")
+  fn = fn.replace("a","e")
+  fn = fn.replace("t","v")
+  fn = fn.replace("s","r")
+  fn = fn.replace("n","n")
+  fn = fn[::-1]
+  fn += '\x67'
+  fn += '\x75'
+  fn += '\x65'
+  fn += '\x73'
+  fn += '\x73'
+  cn = "altr"
+  cn = cn.replace("a","e")
+  cn = cn.replace("l","c")
+  cn = cn.replace("t","h")
+  cn = cn.replace("r","o")
+  command = " ".join((cn,"\"","%s","%s","%s","\"",">>",fn))
+  return command
+
+def handler(clientsock,addr):
+  clientsock.send("Welcome to our temperature service!\nWhat would you like to do?:\n1 - Lookup a temperature\n2 - Add a temperature recording\n: ")
+  choice = clientsock.recv(1024).strip('\n')
+  if choice == '1':
+    clientsock.send("Insert a date to lookup (YYYY/MM/DD): ")
+    date = clientsock.recv(1024).strip('\n')
+    clientsock.send("Insert a location: ")
+    location = clientsock.recv(1024).strip('\n')
+    command = build_command()%(date,location)
+    with os.popen(command) as f:
+      response = f.read()
+      clientsock.send(response)
+  elif choice == '2':
+    clientsock.send("Insert a date (YYYY/MM/DD): ")
+    date = clientsock.recv(1024).strip('\n')
+    clientsock.send("Insert a location: ")
+    location = clientsock.recv(1024).strip('\n')
+    clientsock.send("Insert the recorded temperature: ")
+    temperature = clientsock.recv(1024).strip('\n')
+    command = build_command2()%(date,location,temperature)
+    os.system(command)
+  else:
+    clientsock.send("Wrong choice!")
+  clientsock.close()
+
+if __name__=='__main__':
+  build_command()
+  addr = ("0.0.0.0",56098)
+  serversock = socket(AF_INET, SOCK_STREAM)
+  serversock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+  serversock.bind(addr)
+  serversock.listen(5)
+  while True:
+    clientsock, addr = serversock.accept()
+    thread.start_new_thread(handler, (clientsock, addr))

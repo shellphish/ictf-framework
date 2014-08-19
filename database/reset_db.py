@@ -51,8 +51,9 @@ def init_database(num_teams, services_info):
                  (new_game_id,))
 
     for i in xrange(num_teams):
-        team_name = "Team %s" % i
-        team_ip_range = "10.0.%s" % i
+        team_num = i + 1
+        team_name = "Team %s" % team_num
+        team_ip_range = "10.0.%s" % team_num
         exec_result = my_c.execute("""insert into teams (team_name, ip_range, created_on) values(%s, %s, %s)""", 
                                    (team_name, team_ip_range, datetime.now().isoformat()))
 

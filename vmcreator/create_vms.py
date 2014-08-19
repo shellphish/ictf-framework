@@ -24,7 +24,7 @@ BUNDLE_OUTPUT_DIR = "/var/www/bundles"    # Make sure not listable!
 def status(game_hash, status_msg):
     logging.info("Status: %s", status_msg)
     print status_msg
-    if status_msg in ['READY','CONFIRMED','PENDING']:
+    if status_msg in ['READY','CONFIRMED','PENDING','ERROR']:
         requests.post("http://ictf.cs.ucsb.edu/framework/ctf/status/"+game_hash+"/"+status_msg+"?secret="+secrets.API_SECRET)
 
 def run_cmd(arglist, cmd_name):
@@ -44,7 +44,7 @@ def run_cmd(arglist, cmd_name):
 
 def gamepath(game_hash):
     path = "/game/"+game_hash
-    try: 
+    try:
         os.makedirs(path)
     except OSError:
         if not os.path.isdir(path):
@@ -79,7 +79,7 @@ def bundle(game_hash, vm_name, key_name, team_hash):
     run_cmd(tar_cmdline, "bundle tar")
     status(game_hash, "Created the %s bundle" % vm_name)
     return bundle_filename
-    
+
 
 
 
@@ -127,7 +127,7 @@ iface eth0 inet static
         interfaces += "    gateway %s\n" % gw
     mountdir_writefile(mntdir,'/etc/network/interfaces', interfaces)
     mountdir_writefile(mntdir,'/etc/hostname', hostname)
-    
+
     # Login config
     # Note: This does _not_ prevent console logins with the default password.
     #       If you give out the VM, players can always get root.
@@ -168,7 +168,7 @@ UseDNS no
 """
     )
 
-    # General reset 
+    # General reset
     mountdir_bash(mntdir, "rm -rf /var/cache/apt/*")
     mountdir_bash(mntdir, "rm -f /etc/ssh/ssh_host*")
     mountdir_writefile(mntdir, '/etc/rc.local', """#!/bin/sh -e
@@ -193,7 +193,7 @@ def mountdir_install_deb(mntdir, deb_path):
 
 
 
-#### VM creation ############################################################################ 
+#### VM creation ############################################################################
 
 def create_team(game_hash, team_id, root_key, team_key, services):
     # XXX: see also create_org
@@ -240,7 +240,7 @@ def create_team(game_hash, team_id, root_key, team_key, services):
         subprocess.call(["sudo","umount","-l",mntdir+'/dev'])
         subprocess.Popen(["sudo","guestunmount",mntdir]) # Do it in the background, in case it blocks
         raise
-        
+
 
 def create_org(game_hash, root_key, game_name, teams, services):
     # XXX: see also create_team
@@ -270,7 +270,7 @@ def create_org(game_hash, root_key, game_name, teams, services):
                 )
         mountdir_bash(mntdir, "passwd --lock ictf")
 
-        status(game_hash, "Configuring the organization DB, website, bots...")
+        status(game_hash, "Configuring the organization DB, dashboard, bots...")
 
 
         mountdir_copydir(mntdir, "/org/database/", "/opt/database")
@@ -286,27 +286,27 @@ def create_org(game_hash, root_key, game_name, teams, services):
         combined_info_json = json.dumps(infos, ensure_ascii=False, indent=1)
         mountdir_writefile(mntdir, "/opt/database/combined_info.json", combined_info_json)
 
-        mountdir_copydir(mntdir, "/org/website/", "/opt/website")
+        mountdir_copydir(mntdir, "/org/dashboard/", "/opt/dashboard")
         website_config = """name: %s
 api_base_url: http://127.0.0.1:5000
 api_secret: YOUKNOWSOMETHINGYOUSUCK
 teams:
 """ % game_name
-        for team_id in range(len(teams)):
+        for team_id in range(1,len(teams)):
             assert re.match(r'[a-zA-Z0-9 _-]+\Z',teams[team_id]['name'])
             assert re.match(r'[a-zA-Z0-9 _-]+\Z',teams[team_id]['password'])
             website_config += "  %d:\n" % team_id
             website_config += "    name: %s\n" % teams[team_id]['name']
             website_config += "    hashed_password: %s\n" % teams[team_id]['password']
-        mountdir_writefile(mntdir, '/opt/website/config.yml', website_config)
-        
+        mountdir_writefile(mntdir, '/opt/dashboard/config.yml', website_config)
+
         mountdir_copydir(mntdir, "/org/scorebot/", "/opt/scorebot")
         team_ips = []
-        for team_id in range(len(teams)):
+        for team_id in range(1,len(teams)):
             team_ips.append({'team_id': team_id, 'ip': '10.7.%d.2'%team_id})
         scorebot_config = json.dumps(team_ips, indent=1)
         mountdir_writefile(mntdir, '/opt/scorebot/team_list.json', scorebot_config)
-        
+
         mountdir_writefile(mntdir, "/opt/first_setup.sh", """#!/bin/bash
 
 echo "Doing the first-run setup of the organization services"
@@ -321,10 +321,10 @@ python reset_db.py %d
 cp ctf-database.conf /etc/init
 start ctf-database
 
-cd /opt/website
+cd /opt/dashboard
 ./install.sh
-cp website.conf /etc/init
-start website
+cp dashboard.conf /etc/init
+start dashboard
 
 cd /opt/scorebot
 cp scorebot.conf /etc/init
@@ -332,7 +332,7 @@ start scorebot
 
 echo "Done with the first setup! Check that everything is working and start your CTF!"
 
-""" % len(teams))
+""" % (len(teams)-1))
 
 
         mountdir_writefile(mntdir, "/etc/issue", """
@@ -340,7 +340,6 @@ Organization VM (root password: ictf)
 
 1. Do the first configuration by running /opt/first_setup.sh
 2. Configure the network of this VM to expose it to the Internet
-3. Expose the website to the public (see /opt/website/iptables.sh)
 4. To start the CTF run 'start gamebot'
 
 """)
@@ -375,27 +374,28 @@ if __name__ == '__main__':
         game_name = game['name'];
         assert re.match(r'[a-zA-Z0-9 _-]+\Z',game_name)
         teams = game['teams']
+        teams.insert(0,None) # Make it 1-based
         services = [ s['name'] for s in game['services'] ]
+
         logging.info("Name: %s", game_name)
         logging.info("Teams: %s", repr(teams))
         logging.info("Services: %s", repr(services))
-        assert game['num_teams'] == len(game['teams'])
-        assert game['num_teams'] == len(teams)
+        assert game['num_teams'] == len(teams)-1         # 1-based now
         assert game['num_services'] == len(game['services'])
         assert game['num_services'] == len(services)
         assert len(teams) < 200 # Avoid an IP conflict with the organization VM (10.7.254.10)
 
         gamedir = gamepath(game_hash)
         root_public_key = create_ssh_key(gamedir+"/root_key")
-        
+
         create_org(game_hash, root_public_key, game_name, teams, services)
 
-        for team_id in range(len(teams)):
+        for team_id in range(1,len(teams)):
             team_public_key = create_ssh_key(gamedir+"/team%d_key"%team_id)
             create_team(game_hash, team_id, root_public_key, team_public_key, services)
-        
+
         bundle(game_hash, "Organization", "root_key", game_hash)
-        for team_id in range(len(teams)):
+        for team_id in range(1,len(teams)):
             team_hash = teams[team_id]['hash']
             bundle(game_hash, "Team%d"%team_id, "team%d_key"%team_id, team_hash)
 
@@ -406,5 +406,6 @@ if __name__ == '__main__':
 
     except:
         status(game_hash, "An error occurred. Contact us and report game ID %s" % game_hash)
+        status(game_hash, "ERROR")
         logging.exception("Exception")
         raise

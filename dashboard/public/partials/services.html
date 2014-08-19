@@ -1,12 +1,25 @@
-<div ng-repeat="service in services">
+<div ng-repeat="(service_id, service) in services">
     <div class='row-fluid'>
         <div class='span12'>
             <h2>
                 <span class='glyphicon glyphicon-screenshot'>
                 </span>
+                {{service_id}}:
                 {{service.name}}
                 <small>
-                    Port: {{service.port}}
+                    Port: {{service.port}} - Status:
+                    <span ng-if="services_status[service_id] == 2">
+                        <span class="label label-danger">Offline</span>
+                    </span>
+                    <span ng-if="services_status[service_id] == 1">
+                        <span class="label label-warning">Online, but nonfunctional</span>
+                    </span>
+                    <span ng-if="services_status[service_id] == 0">
+                        <span class="label label-success">Online</span>
+                    </span>
+                    <span ng-if="services_status[service_id] == -1">
+                        <span class="label label-default">Unknown</span>
+                    </span>
                 </small>
             </h2>
             <blockquote>

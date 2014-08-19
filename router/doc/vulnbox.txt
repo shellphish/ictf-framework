@@ -1,0 +1,8 @@
+/etc/network/interfaces
+
+    auto eth0
+    iface eth0 inet static
+        address 10.7.YOUR_TEAM_ID.2
+        netmask 255.255.255.255
+        up route add 10.7.0.1 dev eth0
+        up route add default gw 10.7.0.1

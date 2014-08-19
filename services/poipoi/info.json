@@ -1,0 +1,13 @@
+{
+  "name" : "poipoi",
+  "authors" : ["Alberto Geniola", "Matteo Lancellotti", "Nilo Redini"],  
+  "flag_id_description": "the flag_id is the user_id returned by the server after successful registration.",
+  "service_description": "Uranium mining is the process of extracting uranium ore from the ground. A prominent use of uranium from mining is as fuel for building your nuclear weapons and then terrifying your enemies. The POIPOI service collects information of all uranium mines in the world, so if you know of some new mines please insert related locations as soon as you can and help your country to dominate the world!",
+  "port" : 3335,
+  "getflag" : "scripts/getflag.py",
+  "setflag" : "scripts/setflag.py",
+  "benign" : ["scripts/benign.py"],
+  "exploit" : ["scripts/exploit.py"],
+  "is_working" : 1,
+  "id": 5
+}

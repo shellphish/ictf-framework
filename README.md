@@ -20,7 +20,7 @@ This directory contains routing configuration for the central organizer/scorebot
 
 ## Dashboard
 
-This is the CTF dashboard, showing the scoreboard and allowing players to submit flags.
+This is the CTF dashboard, showing the scoreboard and allowing players to submit flags. Read the [docs](dashboard/README.md)
 
 ## VM Creator
 

@@ -44,7 +44,7 @@ def run_cmd(arglist, cmd_name):
 
 def gamepath(game_hash):
     path = "/game/"+game_hash
-    try: 
+    try:
         os.makedirs(path)
     except OSError:
         if not os.path.isdir(path):
@@ -79,7 +79,7 @@ def bundle(game_hash, vm_name, key_name, team_hash):
     run_cmd(tar_cmdline, "bundle tar")
     status(game_hash, "Created the %s bundle" % vm_name)
     return bundle_filename
-    
+
 
 
 
@@ -127,7 +127,7 @@ iface eth0 inet static
         interfaces += "    gateway %s\n" % gw
     mountdir_writefile(mntdir,'/etc/network/interfaces', interfaces)
     mountdir_writefile(mntdir,'/etc/hostname', hostname)
-    
+
     # Login config
     # Note: This does _not_ prevent console logins with the default password.
     #       If you give out the VM, players can always get root.
@@ -168,7 +168,7 @@ UseDNS no
 """
     )
 
-    # General reset 
+    # General reset
     mountdir_bash(mntdir, "rm -rf /var/cache/apt/*")
     mountdir_bash(mntdir, "rm -f /etc/ssh/ssh_host*")
     mountdir_writefile(mntdir, '/etc/rc.local', """#!/bin/sh -e
@@ -193,7 +193,7 @@ def mountdir_install_deb(mntdir, deb_path):
 
 
 
-#### VM creation ############################################################################ 
+#### VM creation ############################################################################
 
 def create_team(game_hash, team_id, root_key, team_key, services):
     # XXX: see also create_org
@@ -240,7 +240,7 @@ def create_team(game_hash, team_id, root_key, team_key, services):
         subprocess.call(["sudo","umount","-l",mntdir+'/dev'])
         subprocess.Popen(["sudo","guestunmount",mntdir]) # Do it in the background, in case it blocks
         raise
-        
+
 
 def create_org(game_hash, root_key, game_name, teams, services):
     # XXX: see also create_team
@@ -299,14 +299,14 @@ teams:
             website_config += "    name: %s\n" % teams[team_id]['name']
             website_config += "    hashed_password: %s\n" % teams[team_id]['password']
         mountdir_writefile(mntdir, '/opt/dashboard/config.yml', website_config)
-        
+
         mountdir_copydir(mntdir, "/org/scorebot/", "/opt/scorebot")
         team_ips = []
         for team_id in range(1,len(teams)):
             team_ips.append({'team_id': team_id, 'ip': '10.7.%d.2'%team_id})
         scorebot_config = json.dumps(team_ips, indent=1)
         mountdir_writefile(mntdir, '/opt/scorebot/team_list.json', scorebot_config)
-        
+
         mountdir_writefile(mntdir, "/opt/first_setup.sh", """#!/bin/bash
 
 echo "Doing the first-run setup of the organization services"
@@ -340,7 +340,6 @@ Organization VM (root password: ictf)
 
 1. Do the first configuration by running /opt/first_setup.sh
 2. Configure the network of this VM to expose it to the Internet
-3. Expose the website to the public (see /opt/website/iptables.sh)
 4. To start the CTF run 'start gamebot'
 
 """)
@@ -388,13 +387,13 @@ if __name__ == '__main__':
 
         gamedir = gamepath(game_hash)
         root_public_key = create_ssh_key(gamedir+"/root_key")
-        
+
         create_org(game_hash, root_public_key, game_name, teams, services)
 
         for team_id in range(1,len(teams)):
             team_public_key = create_ssh_key(gamedir+"/team%d_key"%team_id)
             create_team(game_hash, team_id, root_public_key, team_public_key, services)
-        
+
         bundle(game_hash, "Organization", "root_key", game_hash)
         for team_id in range(1,len(teams)):
             team_hash = teams[team_id]['hash']

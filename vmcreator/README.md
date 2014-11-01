@@ -2,7 +2,9 @@ This script creates the team and organization VMs.
 
 Usage:
   
-    create_vm.py <game_id> <num_teams> [service1 service2 ...]
+    create_vm.py <game_hash>
+
+It will retrieve the JSON configuration for `game_hash` and generate the VMs for it.
 
 
 It needs:

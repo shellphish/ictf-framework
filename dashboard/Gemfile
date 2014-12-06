@@ -3,3 +3,11 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'httparty'
 gem 'haml'
+gem 'foreman'
+gem 'redis'
+
+
+group :development do
+  gem 'rerun'
+  gem 'yard'
+end

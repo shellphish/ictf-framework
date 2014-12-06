@@ -7,6 +7,9 @@ ctfControllers.controller('ServicesCtrl', ['$scope', '$http',
       $http.get('/services').success(function(data) {
           $scope.services = data;
       });
+      $http.get('/services_status').success(function(data) {
+          $scope.services_status = data;
+      });
   }]);
 
 ctfControllers.controller('FlagCtrl', ['$scope', '$http',

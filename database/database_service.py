@@ -411,8 +411,14 @@ def scores():
     to_return = { 'scores' : {}}
     for result in c.fetchall():
         team_id = result['team_id']
-        score = result['score']
-        to_return['scores'][team_id] = int(score)
+        team_result = {}
+        team_result['raw_score'] = int(result['score'])
+
+        sla_percentage = get_uptime_for_team(team_id, c)
+        team_result['sla'] = int(sla_percentage)
+        team_result['score'] = team_result['raw_score'] * (sla_percentage / 100.0)
+        
+        to_return['scores'][team_id] = team_result
 
     return json.dumps(to_return)
 

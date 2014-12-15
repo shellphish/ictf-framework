@@ -8,13 +8,13 @@
                 {{service.name}}
                 <small>
                     Port: {{service.port}} - Status:
-                    <span ng-if="services_status[service_id] == 2">
+                    <span ng-if="services_status[service_id] == 0">
                         <span class="label label-danger">Offline</span>
                     </span>
                     <span ng-if="services_status[service_id] == 1">
                         <span class="label label-warning">Online, but nonfunctional</span>
                     </span>
-                    <span ng-if="services_status[service_id] == 0">
+                    <span ng-if="services_status[service_id] == 2">
                         <span class="label label-success">Online</span>
                     </span>
                     <span ng-if="services_status[service_id] == -1">

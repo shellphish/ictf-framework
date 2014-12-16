@@ -691,8 +691,6 @@ class Scheduler:
         self.status['script_err']=None
         self.status['last_error']=None
 
-        for l in self.locks:
-            del l
         self.locks = []
 
         for p in self.process_list:

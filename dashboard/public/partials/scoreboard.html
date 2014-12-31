@@ -10,6 +10,12 @@
                         Team
                     </th>
                     <th>
+                        SLA
+                    </th>
+                    <th>
+                        Attack score
+                    </th>
+                    <th>
                         Score
                     </th>
                 </tr>
@@ -23,7 +29,15 @@
                         {{score.team_name}}
                     </td>
                     <td>
-                        {{score.score}}
+                        {{score.score['sla']}}
+                    </td>
+                    <td>
+                        {{score.score['raw_score']}}
+                    </td>
+                    <td>
+                        <b>
+                            {{score.score['score']}}
+                        </b>
                     </td>
                 </tr>
             </tbody>

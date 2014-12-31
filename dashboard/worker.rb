@@ -48,10 +48,10 @@ module Game
   end
 
   def self.ctf_scores
-    Hash[get('/scores')['scores'].map do |team_id, score|
+    Hash[get('/scores')['scores'].map do |team_id, score_hash|
       team = ctf_teams[team_id.to_i]
       next if team.nil?
-      [team['team_name'], score]
+      [team['team_name'], score_hash]
     end]
   end
 

@@ -172,7 +172,7 @@ flag_ids will be a dictionary mapping team_ids to a dictionary mapping service_i
   <p>The JSON response is the following:</p>
 <pre>
 {
-  "scores" : { team_id : int (score), ... }
+  "scores" : { team_id : { score: int, sla: int (0-100, percentage), raw_score: int } }
 }
 </pre>
 

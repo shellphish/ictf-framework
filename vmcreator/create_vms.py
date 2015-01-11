@@ -191,7 +191,7 @@ def mountdir_install_deb(mntdir, deb_path):
 
 #### VM creation ############################################################################
 
-def create_team(game_hash, team_id, root_key, team_key, services):
+def create_team(game_hash, team_id, root_key, team_key, team_password, services):
     # XXX: see also create_org
     assert team_id < 200
     vmdir = clone_vm(game_hash, "iCTF-base", "Team%d"%team_id)
@@ -217,8 +217,17 @@ def create_team(game_hash, team_id, root_key, team_key, services):
                 team_key=team_key
                 )
         mountdir_bash(mntdir, "passwd --lock root")
-        mountdir_bash(mntdir, "passwd --lock ictf")
+        mountdir_bash(mntdir, "echo 'ictf:{}' | chpasswd".format(team_password))
         mountdir_writefile(mntdir, "/etc/sysctl.d/90-no-aslr.conf", "kernel.randomize_va_space = 0")
+        mountdir_writefile(mntdir, "/etc/issue", """
+Team {id} VM
+
+You should allow team {id} to connect via ssh -i team{id}_key ictf@<external_IP_to_reach_this_machine>.
+You can also login via this console (user: ictf, password: see the team web page).
+
+Organizers can also login from their VM (ssh root@10.7.{id}.2).
+
+""".format(id=team_id))
 
         status(game_hash, "Setting up the services for Team %d" % team_id)
         for service in services:
@@ -391,7 +400,7 @@ if __name__ == '__main__':
 
         for team_id in range(1,len(teams)):
             team_public_key = create_ssh_key(gamedir+"/team%d_key"%team_id)
-            create_team(game_hash, team_id, root_public_key, team_public_key, services)
+            create_team(game_hash, team_id, root_public_key, team_public_key, teams[team_id]['password'], services)
 
         bundle(game_hash, "Organization", "root_key", game_hash)
         for team_id in range(1,len(teams)):

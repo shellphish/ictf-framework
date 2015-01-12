@@ -11,7 +11,7 @@ import string
 import subprocess
 import sys
 import tempfile
-sys.path.insert(0,"/var/www/framework")
+sys.path.insert(0,"/var/www/framework") # Comment this out if running locally
 import secrets
 
 
@@ -24,6 +24,7 @@ BUNDLE_OUTPUT_DIR = "/var/www/bundles"    # Make sure not listable!
 def status(game_hash, status_msg):
     logging.info("Status: %s", status_msg)
     print status_msg
+    # Comment this out if running locally
     if status_msg in ['READY','CONFIRMED','PENDING','ERROR']:
         requests.post("http://ictf.cs.ucsb.edu/framework/ctf/status/"+game_hash+"/"+status_msg+"?secret="+secrets.API_SECRET)
 

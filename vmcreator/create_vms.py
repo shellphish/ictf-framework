@@ -417,4 +417,5 @@ if __name__ == '__main__':
         status(game_hash, "An error occurred. Contact us and report game ID %s" % game_hash)
         status(game_hash, "ERROR")
         logging.exception("Exception")
+        os.system("echo 'Creation for %s failed, see the log in /tmp' | mail -s 'Error creating game %s' root" % (game_hash,game_hash))
         raise

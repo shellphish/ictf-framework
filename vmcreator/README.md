@@ -8,7 +8,7 @@ It runs on our web site (http://ictf.cs.ucsb.edu/framework/#/framework): it retr
 
 Besides the JSON configuration, it needs:
 
- - the base VMs as setup (base Ubuntu with no resolvconf and preinstalled dependencies)
+ - the base VMs as setup (base Ubuntu with no resolvconf and preinstalled dependencies - you can get ours at http://ictf.cs.ucsb.edu/base-vms/base-vms.tar.gz)
  - **sudo access** (so it can guestmount and chroot)
  - the services as `/services/name.deb` and `/services/name/info.json` (and their scripts)
  - the organization VM setup scripts as `/org/` (see create\_vms.py)

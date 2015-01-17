@@ -223,8 +223,10 @@ def create_team(game_hash, team_id, root_key, team_key, team_password, services)
         mountdir_writefile(mntdir, "/etc/issue", """
 Team {id} VM
 
-You should allow team {id} to connect via ssh -i team{id}_key ictf@<external_IP_to_reach_this_machine>.
-You can also login via this console (user: ictf, password: see the team web page).
+The team should connect via:
+      ssh -i team{id}_key ictf@<external_IP_to_reach_this_machine>
+
+One can also login via this console (user: ictf, password: on the team web page)
 
 Organizers can also login from their VM (ssh root@10.7.{id}.2).
 
@@ -339,7 +341,9 @@ cd /opt/scorebot
 cp scorebot.conf /etc/init
 start scorebot
 
-echo "Done with the first setup! Check that everything is working and start your CTF!"
+echo
+echo
+echo "Done with the first setup! Check that everything is working and start your CTF! (run 'start gamebot')"
 
 """ % (len(teams)-1))
 
@@ -352,6 +356,8 @@ Organization VM (root password: ictf)
 4. To start the CTF run 'start gamebot'
 
 Note: You can login to TeamX's VM via ssh root@10.7.X.2.
+
+Also, the VMs may not have all security updates installed.
 
 """)
         mountdir_bash(mntdir, "chmod a+x /opt/first_setup.sh")

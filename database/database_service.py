@@ -127,7 +127,7 @@ def get_services_state_by_tick(tick_id, c):
 
     # Get the timeframes of the tick
     c.execute("""select created_on, time_to_change from ticks where id = %s""",
-              tick_id)
+              (tick_id,))
     result = c.fetchone()
     tick_start_time = result['created_on']
     tick_end_time = result['time_to_change']

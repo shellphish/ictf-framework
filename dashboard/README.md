@@ -8,7 +8,7 @@ Structure
 ---------
 The dashboard is designed to withstand a heavy load (hackers are F5-machines), without overloading the rest of the CTF infrastructure. This is why the web server, ```web.rb```, is short and nible, and exclusively talks to a Redis cache. The cache is populated by ```worker.rb```, which fetches updates from the central database every second.
 
-You can start everything as a service (```start dashboard```), or manually with ```forman start```.
+You can start everything as a service (```start dashboard```), or manually with ```foreman start```.
 
 
 API

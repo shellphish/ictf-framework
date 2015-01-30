@@ -1,14 +1,14 @@
 This script creates the team and organization VMs.
 
-usage: create_vms.py [-h] [--hash GAME_HASH] [--json GAME_JSON]
-                     [-o OUTPUT_PATH] [--log LOG_PATH]
+    usage: create_vms.py [-h] [--hash GAME_HASH] [--json GAME_JSON]
+                         [-o OUTPUT_PATH] [--log LOG_PATH]
 
-optional arguments:
-  -h, --help        show this help message and exit
-  --hash GAME_HASH
-  --json GAME_JSON
-  -o OUTPUT_PATH
-  --log LOG_PATH
+    optional arguments:
+        -h, --help        show this help message and exit
+        --hash GAME_HASH
+        --json GAME_JSON
+        -o OUTPUT_PATH
+        --log LOG_PATH
 
 It can run either on our web site (http://ictf.cs.ucsb.edu/framework/#/framework) or locally.
  * If the option --hash is specified, tt retrieves the JSON configuration for `GAME_HASH` and generates the VMs for it.

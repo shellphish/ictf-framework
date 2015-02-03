@@ -1,0 +1,3 @@
+# Install some dependencies
+apt-get install build-essential libsqlite3-dev
+

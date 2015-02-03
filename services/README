@@ -1,0 +1,2 @@
+#Package to build on a 32bit system
+dpkg-buildpackage -us -uc /path/to/driller

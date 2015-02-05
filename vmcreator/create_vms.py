@@ -384,6 +384,7 @@ if __name__ == '__main__':
 
         assert re.match(r'[a-zA-Z0-9]+\Z',game_hash)
         game = requests.get("http://ictf.cs.ucsb.edu/framework/ctf/"+game_hash).json()
+        logging.info("Game description JSON: %s", json.dumps(game, allow_nan=False))
         status(game_hash, "PENDING")
 
         game_name = game['name'];

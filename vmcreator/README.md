@@ -19,16 +19,26 @@ If the script runs locally, the bundle is created in `OUTPUT_PATH`
 
 Once generated, the VMs are independent from our web site.
 
-Besides the JSON configuration, it needs:
+# Download and untar the base VMs: base Ubuntu with no resolvconf and preinstalled dependencies
+wget http://ictf.cs.ucsb.edu/base-vms/base-vms.tar.gz
+tar xzvf base-vms.tar.gz
 
- - the base VMs as setup (base Ubuntu with no resolvconf and preinstalled dependencies - you can get ours at http://ictf.cs.ucsb.edu/base-vms/base-vms.tar.gz)
- - **sudo access** (so it can guestmount and chroot)
- - the services as `/services/name.deb` and `/services/name/info.json` (and their scripts)
- - the organization VM setup scripts as `/org/` (see create\_vms.py)
- - ability to write in `/game/` and `/var/www/bundles`
- - ability to use qemu-kvm
- - libguestfs-tools (run 'update-guestfs-appliance' if necessary)
- - virtualbox (VBoxManage)
- - Don't forget to register your base VMs with virtualbox
+# Setup the environment to create the VMs (as root)
+ln -s /path/to/services /ictf
+ln -s /path/to/database /ictf/
+ln -s /path/to/dashboard/ /ictf/
+ln -s /path/to/scorebot/ /ictf/
+
+# Install required packages (as root)
+apt-get install libguestfs-tools virtualbox
+update-guestfs-appliance
+
+# Register the base VMs with VirtualBox (as root)
+VBoxManage registervm /path/to/base-vms/iCTF-base/iCTF-base.vbox 
+VBoxManage registervm /path/to/base-vms/Organization-base/Organization-base.vbox
+VBoxManage list vms
+
+# Create VMs described by example\_game.json
+sudo python create\_vms.py --json example\_game.json -o /path/to/store/bundle
 
 *Note:* the VMs, as generated, use a single VirtualBox internal network. Test it, then setup a real game network using the documentation in the `router/` directory.

@@ -23,6 +23,7 @@ def main(argv):
 
     try:
         game = args.game
+        logging.info("Game description JSON: {}".format(game))
         status(game_hash, "Started creating VMs", args.remote)
 
         assert re.match(r'[a-zA-Z0-9]+\Z', game_hash)
@@ -64,7 +65,7 @@ def main(argv):
         status(game_hash, "An error occurred. Contact us and report game {}".format(game_hash))
         status(game_hash, "ERROR")
         logging.exception("Exception")
-        #os.system("echo 'Creation for {} failed, see the log in /tmp' | mail -s 'Error creating game {}' root".format(game_hash,game_hash))
+        os.system("echo 'Creation for {} failed, see the log in /tmp' | mail -s 'Error creating game {}' root".format(game_hash,game_hash))
 
 
 if __name__ == '__main__':

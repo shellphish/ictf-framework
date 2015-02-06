@@ -2,6 +2,8 @@ import re
 import os
 import json
 import subprocess
+import logging
+import time
 
 from utils import status
 from utils import gamepath
@@ -37,7 +39,7 @@ def create_team(output_path, game_hash, team_id, root_key, team_key, team_passwo
 
     mntdir = vmdir+"/mnt"
     os.mkdir(mntdir)
-    run_cmd(['sudo', 'guestmount', '-a', 'Team{}-disk1.vdi'.format(team_id), '-i', mntdir], "guestmount")
+    guestmount_pidfile = guestmount('Team{}-disk1.vdi'.format(team_id), mntdir)
     try:
         run_cmd(['sudo', 'mount', '--bind', '/dev', '{}/dev'.format(mntdir)], "dev bind")
         mountdir_start_config(mntdir,
@@ -70,7 +72,7 @@ Organizers can also login from their VM (ssh root@10.7.{id}.2).
         status(game_hash, "Finalizing the VM for Team {}".format(team_id), remote)
         mountdir_end_config(mntdir)
         subprocess.call(["sudo","umount",mntdir+'/dev'])
-        run_cmd(['sudo', 'guestunmount', mntdir], "guestunmount")
+        guestunmount(mntdir, guestmount_pidfile)
     except:
         subprocess.call(["sudo","umount","-l",mntdir+'/dev'])
         subprocess.Popen(["sudo","guestunmount",mntdir]) # Do it in the background, in case it blocks
@@ -94,7 +96,7 @@ def create_org(output_path, game_hash, game_name, teams, services, root_keyfile,
 
     mntdir = vmdir+"/mnt"
     os.mkdir(mntdir)
-    run_cmd(['sudo', 'guestmount', '-a', 'Organization-disk1.vdi', '-i', mntdir], "guestmount")
+    guestmount_pidfile = guestmount('Organization-disk1.vdi', mntdir)
     try:
         run_cmd(['sudo', 'mount', '--bind', '/dev', '{}/dev'.format(mntdir)], "dev bind")
         mountdir_start_config(mntdir,
@@ -195,8 +197,30 @@ Also, the VMs may not have all security updates installed.
         status(game_hash, "Finalizing the organization VM", remote)
         mountdir_end_config(mntdir)
         subprocess.call(["sudo","umount","-l",mntdir+'/dev'])
-        run_cmd(['sudo', 'guestunmount', '{}'.format(mntdir)], "guestunmount")
+        guestunmount(mntdir, guestmount_pidfile)
     except:
         subprocess.call(["sudo","umount","-l",mntdir+'/dev'])
         subprocess.Popen(["sudo","guestunmount",mntdir]) # Do it in the background, in case it blocks
         raise
+
+def guestmount(what, where):
+    pidfile = os.tempnam(None, 'guestmountpid')
+    run_cmd(['sudo','guestmount','--pid-file',pidfile,'-a',what,'-i',where], "guestmount")
+    assert os.path.isfile(pidfile)
+    logging.info('guestmount pid file %s', pidfile)
+    return pidfile
+
+def guestunmount(mntdir, guestmount_pidfile):
+    run_cmd(['sudo','guestunmount',mntdir], "guestunmount")
+    logging.info('Waiting for guestmount (pidfile %s) to exit...', guestmount_pidfile)
+    sleepcount = 0
+    while sleepcount < 100:
+        if subprocess.call(['pgrep','-F',guestmount_pidfile]) != 0:
+            break
+        sleepcount += 1
+        if sleepcount % 10 == 0:
+            logging.info('    still sleeping (count=%d)...', sleepcount)
+        time.sleep(1)
+    if sleepcount > 100:
+        raise "guestmount seems stuck, exiting (pidfile: {})".format(guestmount_pidfile)
+    logging.info('  All right, guestmount exited')

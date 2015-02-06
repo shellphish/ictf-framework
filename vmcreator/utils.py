@@ -67,13 +67,15 @@ def run_cmd(arglist, cmd_name):
 
 def gamepath(output_path, game_hash, clean_up=False):
     path = os.path.join(output_path, game_hash)
-    if os.path.exists(path) and clean_up:
-        shutil.rmtree(path)
-    try:
-        os.makedirs(path)
-    except OSError:
-        if not os.path.isdir(path):
-            raise
+    if os.path.exists(path):
+        if clean_up:
+            shutil.rmtree(path)
+    else:
+        try:
+            os.makedirs(path)
+        except OSError:
+            if not os.path.isdir(path):
+                raise
     return path
 
 def mountdir_copyfile(mntdir, frompath, topath):

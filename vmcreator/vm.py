@@ -241,7 +241,13 @@ def guestunmount(mntdir, guestmount_pidfile):
                  guestmount_pidfile)
     sleepcount = 0
     while sleepcount < 100:
-        if subprocess.call(['pgrep', '-F', guestmount_pidfile]) != 0:
+        try:
+            subprocess.check_output(['pgrep', '-F', guestmount_pidfile],
+                                    stderr=subprocess.STDOUT)
+        except Exception, e:
+            # If the return code was non-zero it raises a CalledProcessError.
+            # The CalledProcessError object will have the return code in the
+            # returncode attribute and any output in the output attribute.
             break
         sleepcount += 1
         if sleepcount % 10 == 0:
@@ -250,4 +256,4 @@ def guestunmount(mntdir, guestmount_pidfile):
     if sleepcount > 100:
         raise "guestmount seems stuck, exiting (pidfile: {})"\
               .format(guestmount_pidfile)
-    logging.info('  All right, guestmount exited')
+    logging.info('All right, guestmount exited')

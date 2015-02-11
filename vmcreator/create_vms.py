@@ -18,14 +18,21 @@ def main(argv):
     arg_parser = ArgParser()
     args = arg_parser.parse(argv)
     game_hash = args.game_hash
+
     # Set up logging
+    formatter = logging.Formatter('%(asctime)s %(message)s')
     logging.basicConfig(filename=os.path.join(args.log_path,
                         'game_{}_vms.log'.format(game_hash)),
-                        level=logging.DEBUG, format='%(asctime)s %(message)s')
+                        level=logging.DEBUG, format='%(asctime)s %(message)s',
+                        datefmt="%H:%M:%S", filemode='w')
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
 
     try:
         game = args.game
-        logging.info("Game description JSON: {}".format(game))
+        logging.debug("Game description JSON: {}".format(game))
         status(game_hash, "Started creating VMs", args.remote)
 
         assert re.match(r'[a-zA-Z0-9]+\Z', game_hash)
@@ -36,7 +43,7 @@ def main(argv):
         teams = game['teams']
         services = [s['name'] for s in game['services']]
 
-        logging.info("Name: {}".format(game_name))
+        logging.info("Game name: {}".format(game_name))
         logging.info("Teams: {}".format(teams))
         logging.info("Services: {}".format(services))
         assert game['num_services'] == len(game['services'])

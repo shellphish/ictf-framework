@@ -1,6 +1,7 @@
 #!/usr/bin/env python2.7
 
 import os
+import logging
 import requests
 import subprocess
 import sys
@@ -13,10 +14,11 @@ while True:
         req_str = 'http://ictf.cs.ucsb.edu/framework/ctf/pending?secret={}'
         games = requests.get(req_str.format(secrets.API_SECRET)).json()
         if 'ctf_hash' in games:
-            print "Spawning the creator for", games['ctf_hash']
-            subprocess.Popen("./create_vms.py "+games['ctf_hash'], shell=True)
+            logging.info("Spawning the creator for", games['ctf_hash'])
+            subprocess.Popen("./create_vms.py {}".format(games['ctf_hash']),
+                             shell=True)
     except:
         msg = '''Exception while getting the pending CTF or spawning its \
 creation'''
-        print msg
+        logging.error(msg)
     time.sleep(30)

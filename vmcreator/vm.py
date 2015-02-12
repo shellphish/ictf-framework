@@ -42,7 +42,7 @@ def create_team(output_path, game_hash, team_id, root_key, team_key,
     run_cmd(['sed', '-i', 's/intnet/ictf/g', 'Team{}.vbox'.format(team_id)],
             "sed replace intnet")
 
-    mntdir = vmdir+"/mnt"
+    mntdir = "{}/mnt".format(vmdir)
     os.mkdir(mntdir)
     guestmount_pidfile = guestmount('Team{}-disk1.vdi'.format(team_id), mntdir)
     try:
@@ -81,10 +81,10 @@ Organizers can also login from their VM (ssh root@10.7.{id}.2).
         status(game_hash, "Finalizing the VM for Team {}".format(team_id),
                remote)
         mountdir_end_config(mntdir)
-        subprocess.call(["sudo", "umount", mntdir+'/dev'])
+        subprocess.call(["sudo", "umount", '{}/dev'.format(mntdir)])
         guestunmount(mntdir, guestmount_pidfile)
     except:
-        subprocess.call(["sudo", "umount", "-l", mntdir+'/dev'])
+        subprocess.call(["sudo", "umount", "-l", '{}/dev'.format(mntdir)])
         # Do it in the background, in case it blocks
         subprocess.Popen(["sudo", "guestunmount", mntdir])
         raise
@@ -100,7 +100,7 @@ def create_org(output_path, game_hash, game_name, teams, services,
 
     with open(root_keyfile) as f:
         root_private_key = f.read()
-    with open(root_keyfile+".pub") as f:
+    with open("{}.pub".format(root_keyfile)) as f:
         root_public_key = f.read()
 
     # VirtualBox internal network: org
@@ -110,7 +110,7 @@ def create_org(output_path, game_hash, game_name, teams, services,
     run_cmd(['sed', '-i', 's/intnet/ictf/g', 'Organization.vbox'],
             "sed replace intnet")
 
-    mntdir = vmdir+"/mnt"
+    mntdir = "{}/mnt".format(vmdir)
     os.mkdir(mntdir)
     guestmount_pidfile = guestmount('Organization-disk1.vdi', mntdir)
     try:
@@ -135,7 +135,7 @@ def create_org(output_path, game_hash, game_name, teams, services,
         mountdir_copydir(mntdir, "/ictf/database/", "/opt/database")
         infos = []
         for service_name in services:
-            os.chdir("/ictf/services/"+service_name)
+            os.chdir("/ictf/services/{}".format(service_name))
             with open("info.json") as jsonfile:
                 info = json.load(jsonfile)
                 info['getflag'] = read_service_script(info['getflag'])
@@ -156,9 +156,9 @@ teams:
         for team_id, team in enumerate(teams, start=1):
             assert re.match(r'[a-zA-Z0-9 _-]+\Z', team['name'])
             assert re.match(r'[a-zA-Z0-9 _-]+\Z', team['password'])
-            website_config += "\t{}:\n".format(team_id)
-            website_config += "\t\tname: {}\n".format(team['name'])
-            website_config += "\t\thashed_password: {}\n"\
+            website_config += "  {}:\n".format(team_id)
+            website_config += "    name: {}\n".format(team['name'])
+            website_config += "    hashed_password: {}\n"\
                               .format(team['password'])
         mountdir_writefile(mntdir, '/opt/dashboard/config.yml', website_config)
 
@@ -217,10 +217,10 @@ Also, the VMs may not have all security updates installed.
 
         status(game_hash, "Finalizing the organization VM", remote)
         mountdir_end_config(mntdir)
-        subprocess.call(["sudo", "umount", "-l", mntdir+'/dev'])
+        subprocess.call(["sudo", "umount", "-l", '{}/dev'.format(mntdir)])
         guestunmount(mntdir, guestmount_pidfile)
     except:
-        subprocess.call(["sudo", "umount", "-l", mntdir+'/dev'])
+        subprocess.call(["sudo", "umount", "-l", '{}/dev'.format(mntdir)])
         # Do it in the background, in case it blocks
         subprocess.Popen(["sudo", "guestunmount", mntdir])
         raise

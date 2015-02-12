@@ -71,18 +71,32 @@ def run_cmd(arglist, cmd_name):
         raise
 
 
-def gamepath(output_path, game_hash, clean_up=False):
+def gamepath(output_path, game_hash):
     path = os.path.join(output_path, game_hash)
-    if os.path.exists(path):
-        if clean_up:
-            shutil.rmtree(path)
-    else:
-        try:
-            os.makedirs(path)
-        except OSError:
-            if not os.path.isdir(path):
-                raise
+    try:
+        os.makedirs(path)
+    except OSError:
+        if not os.path.isdir(path):
+            raise
     return path
+
+
+def clean_up(output_path, game_hash, teams=None, bundle=False):
+    game_path = gamepath(output_path, game_hash)
+    if os.path.exists(game_path):
+        logging.info('Removing game dir {}'.format(game_path))
+        shutil.rmtree(game_path)
+    if bundle:
+        bundle_game_path = '{}.tar.gz'.format(game_path)
+        if os.path.exists(bundle_game_path):
+            logging.info('Removing bundle {}'.format(bundle_game_path))
+            os.remove(bundle_game_path)
+        for team in teams:
+            bundle_team_path = '{}.tar.gz'.format(os.path.join(output_path,
+                                                               team['hash']))
+            if os.path.exists(bundle_team_path):
+                logging.info('Removing bundle {}'.format(bundle_team_path))
+                os.remove(bundle_team_path)
 
 
 def mountdir_copyfile(mntdir, frompath, topath):
@@ -193,8 +207,8 @@ def mountdir_end_config(mntdir):
 
 def mountdir_install_deb(mntdir, deb_path):
     deb_filename = os.path.basename(deb_path)
-    mountdir_copyfile(mntdir, deb_path, '/'+deb_filename)
-    mountdir_bash(mntdir, "gdebi -q -n /"+deb_filename)
+    mountdir_copyfile(mntdir, deb_path, '/{}'.format(deb_filename))
+    mountdir_bash(mntdir, "gdebi -q -n /{}".format(deb_filename))
 
 
 def create_ssh_key(secret_file_name):
@@ -214,10 +228,10 @@ def bundle(game_hash, vm_name, key_name, team_hash, output_dir, remote):
     status(game_hash, "Creating the {} bundle".format(vm_name), remote)
     game_dir = gamepath(output_dir, game_hash)
     os.chdir(game_dir)
-    files = [vm_name+"/"+vm_name+".vbox",
-             vm_name+"/"+vm_name+"-disk1.vdi",
+    files = ["{}/{}.vbox".format(vm_name, vm_name),
+             "{}/{}-disk1.vdi".format(vm_name, vm_name),
              key_name,
-             key_name+".pub"]
+             "{}.pub".format(key_name)]
     for bundle_file in files:
         assert os.path.isfile(bundle_file)
     bundle_filename = "{}.tar.gz".format(team_hash)

@@ -9,6 +9,7 @@ from utils import status
 from utils import gamepath
 from utils import create_ssh_key
 from utils import bundle
+from utils import clean_up
 
 from vm import create_org
 from vm import create_team
@@ -51,7 +52,9 @@ def main(argv):
         # Avoid an IP conflict with the organization VM (10.7.254.10)
         assert len(teams) < 200
 
-        game_dir = gamepath(args.output_path, game_hash, clean_up=True)
+        #Cleaning up previous creations
+        clean_up(args.output_path, game_hash, teams, bundle=True)
+        game_dir = gamepath(args.output_path, game_hash)
         root_key_path = os.path.join(game_dir, "root_key")
         root_public_key = create_ssh_key(root_key_path)
 
@@ -73,7 +76,7 @@ def main(argv):
                    args.remote)
 
         status(game_hash, "Cleaning up the build")
-        gamepath(args.output_path, game_hash, clean_up=True)
+        clean_up(args.output_path, game_hash, teams)
 
         status(game_hash, "READY")
 

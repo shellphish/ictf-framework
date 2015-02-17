@@ -27,7 +27,7 @@ def clone_vm(output_path, game_hash, base_vm, name, remote):
 
 
 def create_team(output_path, game_hash, team_id, root_key, team_key,
-                team_pwd, services, remote):
+                team_pwd, sudo, services, remote):
     # XXX: see also create_org
     assert team_id < 200
     vmdir = clone_vm(output_path, game_hash, "iCTF-base",
@@ -56,6 +56,8 @@ def create_team(output_path, game_hash, team_id, root_key, team_key,
                               team_key=team_key)
         mountdir_bash(mntdir, "passwd --lock root")
         mountdir_bash(mntdir, "echo 'ictf:{}' | chpasswd".format(team_pwd))
+        if sudo:
+            mountdir_bash(mntdir, "adduser ictf sudo")
         mountdir_writefile(mntdir, "/etc/sysctl.d/90-no-aslr.conf",
                            "kernel.randomize_va_space = 0")
         mountdir_writefile(mntdir, "/etc/issue", """

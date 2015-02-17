@@ -34,11 +34,19 @@ apt-get install libguestfs-tools virtualbox
 update-guestfs-appliance
 
 # Register the base VMs with VirtualBox (as root)
-VBoxManage registervm /path/to/base-vms/iCTF-base/iCTF-base.vbox 
+VBoxManage registervm /path/to/base-vms/iCTF-base/iCTF-base.vbox
 VBoxManage registervm /path/to/base-vms/Organization-base/Organization-base.vbox
 VBoxManage list vms
 
 # Create VMs described by example\_game.json
 sudo python create\_vms.py --json example\_game.json -o /path/to/store/bundle
 
+# Configure port forwarding to ssh the ORG VM
+Before starting the ORG VM, type on your host:
+VBoxManage modifyvm Organization --natpf2 "ssh,tcp,,2222,,22"
+
+# Start the ORG VM and then ssh to it:
+ssh -p 2222 root@127.0.0.1 -l /path/to/root\_key
+
 *Note:* the VMs, as generated, use a single VirtualBox internal network. Test it, then setup a real game network using the documentation in the `router/` directory.
+*Note2:* if you are generating VMs in a Virtual Machine running on Virtual Box, don't specify -o option in a shared directory: this will corrupt the VMs generated.

@@ -43,6 +43,7 @@ def main(argv):
         assert re.match(r'[a-zA-Z0-9 _-]+\Z', game_name)
         teams = game['teams']
         services = [s['name'] for s in game['services']]
+        sudo = game.get('sudo', False)
 
         logging.info("Game name: {}".format(game_name))
         logging.info("Teams: {}".format(teams))
@@ -65,7 +66,7 @@ def main(argv):
             team_public_key = create_ssh_key("{}/team{}_key".format(game_dir,
                                                                     team_id))
             create_team(args.output_path, game_hash, team_id, root_public_key,
-                        team_public_key, team['password'], services,
+                        team_public_key, team['password'], sudo, services,
                         args.remote)
         bundle(game_hash, "Organization", "root_key", game_hash,
                args.output_path, args.remote)

@@ -93,7 +93,7 @@ def clean_up(output_path, game_hash, teams=None, bundle=False):
             os.remove(bundle_game_path)
         for team in teams:
             bundle_team_path = '{}.tar.gz'.format(os.path.join(output_path,
-                                                               team['hash']))
+                                                               team['name']))
             if os.path.exists(bundle_team_path):
                 logging.info('Removing bundle {}'.format(bundle_team_path))
                 os.remove(bundle_team_path)
@@ -146,18 +146,27 @@ iface eth0 inet static
         interfaces += '\nauto eth1\niface eth1 inet dhcp\n'
     mountdir_writefile(mntdir, '/etc/network/interfaces', interfaces)
     mountdir_writefile(mntdir, '/etc/hostname', hostname)
+    hosts = """
+127.0.0.1   localhost {}
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+""".format(hostname)
+    mountdir_writefile(mntdir, '/etc/hosts', hosts)
 
     # Login config
     # Note: This does _not_ prevent console logins with the default password.
     #       If you give out the VM, players can always get root.
     mountdir_bash(mntdir, 'mkdir -p /root/.ssh')
     mountdir_writefile(mntdir, '/root/.ssh/authorized_keys', root_key)
-    mountdir_bash(mntdir, 'mkdir -p /home/ictf/.ssh')
-    mountdir_bash(mntdir, 'chown ictf:ictf /home/ictf/.ssh')
-    mountdir_bash(mntdir, 'chmod go-rwx /home/ictf/.ssh')
-    mountdir_writefile(mntdir, '/home/ictf/.ssh/authorized_keys', team_key)
-    mountdir_bash(mntdir, 'chown ictf:ictf /home/ictf/.ssh/authorized_keys')
-    mountdir_bash(mntdir, 'chmod go-rwx /home/ictf/.ssh/authorized_keys')
+    mountdir_bash(mntdir, 'mkdir -p /home/ctf/.ssh')
+    mountdir_bash(mntdir, 'chown ctf:ctf /home/ctf/.ssh')
+    mountdir_bash(mntdir, 'chmod go-rwx /home/ctf/.ssh')
+    mountdir_writefile(mntdir, '/home/ctf/.ssh/authorized_keys', team_key)
+    mountdir_bash(mntdir, 'chown ctf:ctf /home/ctf/.ssh/authorized_keys')
+    mountdir_bash(mntdir, 'chmod go-rwx /home/ctf/.ssh/authorized_keys')
     mountdir_writefile(mntdir, '/etc/ssh/sshd_config', """
 Port 22
 Protocol 2
@@ -207,8 +216,10 @@ def mountdir_end_config(mntdir):
 
 def mountdir_install_deb(mntdir, deb_path):
     deb_filename = os.path.basename(deb_path)
-    mountdir_copyfile(mntdir, deb_path, '/{}'.format(deb_filename))
-    mountdir_bash(mntdir, "gdebi -q -n /{}".format(deb_filename))
+    mountdir_copyfile(mntdir, deb_path, '/opt/{}'.format(deb_filename))
+    # This is not possible to execute here because some services needs a live system
+    # Once the VM is created and blundled, ssh into them and install the packages
+    # mountdir_bash(mntdir, "gdebi -q -n /{}".format(deb_filename))
 
 
 def create_ssh_key(secret_file_name):

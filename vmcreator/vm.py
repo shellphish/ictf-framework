@@ -39,7 +39,7 @@ def create_team(output_path, game_hash, team_id, root_key, team_key,
     # Note: the VM *must* be configured to use the 'intnet' internal network
     with open("Team{}.vbox".format(team_id)) as vboxfile:
         assert vboxfile.read().count("intnet") == 1
-    run_cmd(['sed', '-i', 's/intnet/ictf/g', 'Team{}.vbox'.format(team_id)],
+    run_cmd(['sed', '-i', 's/intnet/ctf/g', 'Team{}.vbox'.format(team_id)],
             "sed replace intnet")
 
     mntdir = "{}/mnt".format(vmdir)
@@ -55,18 +55,18 @@ def create_team(output_path, game_hash, team_id, root_key, team_key,
                               root_key=root_key,
                               team_key=team_key)
         mountdir_bash(mntdir, "passwd --lock root")
-        mountdir_bash(mntdir, "echo 'ictf:{}' | chpasswd".format(team_pwd))
+        mountdir_bash(mntdir, "echo 'ctf:{}' | chpasswd".format(team_pwd))
         if sudo:
-            mountdir_bash(mntdir, "adduser ictf sudo")
+            mountdir_bash(mntdir, "adduser ctf sudo")
         mountdir_writefile(mntdir, "/etc/sysctl.d/90-no-aslr.conf",
                            "kernel.randomize_va_space = 0")
         mountdir_writefile(mntdir, "/etc/issue", """
 Team {id} VM
 
 The team should connect via:
-      ssh -i team{id}_key ictf@<external_IP_to_reach_this_machine>
+      ssh -i team{id}_key ctf@<external_IP_to_reach_this_machine>
 
-One can also login via this console (user: ictf, password: on the team web \
+One can also login via this console (user: ctf, password: on the team web \
 page)
 
 Organizers can also login from their VM (ssh root@10.7.{id}.2).
@@ -75,10 +75,11 @@ Organizers can also login from their VM (ssh root@10.7.{id}.2).
 
         status(game_hash,
                "Setting up the services for Team {}".format(team_id), remote)
-        for service in services:
-            assert re.match(r'[a-zA-Z0-9_-]+\Z', service)
+        for service_name in services:
+            package_name = re.split('ictf-20[\d]+-', service_name)[1]
+            assert re.match(r'[a-zA-Z0-9_-]+\Z', service_name)
             mountdir_install_deb(mntdir,
-                                 '/ictf/services/{}.deb'.format(service))
+                                 '/ictf/services/{}/{}_0.1_i386.deb'.format(service_name, package_name))
 
         status(game_hash, "Finalizing the VM for Team {}".format(team_id),
                remote)
@@ -109,7 +110,7 @@ def create_org(output_path, game_hash, game_name, teams, services,
     # Note: the VM *must* be configured to use the 'intnet' internal network
     with open("Organization.vbox") as vboxfile:
         assert vboxfile.read().count("intnet") >= 1
-    run_cmd(['sed', '-i', 's/intnet/ictf/g', 'Organization.vbox'],
+    run_cmd(['sed', '-i', 's/intnet/ctf/g', 'Organization.vbox'],
             "sed replace intnet")
 
     mntdir = "{}/mnt".format(vmdir)
@@ -125,7 +126,7 @@ def create_org(output_path, game_hash, game_name, teams, services,
                               root_key=root_public_key,
                               team_key="(disabled)",
                               has_nat=True)
-        mountdir_bash(mntdir, "passwd --lock ictf")
+        mountdir_bash(mntdir, "passwd --lock ctf")
         mountdir_bash(mntdir, "mkdir -p /root/.ssh")
         mountdir_writefile(mntdir, "/root/.ssh/id_rsa", root_private_key)
         mountdir_writefile(mntdir, "/root/.ssh/id_rsa.pub", root_public_key)

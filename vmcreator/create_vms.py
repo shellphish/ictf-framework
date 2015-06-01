@@ -42,7 +42,7 @@ def main(argv):
         game_name = game['name']
         assert re.match(r'[a-zA-Z0-9 _-]+\Z', game_name)
         teams = game['teams']
-        services = [s['name'] for s in game['services']]
+        services = [s['service_name'] for s in game['services']]
         sudo = game.get('sudo', False)
 
         logging.info("Game name: {}".format(game_name))
@@ -68,12 +68,12 @@ def main(argv):
             create_team(args.output_path, game_hash, team_id, root_public_key,
                         team_public_key, team['password'], sudo, services,
                         args.remote)
-        bundle(game_hash, "Organization", "root_key", game_hash,
+        bundle(game_hash, "Organization", "root_key", "organization",
                args.output_path, args.remote)
         for team_id, team in enumerate(teams, start=1):
-            team_hash = team['hash']
+            team_name = team['name']
             bundle(game_hash, "Team{}".format(team_id),
-                   "team{}_key".format(team_id), team_hash, args.output_path,
+                   "team{}_key".format(team_id), team_name, args.output_path,
                    args.remote)
 
         status(game_hash, "Cleaning up the build")

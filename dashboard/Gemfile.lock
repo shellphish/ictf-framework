@@ -48,7 +48,7 @@ GEM
     thor (0.19.1)
     tilt (1.4.1)
     timers (1.1.0)
-    yard (0.8.7.4)
+    yard (0.9.20)
 
 PLATFORMS
   ruby

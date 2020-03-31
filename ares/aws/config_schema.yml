@@ -1,0 +1,58 @@
+type: object
+properties:
+  game_info:
+    type: object
+    properties:
+      num_routers:
+        type: integer
+      router_public_ip:
+        type: string
+  services:
+    type: array
+    items:
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+            - "enabled"
+        name:
+          type: string
+  service_metadata:
+    host_dir:
+      type: string
+    guest_dir:
+      type: string
+  teams:
+    type: array
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        country:
+          type: string
+          pattern: "^[A-Z]{3}$"
+        logo:
+          type: string
+        email:
+          type: string
+        validated:
+          type: integer
+          enum:
+            - 1
+        academic_team:
+          type: integer
+          enum:
+            - 0
+            - 1
+        id:
+          type: integer
+          minimum: 1
+        flag_token:
+          type: string
+          pattern: "^[0-9a-zA-Z]{20}$"
+        organizer_hosted:
+          type: boolean

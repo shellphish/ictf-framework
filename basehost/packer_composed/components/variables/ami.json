@@ -1,0 +1,11 @@
+{
+  "variables":
+    {
+      "AWS_VPC": "{{env `AWS_VPC`}}",
+      "AWS_SUBNET": "{{env `AWS_SUBNET`}}",
+      "AWS_REGION": "{{env `AWS_REGION`}}",
+      "AWS_INSTANCE_TYPE": "{{env `AWS_INSTANCE_TYPE`}}",
+      "AWS_ACCESS_KEY": "{{env `AWS_ACCESS_KEY`}}",
+      "AWS_SECRET_KEY": "{{env `AWS_SECRET_KEY`}}"
+    }
+}

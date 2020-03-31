@@ -1,0 +1,13 @@
+.main-header
+  text-align: center
+  position: relative
+  +debug
+
++at-breakpoint(desk)
+  .main-header
+    +position(fixed, 0px none 0px 0px)
+    z-index: 1000
+    text-align: left
+    width: $sidebar-width
+    background-color: $bg-color
+    padding: $grid-gutter

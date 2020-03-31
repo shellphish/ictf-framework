@@ -1,0 +1,72 @@
+.table
+  width: 100%
+  table-layout: fixed
+
+  td, th
+    text-align: left
+    +padding(1)
+
+    &.align--center
+      text-align: center
+
+  th
+    border-bottom: 1px solid $text-color
+    background-color: $dark-bg-color
+    +heading-font-family
+
+    a.is-sorted
+      color: $accent-color
+      /* default sort direction is-asc
+      &:after
+        content: ""
+        display: inline-block
+        margin-left: 6px
+        +triangle(12px, $accent-color, up)
+    a.is-desc
+      &:after
+        border: none
+        +triangle(12px, $accent-color, down)
+
+  tr:nth-child(2n)
+    background-color: $dark-bg-color
+
+  &.condensed
+    td, th
+      padding: 6px 2px
+
++at-breakpoint(eq-palm)
+  .table
+    display: block
+    border-bottom-width: 0
+
+    thead, tbody, th, td, tr
+      display: block
+
+    thead
+      background-color: transparent
+      border-width: 0
+
+      tr
+        position: absolute
+        top: -9999px
+        left: -9999px
+
+    tr
+      display: block
+      border: 1px solid $text-color
+      +margin-bottom(1)
+
+    td
+      border-bottom: 1px solid $text-color
+      white-space: normal
+      text-align: left
+
+      &:last-child
+        border-bottom-width: 0
+
+      &:before
+        +font-size(milli)
+        content: attr(data-title)
+        font-variant: small-caps
+        text-transform: uppercase
+        display: block

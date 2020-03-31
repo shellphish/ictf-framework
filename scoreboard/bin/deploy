@@ -1,0 +1,45 @@
+#!/bin/bash
+
+deploy_dir="/home/deploy/ictf-framework/scoreboard"
+
+remote_exec()
+{
+    echo "[Running as $1] $2"
+    ssh ${1}@scoreboard.ictf2015.net -x $2
+}
+
+service()
+{
+    remote_exec root "service ictf-gunicorn $1; service ictf-poller $1; service nginx $1"
+}
+
+
+deploy()
+{
+    echo "[Checking eslint errors...]"
+    npm run eslint && remote_exec deploy "cd $deploy_dir && git pull origin master && npm install && npm run build"
+}
+
+
+case "$1" in
+    deploy)
+        deploy
+        ;;
+    start)
+        service start
+        ;;
+    stop)
+        service stop
+        ;;
+    restart)
+        service restart
+        ;;
+    status)
+        service status
+        ;;
+    *)
+        echo "Usage: $0 [deploy|start|stop|restart|status]"
+        exit 1
+esac
+
+exit 0

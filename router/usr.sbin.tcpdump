@@ -1,0 +1,67 @@
+# vim:syntax=apparmor
+# Last Modified: Wed Feb  3 07:58:30 2009
+# Author: Jamie Strandboge <jamie@canonical.com>
+#include <tunables/global>
+
+/usr/sbin/tcpdump {
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+  #include <abstractions/user-tmp>
+
+  capability net_raw,
+  capability setuid,
+  capability setgid,
+  capability dac_override,
+  network raw,
+  network packet,
+
+  # for -D
+  capability sys_module,
+  @{PROC}/bus/usb/ r,
+  @{PROC}/bus/usb/** r,
+
+  # for finding an interface
+  @{PROC}/[0-9]*/net/dev r,
+  /sys/bus/usb/devices/ r,
+  /sys/class/net/ r,
+  /sys/devices/**/net/* r,
+
+  # for -j
+  capability net_admin,
+
+  # for tracing USB bus, which libpcap supports
+  /dev/usbmon* r,
+  /dev/bus/usb/ r,
+  /dev/bus/usb/** r,
+
+  # for init_etherarray(), with -e
+  /etc/ethers r,
+
+  # for USB probing (see libpcap-1.1.x/pcap-usb-linux.c:probe_devices())
+  /dev/bus/usb/**/[0-9]* w,
+
+  # for -z
+  /bin/gzip ixr,
+  /bin/bzip2 ixr,
+
+  # for -F and -w
+  audit deny @{HOME}/.* mrwkl,
+  audit deny @{HOME}/.*/ rw,
+  audit deny @{HOME}/.*/** mrwkl,
+  audit deny @{HOME}/bin/ rw,
+  audit deny @{HOME}/bin/** mrwkl,
+  owner @{HOME}/ r,
+  owner @{HOME}/** rw,
+  owner /opt/ictf/router/data/** rw,
+
+  # for -r, -F and -w
+  /**.[pP][cC][aA][pP] rw,
+
+  # for convenience with -r (ie, read pcap files from other sources)
+  /var/log/snort/*log* r,
+
+  /usr/sbin/tcpdump mr,
+
+  # Site-specific additions and overrides. See local/README for details.
+  #include <local/usr.sbin.tcpdump>
+}

@@ -1,0 +1,8 @@
+coloredlogs
+nose
+pexpect
+pwntools
+pycrypto
+requests
+nclib
+docker

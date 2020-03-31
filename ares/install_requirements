@@ -1,0 +1,17 @@
+#!/bin/bash
+set -eux
+
+export VER="0.12.24"
+if [ ! -d ~/.local/bin ];
+then
+    echo "Please create ~/.local/bin and add it to your path!"
+    exit 1
+fi
+cd /tmp
+wget https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
+unzip terraform_${VER}_linux_amd64.zip
+mv terraform ~/.local/bin
+rm terraform_${VER}_linux_amd64.zip
+cd -
+
+source $1/bin/activate && pip install termcolor cmd2 pycryptodome requests pyaml docker jsonschema

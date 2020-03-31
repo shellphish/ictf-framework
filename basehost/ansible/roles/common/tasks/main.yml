@@ -1,0 +1,25 @@
+# Create swapfile
+- name: swapfile - test swapfile exists
+  stat: path=/swapfile
+  register: swapfile
+
+- name: swapfile - create file
+  command: "fallocate -l {{ swapfile_size }} /swapfile"
+  when: swapfile.stat.exists == False
+
+- name: swapfile - make swap
+  command: "mkswap /swapfile"
+  when: swapfile.stat.exists == False
+
+- name: swapfile - set permissions
+  file: path="/swapfile" mode=0600
+
+- name: swapfile - edit fstab
+  lineinfile:
+    dest=/etc/fstab
+    regexp="^/swapfile"
+    line="/swapfile   none    swap    sw    0   0"
+
+- name: swapfile - enable swap
+  command: swapon -a
+  changed_when: False

@@ -1,0 +1,38 @@
+# Example configuration for the iCTF Team Interface API.
+# Move this to "config.py" to use it.
+config = {}
+
+# You probably don't want to leave this on in production, it will leak secrets
+config['DEBUG'] = False
+
+# Key for the auth tokens
+config['SECRET_KEY'] = "{{ ICTF_TI_SECRET_KEY }}"
+# API secret for the DB server
+config['DB_API_SECRET'] = "{{ ICTF_DB_API_SECRET }}"
+# URL for the DB server
+config['DB_API_URL_BASE'] = "http://{{ ICTF_DB_API_ADDRESS }}"
+
+# This is the external URL to your game server.  We use this for password resets
+config['MY_URL'] = "{{ ICTF_TI_SERVER_URL }}"
+
+# This is an API key for sendgrid.  We use this to send email.
+# DANGER: FIXME: WARNING: This is the real sendgrid key.  Scrub before release 
+config['SENDGRID_API_KEY'] = '{{ SENDGRID_API_KEY }}'
+
+config['EMAIL_SENDER'] = '{{ ICTF_EMAIL_SENDER }}'
+
+# This location will serve the VM bundles to the teams.
+# Bundles should be named <team_id>.tgz
+# We used two types of bundles -- "test" bundles have no game services, and are used to test the teams' own VM hosting infrastructure before the game starts.
+# The "real" bundles are released shortly before the game, and contain the actual game services.
+# See the VM Creator's documentation for details.
+config['test_vm_bundles_dir'] = "./bundles/test"
+config['real_vm_bundles_dir'] = "./bundles/real"
+
+# Administration control flags.
+config['registration_open'] = {{ REGISTRATION_OPEN }} # If true, teams can register
+config['game_started'] = {{ GAME_STARTED }} # If true, teams can submit flags, etc
+config['submission_open'] = {{ SUBMISSION_OPEN }} # If true, teams can submit game artifacts (depending on game type)
+
+config['attack_up'] = False # Game mode
+

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+export GIT_DEPLOY_USER="<YOUR_GIT_DEPLOY_USER>"
+export GIT_DEPLOY_TOKEN="<YOUR_GIT_DEPLOY_TOKEN>"

@@ -1,0 +1,29 @@
+.countdown
+  display: block
+  +heading-font-family
+  font-weight: bold
+  width: 160px
+  color: $text-color
+  text-align: center
+  margin: 0 auto
+  +vertical-margin(2)
+  +debug
+
+.countdown__label
+  display: block
+  font-size: 20px
+  line-height: 1
+
+.countdown__time
+  font-size: 50px
+  display: block
+  line-height: 1
+
+.countdown__time--small
+  @extend .countdown__time
+  font-size: 30px
+
++at-breakpoint(desk)
+  .countdown
+    +position(absolute, none none ($grid-gutter - 8) $grid-gutter)
+    margin: 0

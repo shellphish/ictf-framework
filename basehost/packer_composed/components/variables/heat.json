@@ -1,0 +1,5 @@
+{
+  "variables": {
+    "ICTF_USER_PASSWORD": "{{env `ICTF_USER_PASSWORD`}}"
+  }
+}

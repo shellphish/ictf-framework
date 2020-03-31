@@ -1,0 +1,80 @@
+---
+- name: fail if guest_services_path is not specified
+  fail:
+    msg: "the teamvm requires guest_services_path to be set"
+  when: guest_services_path is not defined
+
+- name: fail if host_services_path is not specified
+  fail:
+    msg: "the teamvm requires host_services_path to be set"
+  when: host_services_path is not defined
+
+- name: fail if services is not specified
+  fail:
+    msg: "the teamvm requires services to be set"
+  when: services is not defined
+
+
+########################          Setup the MOTD now        ###############################
+# Messages for the user #TODO: fix for current version of iCTF, root, self-host, services as docker
+- name: motd
+  template:
+    src: motd.j2
+    dest: /etc/motd
+
+########################    CREATE SERVICE BASE DIRECTORY   ###############################
+- name: create service directory
+  file:
+    path: "{{guest_services_path}}"
+    owner: "{{ICTF_USER}}"
+    group: "{{ICTF_USER}}"
+    state: directory
+    mode: 0755
+
+
+########################          DEPLOY THE SERVICES       ###############################
+- name: deploy CTF services
+  include_role:
+    name: deploy_ctf_service
+  vars:
+    service_name: "{{item}}"
+  with_items: "{{services}}"
+
+# see: https://github.com/betrcode/ansible-run-in-parallel
+- name: build service docker files in parallel
+  shell: "docker build -t {{item}} ."
+  args:
+    chdir: "{{guest_services_path}}/{{item}}/"
+  with_items: "{{services}}"
+  register: _build_docker_files
+  async: 6000  # Maximum runtime in seconds. Adjust as needed.
+  poll: 0  # Fire and continue (never poll)
+
+- name: Wait for the docker containers to be built
+  async_status:
+    jid: "{{ item.ansible_job_id }}"
+  register: _jobs
+  until: _jobs.finished
+  delay: 10             # Check every 10 seconds
+  retries: 1000         # Retry up to 1000 times
+  with_items: "{{ _build_docker_files.results }}"
+
+- name: Generate docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{guest_services_path}}/docker-compose.yml"
+
+
+########################    SETUP bindfs for append-only    ###############################
+- name: setup bindfs for the append only dir
+  lineinfile:
+    path: /etc/fstab
+    line: "{{guest_services_path}}/{{item}}/append {{guest_services_path}}/{{item}}/append fuse.bindfs force-user=root,perms=u=rwD:g=r:dg=rwx:o=D"
+  #shell: "bindfs -u root -p 'u=rwD:g=r:dg=rwx:o=D' {{guest_services_path}}/{{service_name}}/append {{guest_services_path}}/{{service_name}}/append"
+
+  with_items: "{{services}}"
+
+
+########################            CLEAN UP YO SHIT        ###############################
+- name: prune docker cache
+  shell: docker system prune --volumes -f

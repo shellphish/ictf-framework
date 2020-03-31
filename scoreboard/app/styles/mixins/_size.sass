@@ -1,0 +1,9 @@
+@mixin size($value)
+  $width: nth($value, 1)
+  $height: $width
+  @if length($value) > 1
+    $height: nth($value, 2)
+
+  width: $width
+  height: $height
+

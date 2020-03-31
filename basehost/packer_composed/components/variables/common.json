@@ -1,0 +1,11 @@
+{
+  "variables":
+    {
+      "ICTF_FRAMEWORK_DIR_HOST": "{{template_dir}}/../../..",
+      "ICTF_USER": "{{env `ICTF_USER`}}",
+      "IMAGE_NAME": "{{env `IMAGE_NAME`}}",
+      "BASE_IMAGE_NAME": "{{env `BASE_IMAGE_NAME`}}",
+      "BUILD_STAGE": "{{env `BUILD_STAGE`}}",
+      "UBUNTU_VERSION": "{{env `UBUNTU_VERSION`}}"
+    }
+}

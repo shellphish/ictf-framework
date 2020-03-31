@@ -1,0 +1,24 @@
+.slide-hover
+  display: inline-block
+  position: relative
+  width: 100%
+  overflow: hidden
+
+  &:hover
+    .slide-hover__show
+      transform: translateY(100%)
+    .slide-hover__hidden
+      transform: translateY(0%)
+
+.slide-hover__show,
+.slide-hover__hidden
+  display: block
+  transition: transform .3s ease-out
+
+.slide-hover__hidden
+  position: absolute
+  top: 0px
+  bottom: 0px
+  white-space: nowrap
+  transform: translateY(-100%)
+  font-weight: bold

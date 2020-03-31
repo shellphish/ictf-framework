@@ -1,0 +1,70 @@
+# .bashrc_tmp
+
+temp=$(tty) ; 
+TTY=${temp:9}
+
+bash_prompt() {
+	local	RET=$?				# set return value of last command
+
+    local NONE="\[\033[0m\]"    # unsets color to term's fg color
+ 
+    # emphasized (bolded) colors
+    local EMR="\[\033[1;31m\]"
+    local EMG="\[\033[1;32m\]"
+    local EMC="\[\033[1;34m\]"
+# consider darkblue "\[\033[01;34m\]" 
+#	local GITB="\$(__git_ps1)"
+    local GITB=""
+ 
+    local UC=$EMC                 # user's color
+    [ $UID -eq "0" ] && UC=$EMR   # root's color
+	local DC=$EMG				  # successful command color
+    local RET_STR=""
+	[ $RET != "0" ] && DC=$EMR && RET_STR="($RET) "  # last command failed color  
+    
+    local HOSTNAME="$(hostname)"
+    
+    if [ "${HOSTNAME^^}" == "GM" ]; then
+        SYSCOLOR="\[\033[01;33m\]"
+    elif [ "${HOSTNAME^^}" == "DATABASE" ]; then
+        SYSCOLOR="\[\033[01;37m\]"
+    elif [ "${HOSTNAME^^}" == "SCRIPTBOT1" ]; then
+        SYSCOLOR="\[\033[01;36m\]"
+    elif [ "${HOSTNAME^^}" == "SCRIPTBOT2" ]; then
+        SYSCOLOR="\[\033[01;36m\]"
+    elif [ "${HOSTNAME^^}" == "SCRIPTBOT3" ]; then
+        SYSCOLOR="\[\033[01;36m\]"
+    elif [ "${HOSTNAME^^}" == "SCRIPTBOT4" ]; then
+        SYSCOLOR="\[\033[01;36m\]"
+    elif [ "${HOSTNAME^^}" == "GAMEBOT" ]; then
+        SYSCOLOR="\[\033[01;35m\]"
+    elif [ "${HOSTNAME^^}" == "SCOREBOARD" ]; then
+        SYSCOLOR="\[\033[01;32m\]"
+    else
+        SYSCOLOR="\[\033[01;33m\]"
+    fi
+
+    local VENV=""
+    if [ ! -z ${REGION_ID} ];
+        then local VENV="$REGION_ID";
+    fi
+
+
+    local TOPDIRS="$(basename $(dirname $PWD))/$(basename $PWD)"
+    local VENV=""
+    if [ ! -z ${VIRTUAL_ENV+x} ];
+        then local VENV=" [$(basename $VIRTUAL_ENV)] ";
+    fi
+    # title bar
+    #PS1="\[\033]0;${HOSTNAME}(${TTY}) :"
+
+    # prompt info line
+    PS1="${UC}\u@${SYSCOLOR}\h${UC}${VENV} \[\033[01;36m\]\w $GITB \n"
+
+    # prompt
+    PS1="${PS1}${DC}${RET_STR}\\$ ${NONE}"
+
+    #   OLD VERSION: PS1="${UC}\u (\@) \w $GITB\n${DC}\\$ ${NONE}"
+}
+PROMPT_COMMAND=bash_prompt
+

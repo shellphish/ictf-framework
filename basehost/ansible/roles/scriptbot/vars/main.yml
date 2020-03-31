@@ -1,0 +1,4 @@
+ICTF_API_SECRET: "{{ lookup('password','/opt/ictf/secrets/api_secret length=25') }}"
+ICTF_API_ADDRESS: "{{ lookup('password','/opt/ictf/secrets/api_address length=25') }}"
+BOT_ID: "{{ lookup('env', 'BOT_ID') }}"
+ALL_BOTS: "{{ lookup('env', 'ALL_BOTS') }}"

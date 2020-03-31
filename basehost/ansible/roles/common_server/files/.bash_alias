@@ -1,0 +1,96 @@
+
+sshu() { ssh ubuntu@"$@" ; }
+
+gip() { /opt/ictf/common/aws_get_ip.py --name "$@" ; };
+
+sa() { ssh ubuntu@`/opt/ictf/common/aws_get_ip.py --name "$@"` ; }
+
+alias awsinfo="curl http://169.254.169.254/latest/dynamic/instance-identity/document && echo"
+
+alias ictf-dblink='echo "http://$(gip database)/teams/info?secret=$(cat ~/ictf/secrets/api_secret)"'
+alias ictf-turnon='curl http://172.31.64.13/game/insert?secret=$(cat ~/ictf/secrets/api_secret)'
+
+alias ictfdb='mysql ictf -u ictf -p`cat /opt/ictf/secrets/database-api/mysql`'
+alias getdburl='echo "http://$(gip database)/teams/info?secret=$(cat ~/ictf/secrets/api_secret)"'
+startictf() { 
+  input_file="$@"
+  if [ -z "$input_file" ]; then
+    input_file="teams_registration_info.yml"
+  fi
+  cd ~/ictf/game_master;
+  echo "Creating game using $input_file"
+  ./gm.py --create "$input_file";
+}
+
+sa() {
+  GOING_TO="${1}"
+  if [ "${GOING_TO^^}" == "GM" ] || [ "${GOING_TO^^}" == "GAME_MASTER" ]; then
+    GOING_TO="game-master"
+  fi
+  OTHER_SSH_FLAGS="${@:2}"
+  IP_ADDY=$(~/ictf/common/aws_get_ip.py --name "${GOING_TO}")
+  echo "Connecting to ${GOING_TO} at IP ${IP_ADDY}"
+  ssh -oStrictHostKeyChecking=no ubuntu@${IP_ADDY} ${OTHER_SSH_FLAGS};
+}
+
+alias cse="curl -s http://172.31.64.13/scripts/get/torun?secret=lhSQLENnsyxrXo4dG-JW,Pkrl | grep -o tick_id |wc -l && curl -s http://172.31.64.13/game/tick/?secret=lhSQLENnsyxrXo4dG-JW,Pkrl | python -c \"import sys, json; print json.load(sys.stdin)['approximate_seconds_left']\""
+
+alias emacs='emacs -nw'
+
+alias gm='cd ~/ictf/game_master'
+alias tv='cd ~/ictf/teamvms/team_vagrs'
+
+alias localservicestats='servicestats 99999'
+alias sstat='servicestats'
+
+alias servicehistory="wget -O- http://$(cat /opt/ictf/secrets/database-api/db_pub_ip)/services/history/status/cnt/15?secret=$(cat /opt/ictf/secrets/api_secret)|python -m json.tool"
+
+servicestats() {
+    TEAM_ID="${1}"
+    echo "Getting service status for Team${TEAM_ID}"
+    wget -qO- http://$(/opt/ictf/common/aws_get_ip.py --name "database")/services/status/${TEAM_ID}?secret=$(cat ~/ictf/secrets/api_secret) |python -m json.tool
+}
+
+read_scriptbot_log() {
+    SCRIPTBOT_ID="${1}"
+    if [ -z "$SCRIPTBOT_ID" ]; then
+        SCRIPTBOT_ID="1"
+    fi
+    echo "Connecting to scriptbot${SCRIPTBOT_ID}"
+    ssh "scriptbot${SCRIPTBOT_ID}" sudo tail -f /var/log/scriptbot/scheduler.log
+}
+read_scriptbot_log_error() {
+    SCRIPTBOT_ID="${1}"
+    if [ -z "$SCRIPTBOT_ID" ]; then
+        SCRIPTBOT_ID="1"
+    fi
+    echo "Connecting to scriptbot${SCRIPTBOT_ID}"
+    ssh "scriptbot${SCRIPTBOT_ID}" sudo tail -f /var/log/scriptbot/error.log
+}
+
+runteamansible(){
+    local TEAMNAME="team${1}"
+    if [[ $1 = "team"* ]]; then
+        TEAMNAME=${1}
+    fi
+    cd /opt/ictf/teamvms/team_vagrs/${TEAMNAME}
+    echo "${TEAMNAME}" > hosts
+    echo "Starting Playbook for ${TEAMNAME}, output being directed to /opt/ictf/gm/data/game_build.log"
+    ansible-playbook -i hosts -l ${TEAMNAME} vansible_team.yml --sudo >> /opt/ictf/gm/data/game_build.log 2>&1 &
+    cd -
+
+}
+
+alias run_team_ansible="runteamansible"
+
+alias logsb='read_scriptbot_log'
+alias logsb_error='read_scriptbot_log'
+
+alias loggb='ssh gamebot  sudo tail -f /var/log/upstart/gamebot.log'
+alias logdb='ssh database  sudo tail -f /var/log/ictf-database-api.log -f /var/log/ictf-db-export-s3.log'
+alias logscoreboard='ssh scoreboard  sudo tail -f /var/log/ictf-database-api.log -f /var/log/ictf-db-export-s3.log'
+alias vlog='grc tail -f /opt/ictf/database/vagrant.log|grc tail -f /var/log/ictf-flask-api-gm.log -f /var/log/ictf-job-worker.log -f /opt/ictf/gm/data/game_build.log'
+alias restartictf='sudo -- sh -c "service ictf-flask-api-gm restart; service ictf-job-terminate-worker restart; service ictf-job-worker restart"'
+alias startstatus='grep -e "ok=" ~/ictf/gm/data/game_build.log | grep "failed=[0-9][0-9]*"'
+alias load='/opt/ictf/gm/vms_report.py -c'
+alias report='/opt/ictf/gm/vms_report.py'

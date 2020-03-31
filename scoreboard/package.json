@@ -1,0 +1,55 @@
+{
+  "name": "ictf-scoreboard",
+  "version": "1.0.0",
+  "description": "iCTF scoreboard static frontend",
+  "main": "index.js",
+  "config": {
+    "dest": "_static"
+  },
+  "scripts": {
+    "clean": "rm -rf $npm_package_config_dest/*",
+    "copy": "cp -rv app/public/* $npm_package_config_dest/",
+    "build:scripts": "browserify -d --extension=.jsx -p [minifyify --compressPath . --map index.js.map --output $npm_package_config_dest/index.js.map] -t [ babelify --stage 0 ] -o $npm_package_config_dest/index.js app/index.js",
+    "prebuild:styles": "node-sass --importer ./node_modules/node-sass-globbing/ --output-style compressed --source-map true --include-path bower_components app/styles/main.sass $npm_package_config_dest/main.css",
+    "build:styles": "postcss -u autoprefixer --autoprefixer.browsers '> 5%' -o $npm_package_config_dest/main.css $npm_package_config_dest/main.css",
+    "watch:scripts": "watchify --extension=.jsx -t [ babelify --stage 0 ] -o $npm_package_config_dest/index.js app/index.js --debug --verbose",
+    "watch:styles": "nodemon -q -w app/styles/ --ext '.sass' --exec 'npm run build:styles'",
+    "prebuild": "npm run clean -s && npm run copy -s",
+    "prestart": "npm run clean -s && npm run copy -s",
+    "eslint": "eslint app/**/*.js*",
+    "build": "npm run eslint && npm run build:scripts && npm run build:styles",
+    "start": "npm run watch:scripts & npm run watch:styles & live-server --port=5000 $npm_package_config_dest"
+  },
+  "author": "Francesco Disperati",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "6.1.1",
+    "babel-eslint": "4.1.8",
+    "babelify": "6.4.0",
+    "browserify": "11.2.0",
+    "eslint": "1.10.1",
+    "eslint-plugin-react": "3.10.0",
+    "live-server": "^1.2.0",
+    "minifyify": "7.1.0",
+    "node-sass": "3.13.1",
+    "node-sass-globbing": "0.0.23",
+    "nodemon": "1.8.1",
+    "postcss-cli": "2.3.2",
+    "watchify": "3.6.1"
+  },
+  "dependencies": {
+    "c3": "0.4.10",
+    "classnames": "2.2.0",
+    "history": "1.13.1",
+    "moment": "2.10.6",
+    "moment-timezone": "0.4.1",
+    "node-sass": "^3.13.1",
+    "react": "0.14.3",
+    "react-addons-css-transition-group": "0.14.3",
+    "react-dom": "0.14.3",
+    "react-router": "1.0.0",
+    "underscore": "1.8.3",
+    "universal-mixin": "1.0.0",
+    "whatwg-fetch": "0.10.1"
+  }
+}

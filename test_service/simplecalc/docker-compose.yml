@@ -1,0 +1,17 @@
+version: '3.2'
+services:
+  chall:
+    build: ./service/
+    volumes:
+      - type: bind
+        source: ./service/ro
+        target: /home/chall/service/ro
+        read_only: true
+      - type: bind
+        source: ./service/rw
+        target: /home/chall/service/rw
+      - type: bind
+        source: ./service/append
+        target: /home/chall/service/append
+    ports:
+      - "6666:6666"

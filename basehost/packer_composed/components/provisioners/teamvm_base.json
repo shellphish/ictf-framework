@@ -1,0 +1,28 @@
+{
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "echo {{user `ICTF_USER` }} | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "scripts/setup.sh",
+      "environment_vars": [
+        "ICTF_USER={{user `ICTF_USER`}}"
+      ]
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo {{user `ICTF_USER` }} | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "scripts/ansible.sh"
+    },
+    {
+      "type": "ansible",
+      "playbook_file": "ansible/teamvm_base.yml",
+      "extra_arguments": [
+        "-e 'ansible_python_interpreter=/usr/bin/python3'",
+        "--become",
+
+        "--extra-vars",
+        "ICTF_USER={{user `ICTF_USER`}} ICTF_FRAMEWORK_DIR_HOST={{user `ICTF_FRAMEWORK_DIR_HOST`}}"
+      ]
+    }
+  ]
+}

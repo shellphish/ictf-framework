@@ -1,0 +1,9 @@
+architecture: i386
+service_name: simplecalc
+type: console
+description: Password-protected calculator service, only you can see your results!
+flag_id_description: Flags are identified by the title inside the results. Flagid is the username. 
+apt_dependencies: 
+    - sl
+authors:
+    - lockshaw

@@ -1,0 +1,16 @@
+#arrow up
+"\e[A":history-search-backward
+
+
+## arrow down
+"\e[B":history-search-forward
+
+
+
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+"\e[5C": forward-word
+"\e[5D": backward-word
+"\e\e[C": forward-word
+"\e\e[D": backward-word
+

@@ -1,0 +1,67 @@
+@function breakpoint-media-queries($list)
+  $result: ()
+  $widths: map-values($list)
+  $i: 0
+
+  @each $name, $width in $list
+    $i: $i + 1
+
+    @if $width > 0px
+      $breakpoint-name: $name
+      $min-width: $width
+      $query: "screen and (min-width: #{$min-width})"
+      $result: map-merge($result, ($breakpoint-name: $query))
+
+    @if $i < length($list)
+      $breakpoint-name: "eq-#{$name}"
+      $min-width: $width
+      $max-width: nth($widths, $i + 1) - 1px
+      $query: "screen"
+      @if $min-width > 0px
+        $query: "#{$query} and (min-width: #{$min-width})"
+      $query: "#{$query} and (max-width: #{$max-width})"
+      $result: map-merge($result, ($breakpoint-name: $query))
+
+    @if $width > 0px and $i < length($list)
+      $breakpoint-name: "lte-#{$name}"
+      $max-width: nth($widths, $i + 1) - 1px
+      $query: "screen and (max-width: #{$max-width})"
+      $result: map-merge($result, ($breakpoint-name: $query))
+
+  @return $result
+
+@function breakpoint-inverse-media-queries($list)
+  $result: ()
+  $widths: map-values($list)
+  $i: 0
+
+  @each $name, $width in $list
+    $i: $i + 1
+
+    @if $width > 0px
+      $breakpoint-name: $name
+      $max-width: $width - 1px
+      $query: "screen and (max-width: #{$max-width})"
+      $result: map-merge($result, ($breakpoint-name: $query))
+
+    @if $i < length($list)
+      $breakpoint-name: "eq-#{$name}"
+      $min-width: nth($widths, $i + 1)
+      $query: "screen and (min-width: #{$min-width})"
+      @if $width > 0px
+        $max-width: $width - 1px
+        $query: "#{$query}, screen and (max-width: #{$max-width})"
+      $result: map-merge($result, ($breakpoint-name: $query))
+
+    @if $width > 0px and $i < length($list)
+      $breakpoint-name: "lte-#{$name}"
+      $min-width: nth($widths, $i + 1)
+      $query: "screen and (min-width: #{$min-width})"
+      $result: map-merge($result, ($breakpoint-name: $query))
+
+  @return $result
+
+
+@function breakpoint-names($list)
+  @return map-keys(breakpoint-media-queries($list))
+

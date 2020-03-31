@@ -1,0 +1,29 @@
+@import vendor/*
+
+@import font-faces
+
+@import functions/*
+@import variables/*
+@import mixins/*
+@import transitions/*
+@import blocks/*
+
+*
+  box-sizing: border-box
+  /* user-select: none
+
+img
+  max-width: 100%
+  height: auto
+
+body
+  color: $text-color
+  background-color: $bg-color
+  +body-font-family
+
+a
+  transition: color .3s $material-ease
+  &:visited, &:active, &:link
+    color: inherit
+  &:hover
+    color: $accent-color

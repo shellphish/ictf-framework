@@ -1,0 +1,68 @@
+#!/usr/bin/env python 
+
+import string
+import sys
+import random
+import json
+import traceback
+
+from nclib import Netcat
+
+
+def random_str(l):
+    POSSIBILITIES = string.ascii_uppercase + string.digits + string.ascii_lowercase
+    return "".join(random.choice(POSSIBILITIES) for _ in range(l))
+
+
+def somestr():
+    l = random.randint(5, 50)
+    return random_str(l)
+
+
+def get_flag(ip, port, flag_id, token):
+    # We read that note, knowing the password (in other words, we're benign traffic)
+    # Whatever the patch, this must still work!
+    response = {
+        "error": False,
+        "payload": {},
+    }
+
+    note_id = flag_id
+    password = token
+
+    # Interaction with the service
+    # Try to be robust, services will not always answer immediately
+    r = Netcat((ip, port))
+
+    r.recvuntil("username:")
+    r.send(flag_id + "\n")
+    r.recvuntil("password:")
+    r.send(token + "\n")
+    r.recvuntil("work:")
+    title = somestr()
+    r.send(title + "\n")
+
+    r.recvuntil("result\n")
+
+    r.send("R\n")
+    flag = r.recvuntil("\n").strip()
+
+    if "No such file or directory" in flag:
+        response['error'] = True
+        response['payload'] = "Flag not found with the specified flag_id and token ({}, {})".format(flag_id, token)
+        return response
+
+    response['payload'] = {'flag': flag}
+
+    return response
+
+
+if __name__ == "__main__":
+    try:
+        print json.dumps(get_flag(sys.argv[1], int(sys.argv[2]), sys.argv[3], sys.argv[4]))
+    except Exception as e:
+        response = {
+            "error": True,
+            "payload": str(e) + "\n" + traceback.format_exc()
+        }
+        print json.dumps(response)

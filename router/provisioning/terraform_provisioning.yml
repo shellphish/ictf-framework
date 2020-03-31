@@ -1,0 +1,72 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  handlers:
+    - name: restart ictf-tcpdump
+      service: name=ictf-tcpdump state=restarted
+
+    - name: restart ictf-pcap-s3
+      service: name=ictf-pcap-s3 state=restarted
+
+    - name: restart openvpn
+      service: name=openvpn state=restarted
+
+  tasks:
+
+    - name: setting hostname
+      hostname:
+        name: "router"
+
+    - name: Add mappings to /etc/hosts
+      blockinfile:
+        dest: /etc/hosts
+        block: |
+          {{ item.ip }} {{ item.name }}
+        marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+      with_items:
+        - { name: "router", ip: 127.0.0.1 }
+
+    - name: create secrets directory
+      copy:
+        content="{{ ICTF_API_SECRET }}"
+        dest=/opt/ictf/secrets/database-api/secret
+        owner=root group=root mode="u=rwx,g=rx,o=rx"
+
+    - name: create aws_router_config.yml
+      template:
+        src: /opt/ictf/router/provisioning/aws_config.yml.j2
+        dest: /opt/ictf/router/aws_config.yml
+
+    - name: Fix permission for configuration file
+      file:
+        path: /opt/ictf/router/aws_config.yml
+        owner: hacker
+        group: hacker
+        mode: 0755
+      notify:
+        - restart ictf-tcpdump
+        - restart ictf-pcap-s3
+
+    - name: install zipfile tools
+      package:
+        name:
+        - unzip
+        - zip
+
+    - name: create openvpn log directory
+      file:
+        path:  /var/log/openvpn
+        state: directory
+        owner: root
+        group: root
+        mode:  0755
+
+    - name: extract openvpn config directory
+      command: unzip -d /etc/openvpn /opt/ictf/openvpn.zip
+
+    - name: reload openvpn config
+      command: systemctl daemon-reload
+
+    - name: restart openvpn
+      command: systemctl restart openvpn

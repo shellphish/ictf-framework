@@ -1,0 +1,32 @@
+{
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "access_key": "{{user `AWS_ACCESS_KEY`}}",
+      "secret_key": "{{user `AWS_SECRET_KEY`}}",
+      "ami_name": "{{user `BUILD_STAGE`}}_{{user `IMAGE_NAME`}}_{{timestamp}}",
+      "instance_type": "{{user `AWS_INSTANCE_TYPE`}}",
+      "region": "{{user `AWS_REGION`}}",
+      "source_ami_filter": {
+        "filters": {
+          "name": "ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*",
+          "virtualization-type": "hvm",
+          "root-device-type": "ebs"
+        },
+        "owners": [
+          "099720109477"
+        ],
+        "most_recent": true
+      },
+
+      "ssh_username": "ubuntu",
+
+      "tags": {
+        "Description": "iCTF {{user `IMAGE_NAME`}} AMI"
+      },
+
+      "vpc_id": "{{user `AWS_VPC`}}",
+      "subnet_id": "{{user `AWS_SUBNET`}}"
+    }
+  ]
+}

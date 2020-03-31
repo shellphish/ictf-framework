@@ -1,0 +1,5 @@
+{
+  "variables": {
+    "BUILD_DIR": "./build"
+  }
+}

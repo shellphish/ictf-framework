@@ -1,0 +1,11 @@
+[Unit]
+Description = Glances in curses mode - A service to gather running statistics
+After = network.target
+
+[Service]
+ExecStart = /usr/local/bin/glances -s
+Restart = always
+User = nobody
+
+[Install]
+WantedBy = multi-user.target

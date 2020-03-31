@@ -1,0 +1,38 @@
+{
+    "db_endpoint": "THE_API_ADDRESS_GOES_HERE",
+    "secret": "THESECRETPASSPHRASEGOESHERE",
+    "db_port": 5000,
+    "lock_name": "redis_cache",
+    "redis_host": "localhost",
+    "redis_port": 6379,
+    "redis_db_id": 0,
+    "polling_sleep_time": 5,
+    "setup_sleep_time": 30,
+    "max_requested_ticks": 30,
+
+    "dynamic_endpoints": {
+        "previous_tick": [
+            "/services/states/tick/"
+        ],
+        "latest": [
+            "/services/exploited",
+            "/scores/firstbloods",
+            "/scores"
+        ]
+    },
+
+    "static_endpoints": [
+        "/services",
+        "/teams/info"
+    ],
+
+    "tick_endpoint": {
+        "key": "tick_id",
+        "e": "/game/tick/"
+    },
+    "game_start": {
+        "key": "num",
+        "stat": "/game/state"
+    }
+
+}

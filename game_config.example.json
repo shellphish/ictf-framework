@@ -1,0 +1,48 @@
+{
+  "services": [
+    {
+      "state": "enabled",
+      "name": "<NAME_SERVICE_1>"
+    },
+    {
+      "state": "enabled",
+      "name": "<NAME_SERVICE_1>"
+    }
+    ...
+  ],
+  "service_metadata": {
+    "host_dir": "<PATH_TO_YOUR_SERVICE_DIRECTORY>",
+    "guest_dir": "/opt/ictf/services"
+  },
+  "game_info": {
+    "num_routers": 20,
+    "router_public_ip": "<ROUTER_PUBLIC_IP>"
+  },
+  "teams": [
+    {
+      "name": "<NAME_TEAM_1>",
+      "url": "<TEAM_1_URL>",
+      "country": "<3_LETTER_COUNTRY_CODE_FOR_TEAM_1>",
+      "logo": "",
+      "email": "<TEAM_1_EMAIL>",
+      "validated": 1,
+      "academic_team": 1,
+      "id": 1,
+      "flag_token": "<TEAM_1_TOKE_20_RANDOM_CHARS>",
+      "organizer_hosted": true
+    },
+    {
+      "name": "<NAME_TEAM_2>",
+      "url": "<TEAM_2_URL>",
+      "country": "<3_LETTER_COUNTRY_CODE_FOR_TEAM_2>",
+      "logo": "",
+      "email": "<TEAM_2_EMAIL>",
+      "validated": 1,
+      "academic_team": 1,
+      "id": 2,
+      "flag_token": "<TEAM_2_TOKE_20_RANDOM_CHARS>",
+      "organizer_hosted": true
+    }
+    ...
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "ansible/router.yml",
+      "extra_arguments": [
+        "--become",
+        "--extra-vars", "ICTF_FRAMEWORK_DIR_HOST={{user `ICTF_FRAMEWORK_DIR_HOST`}} ICTF_USER={{user `ICTF_USER`}}"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+- include_role:
+    name: register_service_daemon
+  vars:
+    service_name: procfs_permissions
+    description: "Daemon remounting /proc with hidepid=2"
+    command: "/bin/mount -o remount,hidepid=2 /proc"
+    working_directory: "/"

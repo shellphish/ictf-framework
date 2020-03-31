@@ -1,0 +1,7 @@
+# The primary network interface
+auto eth0
+iface eth0 inet dhcp
+
+        # routing for 172.31.128.0 - 172.31.159.255
+        up route add -net 172.31.128.0 netmask 255.255.224.0 gw 172.31.172.1
+

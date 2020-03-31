@@ -1,0 +1,81 @@
+---
+- name: fail if guest_services_path is not specified
+  fail:
+    msg: "deploy_ctf_service requires guest_services_path to be set"
+  when: guest_services_path is not defined
+
+- name: fail if host_services_path is not specified
+  fail:
+    msg: "deploy_ctf_service requires host_services_path to be set"
+  when: host_services_path is not defined
+
+- name: fail if service_name is not specified
+  fail:
+    msg: "deploy_ctf_service requires service_name to be set"
+  when: service_name is not defined
+
+- name: SERVICE DEPLOYMENT!
+  debug:
+    msg: "Currently deploying {{service_name}}!"
+
+- name: "create required service directories"
+  local_action: "command mkdir -p '{{host_services_path}}/{{service_name}}/service/{{service_dir}}'"
+  become: false
+  with_items:
+    - rw
+    - ro
+    - append
+  loop_control:
+    loop_var: service_dir
+
+- name: "run `make clean` to get a clean slate for the service files"
+  local_action: "command make -C '{{host_services_path}}/{{service_name}}' clean"
+  become: false
+
+- name: "run `make bundle` to create the service files"
+  local_action: "command make -C '{{host_services_path}}/{{service_name}}' bundle"
+  become: false
+
+- name: "run `make scriptbot_scripts` to create the docker image containing the scripts executed by scriptbot"
+  local_action: "command make -C '{{host_services_path}}/{{service_name}}' scriptbot_scripts SERVICE_NAME={{service_name}}"
+  become: false
+
+- name: copy over service directory to remote
+  synchronize:
+    src: "{{host_services_path}}/{{service_name}}/service/"
+    dest: "{{guest_services_path}}/{{service_name}}/"
+
+- name: set service directory permissions
+  file:
+    path: "{{guest_services_path}}/{{service_name}}/"
+    state: directory
+    owner: "{{ICTF_USER}}"
+    group: "{{ICTF_USER}}"
+    mode: 0755
+
+- name: set ro folder permissions & owner
+  file:
+    path: "{{guest_services_path}}/{{service_name}}/ro"
+    owner: "ctf"
+    group: "ctf"
+    state: directory
+    mode: 0755
+    recurse: yes
+
+- name: set rw folder permissions & owner
+  file:
+    path: "{{guest_services_path}}/{{service_name}}/rw"
+    owner: "ctf"
+    group: "ctf"
+    state: directory
+    mode: 0777
+    recurse: yes
+
+- name: set append folder permissions & owner
+  file:
+    path: "{{guest_services_path}}/{{service_name}}/append"
+    owner: "ctf"
+    group: "ctf"
+    state: directory
+    mode: 01754
+    recurse: yes

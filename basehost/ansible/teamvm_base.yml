@@ -1,0 +1,4 @@
+---
+- hosts: all
+  roles:
+    - teamvm_base

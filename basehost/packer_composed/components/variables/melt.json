@@ -1,0 +1,6 @@
+{
+  "variables": {
+    "GIT_DEPLOY_USER": "{{env `GIT_DEPLOY_USER`}}",
+    "GIT_DEPLOY_TOKEN": "{{env `GIT_DEPLOY_TOKEN`}}"
+  }
+}

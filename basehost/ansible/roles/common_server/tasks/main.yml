@@ -1,0 +1,92 @@
+## setup host for easier identification and management of server
+#- name : include configuration variables when not already included
+#  include_vars:
+#    file: aws_config.yml
+#    name: cfg
+#  when: cfg is undefined
+
+- name: checking that server_hostname is defined
+  debug:
+    msg: "server_hostname is set to {{server_hostname}}"
+  when: server_hostname is defined
+
+- name: "setting {{ server_hostname }} hostname"
+  hostname:
+    name: "{{ server_hostname }}"
+  when: server_hostname is defined
+
+- name: Add mappings to /etc/hosts
+  blockinfile:
+    dest: /etc/hosts
+    block: |
+      {{ item.ip }} {{ item.name }}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+  with_items:
+    - { name: "{{ server_hostname }}", ip: 127.0.0.1 }
+  when: server_hostname is defined
+
+- name: creating link from home to ictf
+  file:
+    src: /opt/ictf
+    dest: /home/{{ICTF_USER}}/ictf
+    owner: "{{ICTF_USER}}"
+    group: "{{ICTF_USER}}"
+    state: link
+
+# copy bash files for configuration of {{ICTF_USER}} on server
+- name: copying new .bashrc
+  copy:
+    src=.bashrc
+    dest=/home/{{ICTF_USER}}/.bashrc
+    owner={{ICTF_USER}} group={{ICTF_USER}}
+- name: copying new .inputrc
+  copy:
+    src=.inputrc
+    dest=/home/{{ICTF_USER}}/.inputrc
+    owner={{ICTF_USER}} group={{ICTF_USER}}
+- name: copying new .bash_prompt
+  copy:
+    src=.bash_prompt
+    dest=/home/{{ICTF_USER}}/.bash_prompt
+    owner={{ICTF_USER}} group={{ICTF_USER}}
+
+- name: copying new .bash_alias
+  copy:
+    src=.bash_alias
+    dest=/home/{{ICTF_USER}}/.bash_alias
+    owner={{ICTF_USER}} group={{ICTF_USER}}
+
+# Glances setup
+- name: pip install glances
+  apt:
+    name: glances
+
+#- name: glances - creating glances-service conf file for service
+#  copy:
+#    src=glances-service.conf
+#    dest=/etc/init/glances-service.conf
+#    owner={{ICTF_USER}} group={{ICTF_USER}}
+
+- name: copy systemd unit file for glances service
+  copy:
+    src=glances.service
+    dest=/etc/systemd/system/glances.service
+    owner=root group=root mode="u=rw,g=r,o=r"
+
+- name: glances - creating .config dir for conf file
+  file: dest=/home/{{ICTF_USER}}/.config owner={{ICTF_USER}} group={{ICTF_USER}} state=directory
+
+- name: glances - creating glances directory conf dir under .config
+  file: dest=/home/{{ICTF_USER}}/.config/glances owner={{ICTF_USER}} group={{ICTF_USER}} state=directory
+
+- name: glances - copy conf file to ~./config/glances
+  copy:
+    src=glances.conf
+    dest=/home/{{ICTF_USER}}/.config/glances/glances.conf
+    owner={{ICTF_USER}} group={{ICTF_USER}}
+
+- name: start glances service
+  service:
+    name: "glances.service"
+    state: started
+

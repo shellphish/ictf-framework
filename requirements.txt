@@ -1,0 +1,12 @@
+# Created by running:
+# for x in `ls **/req*.txt`; do echo "-r $x" >> requirements.txt; done
+-r arse_bak/requirements.txt
+-r database/requirements.txt
+-r gamebot/requirements.txt
+-r game_master/requirements2.txt
+-r game_master/requirements.txt
+-r gm/requirements.txt
+-r scoreboard/requirements.txt
+-r scriptbot/requirements.txt
+-r service_tester/reqs.txt
+-r teaminterface/requirements.txt

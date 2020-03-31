@@ -1,0 +1,92 @@
+# Created by https://www.gitignore.io/api/packer,terraform
+
+# Edit at https://www.gitignore.io/?templates=packer,terraform
+#
+#
+### VisualStudioCode ###
+*/.vscode/*
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+
+### Packer ###
+# Cache objects
+packer_cache/
+
+# For built boxes
+*.box
+
+### Terraform ###
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+
+# Ignore any .tfvars files that are generated automatically for each Terraform run. Most
+# .tfvars files are managed as part of configuration and so should be included in
+# version control.
+#
+# example.tfvars
+
+# Ignore override files as they are usually used to override resources locally and so
+# are not checked in
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Include override files you do wish to add to version control using negated pattern
+#
+# !example_override.tf
+
+# End of https://www.gitignore.io/api/packer,terraform
+*.pyc
+.idea/
+.ropeproject/
+.vagrant/
+.terraform/
+ares/*.yml
+ares/aws/sshkeys/*
+ares/aws/infrastructure/aws_sshkeys.tf
+ares/aws/.terraform
+ares/aws/backup
+yeopardy/aws/backup
+game_master/aws_cli_credentials
+game_master/aws_gm_config.yml
+public_service_samples/sample_c.tgz
+public_service_samples/sample_c/service/ro/sample_c
+public_service_samples/sample_c/src/sample_c
+router/aws_router_config.yml
+secrets/
+.dropbox
+database/notes_for_ictf
+teaminterface/config.py
+setup.retry
+teamvms/scripts/
+game_master/cloud_access_cfg.yml
+secrets/api_secret
+secrets/ictf_ssh_config
+*.DS_Store
+.DS_Store
+# Files to keep (even though ignored above)
+!ares/aws-cfg-SAMPLE.yml
+!ares/cfg-game-DEFAULT.yml
+backup/
+ares/gm_pub_ip
+ares/gm_token
+.DS_Store
+.dropbox.attr
+.*.swp
+desktop.ini
+game_master/vagrantout.log
+gm/data/*.yml
+basehost/build/*
+basehost/packer_cache/*
+basehost/iso/*
+**/game_config.json

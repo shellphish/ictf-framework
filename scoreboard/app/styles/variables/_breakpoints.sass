@@ -1,0 +1,23 @@
+// 0px            480px           1024x           1500px           ∞
+// |               |               |                |              |
+// |               |<-- lap -------------------------------------->|
+// |               |               |<-- desk --------------------->|
+// |               |               |                |<-- wall ---->|
+// |               |               |                |              |
+// |<-- eq-palm -->|               |                |              |
+// |               |<-- eq-lap --->|                |              |
+// |               |               |<-- eq-desk --->|              |
+// |               |               |                |              |
+// |<------------------ lte-lap -->|                |              |
+// |<---------------------------------- lte-desk -->|              |
+// |               |               |                |              |
+// 0px            480x           1024px          1500px            ∞
+
+// define breakpoints
+$breakpoint-widths: ('palm': 0px, 'lap': 480px, 'desk': 1024px, 'wall': 1500px)
+
+// derived variables
+$breakpoint-names: breakpoint-names($breakpoint-widths)
+$breakpoint-media-queries: breakpoint-media-queries($breakpoint-widths)
+$breakpoint-inverse-media-queries: breakpoint-inverse-media-queries($breakpoint-widths)
+

@@ -1,0 +1,5 @@
+__author__ = 'machiry'
+
+# DB settings
+DB_HOST = 'THE_API_ADDRESS_GOES_HERE'
+DB_SECRET = 'THESECRETPASSPHRASEGOESHERE'

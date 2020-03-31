@@ -1,0 +1,24 @@
+.navigation
+  +margin-top(2)
+  +margin-bottom(4)
+  > a
+    display: inline-block
+    +padding(1)
+    padding-top: 0
+    text-decoration: none
+    +heading-font-family
+    font-weight: bold
+
+    &.is-active
+      color: $accent-color
+
++at-breakpoint(desk)
+  .navigation
+    +padding-left(1)
+    > a
+      display: block
+      +horizontal-padding(0)
+      +padding-bottom(1)
+
+      &:before
+        content: "$> "

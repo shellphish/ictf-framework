@@ -1,0 +1,26 @@
+.logo
+  display: block
+  text-decoration: none
+  +heading-font-family
+  font-weight: bold
+  color: $text-color
+  line-height: 1
+  margin: 0 auto
+  text-align: center
+  +debug
+
+.logo__name
+  font-size: 80px
+  display: inline-block
+  line-height: 1
+
+.logo__year
+  font-size: 30px
+  display: inline-block
+  line-height: 1
+  letter-spacing: 5px
+
++at-breakpoint(desk)
+  .logo
+    margin: 0
+    +margin-bottom(4)

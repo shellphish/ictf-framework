@@ -1,0 +1,27 @@
+[Unit]
+Description = {{description}}
+After = network.target
+
+{% for dep in dependencies|default([]) %}
+After = {{dep}}
+Requires = {{dep}}
+{% endfor %}
+
+AssertPathExists = {{ working_directory }}
+
+[Service]
+WorkingDirectory= {{ working_directory }}
+
+{% if myenvironment is defined %}
+Environment={{ myenvironment }}
+{% endif %}
+
+ExecStart={{ command }}
+Restart=always
+
+{% if setuid_user is defined %}
+User={{ setuid_user }}
+{% endif %}
+
+[Install]
+WantedBy = multi-user.target

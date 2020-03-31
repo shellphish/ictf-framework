@@ -1,0 +1,36 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  handlers:
+    - name: restart gamebot
+      service: name=ictf-gamebot state=restarted
+
+  tasks:
+
+  - name: setting hostname
+    hostname:
+      name: "gamebot"
+
+  - name: Add mappings to /etc/hosts
+    blockinfile:
+      dest: /etc/hosts
+      block: |
+        {{ item.ip }} {{ item.name }}
+      marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+    with_items:
+      - { name: "gamebot", ip: 127.0.0.1 }
+
+  - name: ictf-database database connection settings.py configuration - set ICTF_API_ADDRESS
+    replace:
+      name=/opt/ictf/gamebot/settings.py
+      regexp="(THE_API_ADDRESS_GOES_HERE)"
+      replace="{{ ICTF_API_ADDRESS }}"
+
+  - name: ictf-database database connection config.json configuration - set API_SECRET
+    replace:
+      name=/opt/ictf/gamebot/settings.py
+      regexp="(THESECRETPASSPHRASEGOESHERE)"
+      replace="{{ ICTF_API_SECRET }}"
+    notify:
+      - restart gamebot

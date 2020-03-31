@@ -1,0 +1,21 @@
+- name: install utils for teams
+  apt:
+    pkg:
+    - zip
+    - tmux
+    - screen
+    - vim
+    - emacs
+    - nano
+    - curl
+    - wget
+    - python2.7
+    - python3
+    - python-pip
+    - python3-pip
+    - ruby
+    - perl
+    - gcc
+    - binutils
+    - build-essential
+    - tcpdump

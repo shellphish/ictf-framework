@@ -1,0 +1,29 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  handlers:
+    - name: restart scriptbot
+      service: name=scriptbot enabled=yes state=started
+
+
+  tasks:
+  - name: setting {{ BOT_ID }} hostname
+    hostname:
+      name: "scriptbot{{ BOT_ID }}"
+
+  - name: Add mappings to /etc/hosts
+    blockinfile:
+      dest: /etc/hosts
+      block: |
+        {{ item.ip }} {{ item.name }}
+      marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+    with_items:
+      - { name: "scriptbot{{ BOT_ID }}", ip: 127.0.0.1 }
+
+  - name: template the settings.py file
+    template:
+      src: /opt/ictf/scriptbot/settings.py.j2
+      dest: /opt/ictf/scriptbot/settings.py
+    notify:
+      restart scriptbot

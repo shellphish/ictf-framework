@@ -1,0 +1,8 @@
+---
+- name: fail if ICTF_API_SECRET is not specified
+  fail:
+    msg: "database requires ICTF_API_SECRET to be set"
+  when: ICTF_API_SECRET is not defined
+
+- name: build_database
+  import_tasks: setup_database.yml

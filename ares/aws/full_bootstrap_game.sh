@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -euo pipefail
+# set -x
+
+AWS_ACCESS_KEY="$1"
+AWS_SECRET_KEY="$2"
+AWS_REGION="$3"
+GAME_CONFIG_PATH="$4"
+
+VAR_FILE_PATH="ictf_game_vars.auto.tfvars.json"
+printf '\n[*] -----------------STEP -1: Sanity check game_config.json ----------------\n'
+python configlint.py "$GAME_CONFIG_PATH"
+
+printf '\n[*] ---------------- STEP 0: Generate SSH & OpenVPN credentials ----------------\n'
+./0_make_credentials.py "$GAME_CONFIG_PATH"
+
+printf '\n[*] ---------------- STEP 1: Create terraform variables file ----------------\n'
+./1_make_auto_tfvars.py "$AWS_ACCESS_KEY" "$AWS_SECRET_KEY" "$AWS_REGION" "$GAME_CONFIG_PATH"
+
+printf '\n[*] ---------------- STEP 2: terraform init ----------------'
+terraform init ./infrastructure
+
+printf '\n[*] ---------------- STEP 3: terraform apply - spawn infrastructure ----------------\n'
+echo "$VAR_FILE_PATH"
+cat "$VAR_FILE_PATH"
+echo
+printf "\n"
+read -p "Are you sure you want to spin up a game with these infrastructure settings? (yes) " choice
+case "$choice" in
+  yes ) ;;
+  no ) exit 1;;
+  * ) echo "invalid choice : $choice"; exit 1;;
+esac
+terraform apply --parallelism=50 -var-file "$VAR_FILE_PATH" ./infrastructure
+
+printf '\n[*] ---------------- STEP 4: Generate SSH config ----------------\n'
+./4_generate_ssh_config.py
+
+printf '\n[*] ---------------- STEP 5: Register teamvms into the database ----------------\n'
+./5_register_teamvms.py

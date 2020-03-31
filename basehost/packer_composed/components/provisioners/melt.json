@@ -1,0 +1,43 @@
+{
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "echo {{user `ICTF_USER` }} | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "scripts/setup.sh",
+      "environment_vars": [
+        "ICTF_USER={{user `ICTF_USER`}}"
+      ]
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo {{user `ICTF_USER` }} | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "script": "scripts/ansible.sh"
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "ansible/main.yml",
+      "galaxy_file": "requirements.yml"
+    },
+    {
+      "type": "file",
+      "source": "files/.ssh",
+      "destination": "/home/{{user `ICTF_USER`}}"
+    },
+    {
+      "type": "shell",
+      "execute_command": "echo {{user `ICTF_USER` }} | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "inline": "mkdir -p /opt/ictf && chown -R {{user `ICTF_USER` }}:{{user `ICTF_USER`}} /opt/ictf"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "cd /opt/ictf && git clone --branch master https://github.com/ucsb-seclab/ictf-framework.git ."
+      ]
+    },
+    {
+      "type": "file",
+      "source": "{{user `ICTF_FRAMEWORK_DIR_HOST`}}/secrets",
+      "destination": "/opt/ictf/"
+    }
+  ]
+}

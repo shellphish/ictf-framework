@@ -1,0 +1,84 @@
+# this must be done after, see gmapp:889
+#- name: include teams
+#  include_vars:
+#    file: teams.yml
+
+- name: install ubuntu package requirements
+  package: name={{ item }} state=latest update_cache=yes
+  with_items:
+    - python-pip
+    - python-virtualenv
+    - python2.7
+    - python-dev
+    - git
+    - libssl-dev
+    - libffi-dev
+    - build-essential
+    - libc6-dev-i386
+    - docker.io
+  tags: [skip_ansible_lint]
+
+- name: Manually create the initial virtualenv
+  command: virtualenv /opt/ictf/venv/scriptbot -p python2.7
+
+- name: Manually creating the log folder for scriptbot
+  file:
+    path: /var/log/scriptbot
+    state: directory
+    owner: "{{ ICTF_USER }}"
+    group: "{{ ICTF_USER }}"
+
+- name: virtualenv - install setuptools
+  pip:
+    name: setuptools==44.0.0
+    virtualenv: /opt/ictf/venv/scriptbot
+  become: true
+
+- name: virtualenv - install requirements
+  pip:
+    requirements=/opt/ictf/scriptbot/requirements.txt
+    virtualenv=/opt/ictf/venv/scriptbot
+  become: true
+
+- name: install nose
+  pip: name=nose
+  become: true
+
+- name: create ctf user (home directory will be created by default)
+  user:
+    name: ctf
+    shell: /bin/bash
+    groups: docker
+    append: yes
+
+- name: "add {{ICTF_USER}} to the docker group"
+  user:
+    name: "{{ICTF_USER}}"
+    groups: docker
+    append: yes
+
+- name: copy local teamhosts to /etc/hosts if exists
+  copy:
+    src=/opt/ictf/common/teamhosts
+    dest=/etc/hosts
+    owner=root group=root mode="u=rw,g=r,o=r"
+
+- name: Fix permission for venv
+  file:
+    path: /opt/ictf/venv/scriptbot
+    owner: hacker
+    group: hacker
+    recurse: yes
+
+- include_role:
+    name: register_service_daemon
+  vars:
+    service_name: scriptbot
+    description: "setup scriptbot service daemon"
+    command: "/opt/ictf/venv/scriptbot/bin/python scriptbot.py"
+    working_directory: "/opt/ictf/scriptbot"
+
+- include_role:
+    name: common_server
+  vars:
+    cfg: NONE

@@ -1,0 +1,36 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  handlers:
+    - name: restart ictf-poller
+      service: name=ictf-poller state=restarted
+
+  tasks:
+
+  - name: setting hostname
+    hostname:
+      name: "scoreboard"
+
+  - name: Add mappings to /etc/hosts
+    blockinfile:
+      dest: /etc/hosts
+      block: |
+        {{ item.ip }} {{ item.name }}
+      marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+    with_items:
+      - { name: "scoreboard", ip: 127.0.0.1 }
+
+  - name: frontend - ictf-database database connection config.json configuration - set API_ADDRESS
+    replace:
+      name=/opt/ictf/scoreboard/config.json
+      regexp="(THE_API_ADDRESS_GOES_HERE)"
+      replace="{{ ICTF_API_ADDRESS }}"
+
+  - name: frontend - ictf-database database connection config.json configuration - set API_SECRET
+    replace:
+      name=/opt/ictf/scoreboard/config.json
+      regexp="(THESECRETPASSPHRASEGOESHERE)"
+      replace="{{ ICTF_API_SECRET }}"
+    notify:
+      - restart ictf-poller

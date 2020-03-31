@@ -1,0 +1,5 @@
+vms_18.04/
+vms_16.04/
+composed_templates_ami_18.04/
+composed_templates_ami_16.04/
+build_*/

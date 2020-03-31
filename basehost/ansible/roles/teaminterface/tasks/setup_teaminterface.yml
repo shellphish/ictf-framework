@@ -1,0 +1,111 @@
+- name: install requirements
+  package: name={{ item }} state=latest update_cache=yes
+  with_items:
+    - nginx
+    - python-pip
+    - python-virtualenv
+    - python-dev
+    - libjpeg8
+    - libjpeg-dev
+    - zlib1g
+    - zlib1g-dev
+    - libpng-dev
+    - libmemcached-dev
+    - libmemcached-tools
+    - libgeoip1
+    - libgeoip-dev
+    - geoip-bin
+    - geoip-database
+    - redis-server
+  tags: [skip_ansible_lint]
+
+- include_role:
+    name: common
+  vars:
+    swapfile_size: "2G"
+
+# - name: teaminterface - write config.py
+#   copy:
+#     src="/opt/ictf/teaminterface/config.py.example"
+#     dest="/opt/ictf/teaminterface/config.py"
+#     mode="0666"
+#   notify:
+#     - restart ictf-teaminterface
+
+# sysctl
+- name: sysctl - performance tuning
+  copy:
+    src=/opt/ictf/teaminterface/support/sysctl.conf
+    dest=/etc/sysctl.d/99-ictf-teaminterface.conf
+    owner=root group=root mode="u=rw,g=r,o=r"
+
+- name: sysctl - reload
+  command: sysctl -p /etc/sysctl.d/99-ictf-teaminterface.conf
+  tags: [skip_ansible_lint]
+
+- name: virtualenv - install setuptools
+  pip:
+    name: setuptools==44.0.0
+    virtualenv: /opt/ictf/venv/teaminterface
+  become: true
+
+- name: virtualenv - install requirements
+  pip:
+    requirements=/opt/ictf/teaminterface/requirements.txt
+    virtualenv=/opt/ictf/venv/teaminterface
+
+# ictf-teaminterface configuration
+- include_role:
+    name: register_service_daemon
+  vars:
+    service_name: ictf-teaminterface
+    description: "iCTF Team Interface API service"
+    command:  "/opt/ictf/venv/teaminterface/bin/uwsgi -s /tmp/ictf-api.sock --chmod-socket --virtualenv=/opt/ictf/venv/teaminterface --logto /tmp/uwsgi.log --module team_interface --callable app --enable-threads -z 6000 --master --listen 65535 --processes 10 --max-requests 655350 --die-on-term"
+    working_directory: "/opt/ictf/teaminterface"
+
+# setup nginx
+- name: nginx - allow worker processes, 4 per core
+  lineinfile:
+    dest=/etc/nginx/nginx.conf
+    regexp="(worker_processes).*$"
+    line="worker_processes {{ 4 * ansible_processor_cores }};"
+
+- name: nginx - allow more open files
+  lineinfile:
+    dest=/etc/nginx/nginx.conf
+    regexp="^worker_rlimit_nofile"
+    line="worker_rlimit_nofile 512000;"
+    insertafter="(worker_processes).*"
+
+- name: nginx - set worker connections to 4096
+  lineinfile:
+    dest=/etc/nginx/nginx.conf
+    regexp="(worker_connections).*$"
+    line="\tworker_connections 4096;"
+
+- name: nginx - disable default configuration
+  file:
+    path=/etc/nginx/sites-enabled/default
+    state=absent recurse=no
+
+- name: nginx - add ictf-teaminterface
+  template:
+    src=/opt/ictf/teaminterface/support/nginx.conf
+    dest=/etc/nginx/sites-available/ictf-teaminterface.conf
+    owner=root group=root mode="u=rw,g=r,o=r"
+  notify:
+    - reload nginx
+
+- name: nginx - enable ictf-teaminterface
+  file:
+    src=/etc/nginx/sites-available/ictf-teaminterface.conf
+    dest=/etc/nginx/sites-enabled/ictf-teaminterface.conf
+    owner=root group=root
+    state=link
+  notify:
+    - reload nginx
+
+- include_role:
+    name: common_server
+  vars:
+    server_hostname: TeamInterface

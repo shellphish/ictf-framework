@@ -1,0 +1,10 @@
+{
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "cd /opt/ictf && git pull"
+      ]
+    }
+  ]
+}

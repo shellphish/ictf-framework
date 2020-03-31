@@ -1,0 +1,10 @@
+.main-content
+  position: relative
+  +debug
+  > * > div
+    background-color: $bg-color
+
++at-breakpoint(desk)
+  .main-content
+    width: calc(100% - #{$sidebar-width})
+    left: $sidebar-width

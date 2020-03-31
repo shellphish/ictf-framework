@@ -1,0 +1,95 @@
+#!/usr/bin/env python 
+
+import random
+import sys
+import string
+import json
+import traceback
+
+from nclib import Netcat
+
+# To create random strings
+def random_str(l):
+    POSSIBILITIES = string.ascii_uppercase + string.digits + string.ascii_lowercase
+    return "".join(random.choice(POSSIBILITIES) for _ in range(l))
+
+def somestr():
+    l = random.randint(5,50)
+    return random_str(l)
+
+def benign(ip, port):
+    # There should be some other benign traffic to your service.
+    # It helps determine if the service is functional or not, and makes it
+    # harder to fingerprint flag-related traffic.
+    response = {
+        "error": False,
+        "payload": {},
+    }
+    r = Netcat((ip, port))
+    r.recvuntil("username:")
+    r.send(somestr() + "\n")
+    r.recvuntil("password:")
+    r.send(somestr() + "\n")
+    r.recvuntil("work:")
+    title=somestr()
+    r.send(title + "\n")
+
+    r.recvuntil("result")
+    
+    r.send("S\n")
+    r.recvuntil("end")
+    variables=[0]*20
+    
+    num_eqn = random.randint(1,10)
+    for _ in range(num_eqn):
+        var_num = random.randint(0,19)
+        var2_num = random.randint(0,19)
+        op = random.choice(["+","-","*","/"])
+        if random.randint(0,1) == 0:
+            const = random.randint(-(2**31-1), 2**31-1)
+        else:
+            const = random.randint(-1000,1000)
+        r.send("V" + str(var_num) + "=V" + str(var2_num) + op + str(const) + "\n")
+        if op == "+":
+            variables[var_num] = (variables[var2_num] + const) & 0xffffffff
+        if op == "-":
+            variables[var_num] = (variables[var2_num] - const) & 0xffffffff
+        if op == "*":
+            variables[var_num] = (variables[var2_num] * const) & 0xffffffff
+        if op == "/":
+            signedness = -1 if variables[var2_num] * const < 0 else 1
+            variables[var_num] = ((abs(variables[var2_num]) / abs(const))*signedness) & 0xffffffff
+        if variables[var_num] > 0x7fffffff:
+            variables[var_num] = -(2**32-variables[var_num])
+    
+    r.send("\n")
+    r.recvuntil("result\n")
+    r.send("R\n")
+    received_title = r.recvuntil("\n").strip()
+
+    if title != received_title:
+        response['error'] = True
+        response['payload'] = "ERROR: The title received ({}) does not match the expected one ({})".format(received_title, title)
+        return response
+
+    for i in range(20):
+        expected = "V" + str(i) + ": " + str(variables[i])
+        actual = r.recvuntil("\n").strip()
+        if expected != actual:
+            response['error'] = True
+            response['payload'] = "ERROR: The string received ({}) does not match the expected one ({})".format(actual, expected)
+            return response
+    
+    return response
+
+
+if __name__ == "__main__":
+    try:
+        print json.dumps(benign(sys.argv[1], int(sys.argv[2])))
+    except Exception as e:
+        response = {
+            "error": True,
+            "payload": str(e) + "\n" + traceback.format_exc()
+        }
+        print json.dumps(response)
+    

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -eux
+FW_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+VENV_NAME=$1
+
+for f in $FW_DIR/*/install_requirements; do
+    $f $VENV_NAME
+done

@@ -1,0 +1,12 @@
+# restart handlers
+- name: restart ictf-database-api
+  service: name=ictf-database-api state=restarted
+
+- name: restart mysql
+  service: name=mysql state=restarted
+
+- name: restart nginx
+  service: name=nginx state=restarted
+
+- name: restart ictf-db-export-s3
+  service: name=ictf-db-export-s3 state=restarted

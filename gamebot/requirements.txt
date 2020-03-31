@@ -1,0 +1,3 @@
+#coloredlogs
+coloredlogs==7.3.1
+requests==2.18.4

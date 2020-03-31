@@ -1,7 +1,7 @@
 Flask-Cache==0.13.1
 Flask-HTTPAuth==2.7.0
 Flask-RESTful==0.3.4
-Flask==0.10.1
+Flask==1.0
 GeoIP
 Jinja2==2.8
 Pillow==3.4.1

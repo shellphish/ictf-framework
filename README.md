@@ -2,8 +2,6 @@
 
 This is the framework that [Shellphish](http://www.shellphish.net) uses to host the [iCTF](http://ictf.cs.ucsb.edu).
 
-This [framework](http://ictf.cs.ucsb.edu/framework) can be used to create A/D Capture The Flag (CTF) competitions. 
-
 The iCTF Framework is described in a [paper](https://www.usenix.org/conference/3gse14/summit-program/presentation/vigna) presented at the Usenix 3GSE workshop in 2014. 
 That paper and presentation detail the history, philosophy, and design of the framework.
 

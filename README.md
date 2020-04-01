@@ -23,6 +23,7 @@ If you have questions, please send an email to ctf-admin@lists.cs.ucsb.edu.
 - Extend the framework to support multiple cloud providers other than AWS.
 - Implment a built in resource monitoring system.
 - The images building process sometimes does not terminate correctly. The solution so far is to re-execute the `make all -j` comand until it terminates.
+- The CTF cannot be run for more than 12 hours because the credentials we use to login to the docker registry will expire after such time and we currently don't have a way to renew them.
 
 ## Database
 

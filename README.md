@@ -11,6 +11,18 @@ We are planning to release more technical documentation regarding each component
 
 If you have questions, please send an email to ctf-admin@lists.cs.ucsb.edu. 
 
+**DISCLAIMER**: This framework is still a work in progress and this release have to be considered as an **ALPHA** version. New pull requests and new issues are welcome :)
+
+## TODOs and known issues
+
+- The codebase needs to be cleaned from old pieces of unused code.
+- Finish to port every component to python 3.
+- Finish to document the various components.
+- Logs are scattered among all different components and currently there isn't an easy way to query them.
+- Scriptbot, although it's replicated, is currently not fault tolerant.
+- Extend the framework to support multiple cloud providers other than AWS.
+- Implment a built in resource monitoring system.
+- The images building process sometimes does not terminate correctly. The solution so far is to re-execute the `make all -j` comand until it terminates.
 
 ## Database
 

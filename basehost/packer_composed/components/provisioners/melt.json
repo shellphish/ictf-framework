@@ -31,7 +31,7 @@
     {
       "type": "shell",
       "inline": [
-        "cd /opt/ictf && git clone --branch master https://github.com/ucsb-seclab/ictf-framework.git ."
+        "cd /opt/ictf && git clone --branch master https://github.com/shellphish/ictf-framework.git ."
       ]
     },
     {

@@ -16,7 +16,7 @@
   },
   "game_info": {
     "num_routers": 20,
-    "router_public_ip": "<ROUTER_PUBLIC_IP>"
+    "router_public_ip": "<ROUTER_ELASTIC_IP>"
   },
   "teams": [
     {

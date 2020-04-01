@@ -32,17 +32,6 @@
     requirements: "/opt/ictf/router/requirements2.txt"
     executable: pip
 
-
-- name: copy teamhosts to /etc/hosts
-  copy:
-    remote_src: yes
-    src: "/opt/ictf/common/teamhosts"
-    dest: /etc/hosts
-    owner: root
-    group: root
-    mode: "u=rw,g=r,o=r"
-
-
 - name: update app armor to allow tcpdump to write in /ictf/data folder
   file:
     src=/etc/apparmor.d/usr.sbin.tcpdump
@@ -51,9 +40,6 @@
   notify:
     - restart apparmor
 
-
-
-
 - name: copy kernel settings to server
   template:
     src:   templates/sysctl.conf.j2
@@ -61,7 +47,6 @@
     owner: root
     group: root
     mode:  0644
-
 
 - name: Create config file for xt_recent so hitcount can be 255 in /etc/modeprobe.d
   copy:

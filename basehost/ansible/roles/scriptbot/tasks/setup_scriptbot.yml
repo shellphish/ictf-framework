@@ -57,12 +57,6 @@
     groups: docker
     append: yes
 
-- name: copy local teamhosts to /etc/hosts if exists
-  copy:
-    src=/opt/ictf/common/teamhosts
-    dest=/etc/hosts
-    owner=root group=root mode="u=rw,g=r,o=r"
-
 - name: Fix permission for venv
   file:
     path: /opt/ictf/venv/scriptbot

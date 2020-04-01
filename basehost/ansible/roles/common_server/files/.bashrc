@@ -122,10 +122,6 @@ if [ -f ~/.bash_alias ]; then
   source ~/.bash_alias
 fi
 
-#if [ -f ~/ictf/common/get-aws-id.py ]; then
-#  REGION_ID=`~/ictf/common/get-aws-id.py`
-#fi
-
 if [ -f ~/ictf/gm/vms_report.py ]; then
   /opt/ictf/gm/vms_report.py -c > /dev/null 2> /dev/null &
 fi

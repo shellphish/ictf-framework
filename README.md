@@ -20,7 +20,7 @@ Pull requests are always welcome!
 The framework creates several virtual machines (VMs), a few for the organizers and one for every team. 
 The components that run on each VM are described below.
 
-## Central Database
+## Database
 
 This is the central database that tracks the state of the game. 
 It runs on the Database VM and exposes a RESTful API.  

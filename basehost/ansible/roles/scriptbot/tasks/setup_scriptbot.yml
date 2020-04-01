@@ -51,6 +51,12 @@
     groups: docker
     append: yes
 
+- name: copy local teamhosts to /etc/hosts if exists	
+  copy:	
+    src=/opt/ictf/common/teamhosts	
+    dest=/etc/hosts	
+    owner=root group=root mode="u=rw,g=r,o=r"
+
 - name: "add {{ICTF_USER}} to the docker group"
   user:
     name: "{{ICTF_USER}}"

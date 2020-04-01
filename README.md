@@ -1,24 +1,19 @@
 # The iCTF Framework
 
-This is the framework that the UC Santa Barbara [Seclab](http://seclab.cs.ucsb.edu) and [Shellphish](http://www.shellphish.net) use to host the [iCTF](http://ictf.cs.ucsb.edu).
-The initial framework has been expanded by the Arizona State University [SEFCOM](http://sefcom.asu.edu/), to allow for cloud-based deployments.
+This is the framework that [Shellphish](http://www.shellphish.net) uses to host the [iCTF](http://ictf.cs.ucsb.edu).
 
-This [framework](http://ictf.cs.ucsb.edu/framework) can be used to create Capture The Flag (CTF) competitions. 
-In the following discussion, we assume that the reader has a precise understanding of how CTF competitions work.
+This [framework](http://ictf.cs.ucsb.edu/framework) can be used to create A/D Capture The Flag (CTF) competitions. 
 
 The iCTF Framework is described in a [paper](https://www.usenix.org/conference/3gse14/summit-program/presentation/vigna) presented at the Usenix 3GSE workshop in 2014. 
 That paper and presentation detail the history, philosophy, and design of the framework.
 
 We released this framework in the hope that it allows educators and trainers to host their own CTFs. 
-This framework is free for commercial use, but the support that we can provide is limited. 
+This framework is free for commercial use, but the support that we can provide is limited.
+
+We are planning to release more technical documentation regarding the components of the framework. As for now you can find instruction on how to create a game [here](https://github.com/shellphish/ictf-framework/wiki/running-a-class-ctf). 
+
 If you have questions, please send an email to ctf-admin@lists.cs.ucsb.edu. 
 
-Currently, attack-defense CTFs are the focus of the framework, but we are planning to develop support for other formats as well (e.g., Jeopardy-style competitions). 
-
-Pull requests are always welcome!
-
-The framework creates several virtual machines (VMs), a few for the organizers and one for every team. 
-The components that run on each VM are described below.
 
 ## Database
 

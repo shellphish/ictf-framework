@@ -3,9 +3,8 @@
 This is the framework that [Shellphish](http://www.shellphish.net) uses to host the [iCTF](http://ictf.cs.ucsb.edu).
 
 The iCTF Framework is described in a [paper](https://www.usenix.org/conference/3gse14/summit-program/presentation/vigna) presented at the Usenix 3GSE workshop in 2014. 
-That paper and presentation detail the history, philosophy, and design of the framework.
 
-We released this framework in the hope that it allows educators and trainers to host their own CTFs. 
+We released this in the hope that it allows educators and trainers to host their own A/D CTFs. 
 This framework is free for commercial use, but the support that we can provide is limited.
 
 We are planning to release more technical documentation regarding each components in the future; as for now you can find instruction on how to create a game [here](https://github.com/shellphish/ictf-framework/wiki/running-a-class-ctf). 

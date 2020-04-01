@@ -8,7 +8,7 @@ That paper and presentation detail the history, philosophy, and design of the fr
 We released this framework in the hope that it allows educators and trainers to host their own CTFs. 
 This framework is free for commercial use, but the support that we can provide is limited.
 
-We are planning to release more technical documentation regarding the components of the framework. As for now you can find instruction on how to create a game [here](https://github.com/shellphish/ictf-framework/wiki/running-a-class-ctf). 
+We are planning to release more technical documentation regarding each components in the future; as for now you can find instruction on how to create a game [here](https://github.com/shellphish/ictf-framework/wiki/running-a-class-ctf). 
 
 If you have questions, please send an email to ctf-admin@lists.cs.ucsb.edu. 
 

@@ -31,13 +31,13 @@
     requirements: "/opt/ictf/router/requirements2.txt"
     executable: pip
 
-- name: copy teamhosts to /etc/hosts	
-  copy:	
-    remote_src: yes	
-    src: "/opt/ictf/common/teamhosts"	
-    dest: /etc/hosts	
-    owner: root	
-    group: root	
+- name: copy teamhosts to /etc/hosts
+  copy:
+    remote_src: yes
+    src: "/opt/ictf/common/teamhosts"
+    dest: /etc/hosts
+    owner: root
+    group: root
     mode: "u=rw,g=r,o=r"
 
 - name: update app armor to allow tcpdump to write in /ictf/data folder

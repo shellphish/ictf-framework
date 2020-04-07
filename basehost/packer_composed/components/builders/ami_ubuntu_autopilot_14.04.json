@@ -7,7 +7,6 @@
       "ami_name": "{{user `BUILD_STAGE`}}_{{user `IMAGE_NAME`}}_{{timestamp}}",
       "instance_type": "{{user `AWS_INSTANCE_TYPE`}}",
       "region": "{{user `AWS_REGION`}}",
-      "availability_zone": "{{user `AWS_REGION`}}a",
       "source_ami_filter": {
         "filters": {
           "name": "Ubuntu 14.04 with Virtual Display setup for GPU accelerated OpenGL*",

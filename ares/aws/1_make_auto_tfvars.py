@@ -36,7 +36,8 @@ if __name__ == '__main__':
             "gamebot_instance_type": "t2.small",
             "teaminterface_instance_type": "t2.small",
             "teamvm_instance_type": "t2.small",
-            "jobscheduler_instance_type": "t2.small"
+            "jobscheduler_instance_type": "t2.small",
+            "logger_instance_type": "t2.small",
         })
 
     with open('ictf_game_vars.auto.tfvars.json', 'w') as f:

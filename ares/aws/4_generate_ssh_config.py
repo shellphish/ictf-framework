@@ -68,7 +68,7 @@ AWS_KEY_TEMPLATE = Template('resource "aws_key_pair" "$keyname" { \n\
 }\n')
 
 # Define the Vms
-VM_NAMES = ['database', 'router', 'gamebot', 'scoreboard', 'teaminterface', 'scriptbot', 'teamvmmaster', 'jobscheduler']
+VM_NAMES = ['database', 'router', 'gamebot', 'scoreboard', 'teaminterface', 'scriptbot', 'teamvmmaster', 'jobscheduler', 'logger']
 
 def _execute_terraform_output(args, terraform_path):
     tf_output_process = subprocess.run(

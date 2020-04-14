@@ -26,7 +26,7 @@ AWS_KEY_TEMPLATE = Template('resource "aws_key_pair" "$keyname" { \n\
 }\n')
 
 # Define the Vms
-VM_NAMES = ['database', 'router', 'gamebot', 'scoreboard', 'teaminterface', 'scriptbot', 'teamvmmaster', 'jobscheduler']
+VM_NAMES = ['database', 'router', 'gamebot', 'scoreboard', 'teaminterface', 'scriptbot', 'teamvmmaster', 'jobscheduler', 'logger']
 
 
 def make_ssh_keys(num_teams):

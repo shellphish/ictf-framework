@@ -52,6 +52,11 @@ variable "gamebot_instance_type"  {
     description = "Game bot AWS instance type"
     type = string
 }
+variable "jobscheduler_instance_type"  {
+    default = "t2.2xlarge"
+    description = "Job Scheduler AWS instance type"
+    type = string
+}
 variable "teaminterface_instance_type"  {
     default = "t2.2xlarge"
     description = "Team interface AWS instance type"

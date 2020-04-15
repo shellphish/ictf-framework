@@ -51,7 +51,7 @@ The router component is responsible for routing the traffic between the teams in
 The component implements an OpenVPN service. Each team is given a VM that acts as the router for the team.
 The traffic among teams needs to be anonymized to prevent teams from distinguishing scriptbot-generate traffic from team traffic.
 
-# Creating a CTF competition
+## Creating a CTF competition
 
 For more information visit our wiki page about [running a class CTF](https://github.com/shellphish/ictf-framework/wiki/running-a-class-ctf)
 

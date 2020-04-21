@@ -109,3 +109,6 @@
     name: common_server
   vars:
     server_hostname: TeamInterface
+
+- include_role:
+    name: deploy_prometheus_node_exporter

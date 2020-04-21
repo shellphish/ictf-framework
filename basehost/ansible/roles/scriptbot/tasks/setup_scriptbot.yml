@@ -82,3 +82,6 @@
     name: common_server
   vars:
     cfg: NONE
+
+- include_role:
+    name: deploy_prometheus_node_exporter

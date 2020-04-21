@@ -20,7 +20,7 @@ ICTF_UBUNTU_VERSION=16.04 $SCRIPT_DIR/compose_heat.sh "$TO_CHECK_OR_TO_COMPOSE" 
 echo "Running $TO_CHECK_OR_TO_COMPOSE on melt template!"
 $SCRIPT_DIR/compose_melt.sh "$TO_CHECK_OR_TO_COMPOSE" "$OUT_DIR" "$BUILDER" || [ "$TO_CHECK_OR_TO_COMPOSE" == "check" ]
 
-for MACHINE in database gamebot router scoreboard scriptbot teaminterface;
+for MACHINE in database gamebot router scoreboard scriptbot teaminterface logger;
 do
     echo "Running $TO_CHECK_OR_TO_COMPOSE on $MACHINE cast template!"
     $SCRIPT_DIR/compose_cast.sh "$TO_CHECK_OR_TO_COMPOSE" "$OUT_DIR" "$BUILDER" "$MACHINE" $@ || [ "$TO_CHECK_OR_TO_COMPOSE" == "check" ]

@@ -1,0 +1,13 @@
+{
+  "provisioners": [
+    {
+      "type": "ansible-local",
+      "playbook_dir": "ansible/",
+      "playbook_file": "ansible/logger.yml",
+      "extra_arguments": [
+        "--become",
+        "--extra-vars", "ICTF_USER={{user `ICTF_USER`}}"
+      ]
+    }
+  ]
+}

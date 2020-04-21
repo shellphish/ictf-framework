@@ -147,3 +147,6 @@
     name: common_server
   vars:
     server_hostname: ScoreBoard
+
+- include_role:
+    name: deploy_prometheus_node_exporter

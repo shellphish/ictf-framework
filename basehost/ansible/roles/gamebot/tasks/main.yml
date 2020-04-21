@@ -29,3 +29,6 @@
     name: common_server
   vars:
     server_hostname: GameBOT
+
+- include_role:
+    name: deploy_prometheus_node_exporter

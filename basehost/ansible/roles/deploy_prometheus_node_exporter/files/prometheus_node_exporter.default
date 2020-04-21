@@ -1,0 +1,19 @@
+# Set the command-line arguments to pass to the server.
+# Bugfix: https://github.com/vegasbrianc/prometheus/issues/66
+ARGS='-collector.diskstats.ignored-devices="^(ram|loop|fd)\\d+$ -collector.filesystem.ignored-mount-points=^/(sys|proc|dev|run|var/lib/docker|tmp)($|/)'
+
+# Prometheus-node-exporter supports the following options:
+#  -auth.pass="": Password for basic auth.
+#  -auth.user="": Username for basic auth.
+#  -collector.diskstats.ignored-devices="^(ram|loop|fd|(h|s|v|xv)d[a-z])\\d+$": Regexp of devices to ignore for diskstats.
+#  -collector.filesystem.ignored-mount-points="^/(sys|proc|dev)($|/)": Regexp of mount points to ignore for filesystem collector.
+#  -collector.ipvs.procfs="/proc": procfs mountpoint.
+#  -collector.megacli.command="megacli": Command to run megacli.
+#  -collector.ntp.server="": NTP server to use for ntp collector.
+#  -collector.textfile.directory="": Directory to read text files with metrics from.
+#  -collectors.enabled="diskstats,filesystem,loadavg,meminfo,stat,textfile,time,netdev,netstat": Comma-separated list of collectors to use.
+#  -collectors.print=false: If true, print available collectors and exit.
+#  -debug.memprofile-file="": Write memory profile to this file upon receipt of SIGUSR1.
+#  -log.level=info: Only log messages with the given severity or above. Valid levels: [debug, info, warn, error, fatal, panic].
+#  -web.listen-address=":9100": Address on which to expose metrics and web interface.
+#  -web.telemetry-path="/metrics": Path under which to expose metrics.

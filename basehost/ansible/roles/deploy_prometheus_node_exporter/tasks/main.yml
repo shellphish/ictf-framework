@@ -1,0 +1,17 @@
+---
+- name: install requirements
+  package:
+    name:  prometheus-node-exporter
+    state: latest
+    update_cache: yes
+  
+- name: configure node_exporter
+  copy:
+    src: prometheus_node_exporter.default
+    dest: /etc/default/prometheus-node-exporter
+
+- name: restart node_exporter
+  systemd:
+    name: prometheus-node-exporter
+    state: restarted
+    enabled: true

@@ -20,12 +20,15 @@ ALL_MACHINES := $(foreach v, $(shell find ./$(TEMPLATE_DIR)/ -name "$(BUILDER)_c
 ALL_MACHINES := $(patsubst $(BUILDER)_cast_%.json, %, $(ALL_MACHINES))
 ALL_TARGETS := heat melt teamvm_base teamvm_primed $(ALL_MACHINES:%=cast_%) $(ALL_MACHINES:%=harden_%)
 ALL_VMS_ALL_TARGETS := $(ALL_TARGETS:%=$(VMS_DIR_16.04)/%) $(ALL_TARGETS:%=$(VMS_DIR_18.04)/%)
-.PHONY: all cast harden init teamvm_ova
+.PHONY: all cast harden init teamvm_ova infra teamvm_ami remote
 .PRECIOUS: $(ALL_VMS_ALL_TARGETS)
 
 
 
-all: cast harden $(VMS_DIR_18.04)/teamvm_base $(VMS_DIR_18.04)/teamvm_primed teamvm_ova
+all: remote teamvm_ova
+remote: infra teamvm_ami 
+infra: cast harden
+teamvm_ami: $(VMS_DIR_18.04)/teamvm_base $(VMS_DIR_18.04)/teamvm_primed
 init: $(BUILD_DIR) $(VMS_DIR_16.04) $(VMS_DIR_18.04) $(TEMPLATE_DIR) $(OVA_TEMPLATE_DIR)
 cast: $(patsubst %, $(VMS_DIR_16.04)/cast_%, $(ALL_MACHINES))
 harden: $(patsubst %, $(VMS_DIR_16.04)/harden_%, $(ALL_MACHINES))

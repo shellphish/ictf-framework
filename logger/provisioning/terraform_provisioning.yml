@@ -1,0 +1,19 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  handlers:
+    - name: restart prometheus
+      service: name=prometheus state=restarted
+
+  tasks:
+    - name: setting hostname
+      hostname:
+        name: "gamebot"
+
+    - name: configure prometheus
+      template:
+        src:  /opt/ictf/logger/provisioning/prometheus.yml.j2
+        dest: /etc/prometheus/prometheus.yml
+      notify:
+        restart prometheus

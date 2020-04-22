@@ -39,8 +39,25 @@ resource "aws_instance" "logger" {
 
     provisioner "remote-exec" {
         inline = [
+            "mkdir -p /opt/ictf/logger/provisioning"
+        ]
+    }
+    
+
+    provisioner "file" {
+        source = "../../logger/provisioning/prometheus.yml.j2"
+        destination = "/opt/ictf/logger/provisioning/prometheus.yml.j2"
+    }
+
+    provisioner "file" {
+        source = "../../logger/provisioning/terraform_provisioning.yml"
+        destination = "/opt/ictf/logger/provisioning/terraform_provisioning.yml"
+    }
+
+    provisioner "remote-exec" {
+        inline = [
             "sudo pip install -q ansible",
-            # "/usr/local/bin/ansible-playbook /opt/ictf/gamebot/provisioning/terraform_provisioning.yml --extra-vars ICTF_API_ADDRESS=${aws_instance.database.private_ip} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")}",
+            #"/usr/local/bin/ansible-playbook /opt/ictf/logger/provisioning/terraform_provisioning.yml --extra-vars SOURCES='{}'", 
             "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
             "sudo service ssh restart"
         ]

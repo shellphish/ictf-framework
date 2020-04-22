@@ -95,12 +95,23 @@ $(VMS_DIR_16.04)/cast_%: $(TEMPLATE_DIR)/$(BUILDER)_cast_%.json $(TEMPLATE_DIR) 
 	UBUNTU_VERSION=$(UBUNTU_VERSION) BASE_IMAGE_NAME=melt_ubuntu_amd64_$(UBUNTU_VERSION) packer build $<
 	touch $@
 
+# $(VMS_DIR_18.04)/cast_%: $(TEMPLATE_DIR)/$(BUILDER)_cast_%.json $(TEMPLATE_DIR) $(VMS_DIR_18.04)/melt $(call cast_ansible_role_dependencies,%) ../%
+# 	@echo "Building $@"
+# 	UBUNTU_VERSION=18.04 BASE_IMAGE_NAME=melt_ubuntu_amd64_18.04 packer build $<
+# 	touch $@
+
 $(VMS_DIR_16.04)/harden_%: $(TEMPLATE_DIR)/$(BUILDER)_harden.json $(TEMPLATE_DIR) $(VMS_DIR_16.04)/cast_%
 	@echo "Building $@"
 	$(eval MACHINE=$(strip $(patsubst harden_%, %, $(shell basename $@))))
 	$(eval UBUNTU_VERSION=$(call ubuntu_version,$@))
 	BASE_IMAGE_NAME=cast_$(MACHINE)_$(UBUNTU_VERSION) IMAGE_NAME="$(MACHINE)" UBUNTU_VERSION=$(UBUNTU_VERSION) packer build $<
 	touch $@
+
+# $(VMS_DIR_18.04)/harden_%: $(TEMPLATE_DIR)/$(BUILDER)_harden.json $(TEMPLATE_DIR) $(VMS_DIR_18.04)/cast_%
+# 	@echo "Building $@"
+# 	$(eval MACHINE=$(strip $(patsubst harden_%, %, $(shell basename $@))))
+# 	BASE_IMAGE_NAME=cast_$(MACHINE)_18.04 IMAGE_NAME="$(MACHINE)" UBUNTU_VERSION=18.04 packer build $<
+# 	touch $@
 
 
 $(VMS_DIR_16.04)/teamvm_base $(VMS_DIR_18.04)/teamvm_base: $(TEMPLATE_DIR)/$(BUILDER)_teamvm_base.json $(TEMPLATE_DIR) $(VMS_DIR_16.04)/heat $(VMS_DIR_18.04)/heat scripts/ansible.sh ansible/teamvm_base.yml $(call ansible_role_dependency,teamvm_base) $(call ansible_role_dependency,register_service_daemon)

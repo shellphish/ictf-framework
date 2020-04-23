@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+
+    cast_database:
+        image: ictf_3_cast_database
+        build:
+            dockerfile: ./hephaestus/3_cast_database/Dockerfile
+            context: ../
+        entrypoint: "/bin/bash"
+        working_dir: /opt/ictf/database

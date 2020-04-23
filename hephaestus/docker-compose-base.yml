@@ -1,0 +1,19 @@
+version: '3.4'
+
+services:
+
+    heat:
+        image: ictf_1_heat
+        build:
+            dockerfile: ./1_heat/Dockerfile
+            context: ./
+            args:
+                ictfuser: "hacker"
+                ictfuserpassword: "hacker"
+    
+    melt:
+        image: ictf_2_melt
+        build:
+            dockerfile: ./hephaestus/2_melt/Dockerfile
+            context: ../
+    

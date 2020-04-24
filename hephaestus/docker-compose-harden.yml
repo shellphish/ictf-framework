@@ -16,3 +16,9 @@ services:
             dockerfile: ./hephaestus/4_harden_gamebot/Dockerfile
             context: ../
         
+    harden_scoreboard:
+        image: ictf_4_harden_scoreboard
+        hostname: scoreboard
+        build:
+            dockerfile: ./hephaestus/4_harden_scoreboard/Dockerfile
+            context: ../

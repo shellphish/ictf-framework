@@ -1,0 +1,8 @@
+- name: restart ictf-poller
+  service: name=ictf-poller state=restarted
+
+- name: restart ictf-gunicorn
+  service: name=ictf-gunicorn state=restarted
+
+- name: restart nginx
+  service: name=nginx state=restarted

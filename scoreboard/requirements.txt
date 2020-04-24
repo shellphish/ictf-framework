@@ -16,3 +16,8 @@ saferedisqueue==3.0.0
 six==1.11.0
 wsgiref==0.1.2
 ujson
+setuptools
+pyOpenSSL
+ndg-httpsclient
+pyasn1
+ujson

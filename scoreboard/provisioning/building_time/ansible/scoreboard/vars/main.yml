@@ -1,0 +1,6 @@
+SCOREBOARD_DEPLOY_PATH: "/opt/ictf/scoreboard"
+SCOREBOARD_ASSETS_VERSION: "1.1.1"
+SCOREBOARD_NAME: "SWPAG"
+ICTF_API_SECRET: "{{ lookup('password','{{ ICTF_FRAMEWORK_DIR_HOST }}/secrets/api_secret length=25') }}"
+ICTF_API_ADDRESS: "{{ lookup('password','{{ ICTF_FRAMEWORK_DIR_HOST }}/secrets/api_address length=25') }}"
+NODE_VERSION: 6

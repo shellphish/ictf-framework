@@ -19,3 +19,12 @@ services:
             context: ../
         entrypoint: "/bin/bash"
         working_dir: /opt/ictf/gamebot
+
+    cast_scoreboard:
+        image: ictf_3_cast_scoreboard
+        hostname: cast_scoreboard
+        build:
+            dockerfile: ./hephaestus/3_cast_scoreboard/Dockerfile
+            context: ../
+        entrypoint: "/bin/bash"
+        working_dir: /opt/ictf/scoreboard

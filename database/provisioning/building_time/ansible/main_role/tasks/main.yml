@@ -10,6 +10,7 @@
     state=directory
     owner=root group=root mode="u=rwx,g=rx,o=rx"
 
+# TODO: Change me
 # sysctl
 # - name: sysctl - performance tuning
 #   copy:
@@ -27,13 +28,9 @@
     src=mysql.conf
     dest=/etc/mysql/conf.d/ictf-database.cnf
     owner=root group=root mode="u=rw,g=r,o=r"
-  notify:
-    restart mysql
 
-- name: mysql - restart MySQL service to apply new configurations
-  service:
-      name=mysql
-      state=started
+- name: mysql - start MySQL service to apply new configurations
+  command: service mysql start
 
 - name: mysql - create ictf user
   mysql_user:
@@ -106,17 +103,18 @@
     regexp="^(DEBUG).*$"
     replace="\1 = False"
 
-- include_role:
-    name: register_service_daemon
-  vars:
-    service_name: ictf-database-api
-    description: "Web-API for the iCTF database"
-    command: "/usr/bin/uwsgi -c uwsgi.ini"
-    myenvironment: "ICTF_DATABASE_SETTINGS=/opt/ictf/settings/database-api.py"
-    working_directory: "/opt/ictf/database"
-    dependencies:
-      - "nginx.service"
-      - "mysql.service"
+# TODO: Change me
+# - include_role:
+#     name: register_service_daemon
+#   vars:
+#     service_name: ictf-database-api
+#     description: "Web-API for the iCTF database"
+#     command: "/usr/bin/uwsgi -c uwsgi.ini"
+#     myenvironment: "ICTF_DATABASE_SETTINGS=/opt/ictf/settings/database-api.py"
+#     working_directory: "/opt/ictf/database"
+#     dependencies:
+#       - "nginx.service"
+#       - "mysql.service"
 
 #- name: ictf-database-api - setup service daemon
 #  template:
@@ -169,17 +167,21 @@
     dest=/etc/nginx/sites-enabled/ictf-database-api.conf
     owner=root group=root
     state=link
-  notify:
-    - restart nginx
 
-- include_role:
-    name: register_service_daemon
-  vars:
-    service_name: ictf-db-export-s3
-    description: "Daemon periodically exporting database dumps to S3"
-    command: "/opt/ictf/venv/database/bin/python ictf-db-export-s3.py"
-    working_directory: "/opt/ictf/database"
-    dependencies:
-      - "nginx.service"
-      - "mysql.service"
-  
+# TODO: Change me
+# - include_role:
+#     name: register_service_daemon
+#   vars:
+#     service_name: ictf-db-export-s3
+#     description: "Daemon periodically exporting database dumps to S3"
+#     command: "/opt/ictf/venv/database/bin/python ictf-db-export-s3.py"
+#     working_directory: "/opt/ictf/database"
+#     dependencies:
+#       - "nginx.service"
+#       - "mysql.service"
+
+# TODO: Change me
+# - include_role:
+#     name: common_server
+#   vars:
+#     server_hostname: Database

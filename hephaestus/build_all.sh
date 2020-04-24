@@ -7,3 +7,5 @@ docker-compose -f ./docker-compose-base.yml build heat
 docker-compose -f ./docker-compose-base.yml build melt
 
 docker-compose -f ./docker-compose-cast.yml build --parallel
+
+docker-compose -f ./docker-compose-harden.yml build --parallel

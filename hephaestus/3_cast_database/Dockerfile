@@ -9,4 +9,4 @@ COPY ./scoring_ictf /opt/ictf/scoring_ictf
 
 WORKDIR /opt/ictf/database
 
-# RUN service mysql start && ansible-playbook --become --extra-vars ICTF_USER="hacker" provisioning/building_time/ansible/main.yml
+RUN ansible-playbook --become --extra-vars ICTF_USER="hacker" provisioning/building_time/ansible/main.yml

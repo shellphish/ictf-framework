@@ -15,8 +15,6 @@ from time import sleep
 from filecmp import cmp as fcmp
 sys.path.append(os.path.abspath(join(os.path.dirname(__file__), '..')))
 
-from common.world_constants import CfgKey
-
 SLEEP_TIME = 30
 
 BACKUP_DIR = "/media/backups/ictf/"

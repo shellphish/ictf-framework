@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+
+    harden_database:
+        image: ictf_4_harden_database
+        build:
+            dockerfile: ./hephaestus/4_harden_database/Dockerfile
+            context: ../

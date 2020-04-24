@@ -4,6 +4,15 @@ services:
 
     harden_database:
         image: ictf_4_harden_database
+        hostname: database
         build:
             dockerfile: ./hephaestus/4_harden_database/Dockerfile
             context: ../
+
+    harden_gamebot:
+        image: ictf_4_harden_gamebot
+        hostname: gamebot
+        build:
+            dockerfile: ./hephaestus/4_harden_gamebot/Dockerfile
+            context: ../
+        

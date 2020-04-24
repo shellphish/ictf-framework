@@ -4,8 +4,18 @@ services:
 
     cast_database:
         image: ictf_3_cast_database
+        hostname: cast_database
         build:
             dockerfile: ./hephaestus/3_cast_database/Dockerfile
             context: ../
         entrypoint: "/bin/bash"
         working_dir: /opt/ictf/database
+
+    cast_gamebot:
+        image: ictf_3_cast_gamebot
+        hostname: cast_gamebot
+        build:
+            dockerfile: ./hephaestus/3_cast_gamebot/Dockerfile
+            context: ../
+        entrypoint: "/bin/bash"
+        working_dir: /opt/ictf/gamebot

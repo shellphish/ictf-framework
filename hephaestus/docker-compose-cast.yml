@@ -28,3 +28,12 @@ services:
             context: ../
         entrypoint: "/bin/bash"
         working_dir: /opt/ictf/scoreboard
+
+    cast_teaminterface:
+        image: ictf_3_cast_teaminterface
+        hostname: cast_teamisterface
+        build:
+            dockerfile: ./hephaestus/3_cast_teaminterface/Dockerfile
+            context: ../
+        entrypoint: "/bin/bash"
+        working_dir: /opt/ictf/teaminterface

@@ -22,3 +22,10 @@ services:
         build:
             dockerfile: ./hephaestus/4_harden_scoreboard/Dockerfile
             context: ../
+
+    harden_teaminterface:
+        image: ictf_4_harden_teaminterface
+        hostname: teaminterface
+        build:
+            dockerfile: ./hephaestus/4_harden_teaminterface/Dockerfile
+            context: ../

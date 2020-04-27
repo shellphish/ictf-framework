@@ -1,0 +1,10 @@
+input {
+     udp {
+             port => 1717
+     }
+}
+output {
+     elasticsearch {
+       hosts => [{{LOGGER_ES_URL}}:9200]
+     }
+}

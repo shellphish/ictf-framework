@@ -45,7 +45,7 @@ resource "aws_instance" "database" {
     provisioner "remote-exec" {
         inline = [
             "sudo pip install -q ansible",
-            "/usr/local/bin/ansible-playbook /opt/ictf/database/provisioning/terraform_provisioning.yml --extra-vars AWS_BUCKET_NAME=${data.aws_s3_bucket.database_bucket.id} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")} --extra-vars ICTF_USER_PASSWORD_SALT=${file("../../secrets/database-api/salt")} --extra-vars ICTF_MYSQL_DATABASE_PASSWORD=${file("../../secrets/database-api/mysql")}",
+            "/usr/local/bin/ansible-playbook /opt/ictf/database/provisioning/terraform_provisioning.yml --extra-vars AWS_BUCKET_NAME=${data.aws_s3_bucket.database_bucket.id} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")} --extra-vars LOGGER_ES_URL=${aws_instance.logger.private_ip} --extra-vars ICTF_USER_PASSWORD_SALT=${file("../../secrets/database-api/salt")} --extra-vars ICTF_MYSQL_DATABASE_PASSWORD=${file("../../secrets/database-api/mysql")}",
             "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
             "sudo service ssh restart"
         ]
@@ -56,6 +56,12 @@ resource "aws_instance" "database" {
         inline = [
             "sudo pkill -9 mysql || echo '##### SPEEEEEEEEEEED gone: FAILED TO KILL mysql.'"
         ]
+    }
+
+    // This is temporary here, it will be on the machines.
+    provisioner "file" {
+        source = "../../database/provisioning/logstash.conf.j2"
+        destination = "/home/hacker/"
     }
 }
 

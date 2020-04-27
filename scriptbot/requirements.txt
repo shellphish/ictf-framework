@@ -6,3 +6,5 @@ pycrypto
 requests
 nclib
 docker
+setuptools==44.0.0
+nose

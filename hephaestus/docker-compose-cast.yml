@@ -37,3 +37,12 @@ services:
             context: ../
         entrypoint: "/bin/bash"
         working_dir: /opt/ictf/teaminterface
+
+    cast_scriptbot:
+        image: ictf_3_cast_scriptbot
+        hostname: cast_scriptbot
+        build:
+            dockerfile: ./hephaestus/3_cast_scriptbot/Dockerfile
+            context: ../
+        entrypoint: "/bin/bash"
+        working_dir: /opt/ictf/scriptbot

@@ -29,3 +29,10 @@ services:
         build:
             dockerfile: ./hephaestus/4_harden_teaminterface/Dockerfile
             context: ../
+
+    harden_scriptbot:
+        image: ictf_4_harden_scriptbot
+        hostname: scriptbot
+        build:
+            dockerfile: ./hephaestus/4_harden_scriptbot/Dockerfile
+            context: ../

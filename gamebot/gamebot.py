@@ -59,10 +59,16 @@ def main():     # pylint:disable=missing-docstring,too-many-locals
     log.info("Starting GameBot")
     db_api = DBApi()
     # Check DB connection.
-    if db_api.check_connection():
-        log.info("Connection to DB Verified.")
-    else:
-        log.fatal("Looks like DB is Down. Unable to verify db connection.")
+
+    is_db_up = False
+
+    while not is_db_up:
+        if db_api.check_connection():
+            log.info("Connection to DB Verified.")
+            is_db_up = True
+        else:
+            log.fatal("Looks like DB is Down. Unable to verify db connection.")
+            time.sleep(5)
 
     scripts_interface = ScriptsFacade(db_api)
     log.info("Initialization Complete")

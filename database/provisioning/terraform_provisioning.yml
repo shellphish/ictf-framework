@@ -2,14 +2,18 @@
   remote_user: root
   become: true
 
-  handlers:
+  vars:
+    - ICTF_API_SECRET: "{{ lookup('file', '/opt/ictf/secrets/database-api/secret') }}"
+    - ICTF_USER_PASSWORD_SALT: "{{ lookup('file', '/opt/ictf/secrets/database-api/salt') }}"
+    - ICTF_MYSQL_DATABASE_PASSWORD: "{{ lookup('file', '/opt/ictf/secrets/database-api/mysql') }}"
 
-    - name: restart nginx
-      service: name=nginx state=restarted
+  # handlers:
 
-    - name: restart ictf-db-export-s3
-      service: name=ictf-db-export-s3 state=restarted
+  #   - name: restart nginx
+  #     service: name=nginx state=restarted
 
+  #   - name: restart ictf-db-export-s3
+  #     service: name=ictf-db-export-s3 state=restarted
 
   tasks:
   - name: fail if ICTF_API_SECRET is not specified
@@ -27,19 +31,21 @@
       msg: "database requires ICTF_USER_PASSWORD_SALT to be set"
     when: ICTF_USER_PASSWORD_SALT is not defined
 
+  # - name: setting hostname
+  #   hostname:
+  #     name: "database"
 
-  - name: setting hostname
-    hostname:
-      name: "database"
+  - name: mysql - start MySQL service to apply new configurations
+    command: service mysql start
 
-  - name: Add mappings to /etc/hosts
-    blockinfile:
-      dest: /etc/hosts
-      block: |
-        {{ item.ip }} {{ item.name }}
-      marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
-    with_items:
-      - { name: "database", ip: 127.0.0.1 }
+  # - name: Add mappings to /etc/hosts
+  #   blockinfile:
+  #     dest: /etc/hosts
+  #     block: |
+  #       {{ item.ip }} {{ item.name }}
+  #     marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+  #   with_items:
+  #     - { name: "database", ip: 127.0.0.1 }
 
   - name: change mysql password
     shell: "mysqladmin -u ictf -phacker password {{ ICTF_MYSQL_DATABASE_PASSWORD }}"
@@ -61,8 +67,8 @@
       name=/opt/ictf/settings/database-api.py
       regexp="^(USER_PASSWORD_SALT).*$"
       replace="\1 = \"{{ ICTF_USER_PASSWORD_SALT }}\""
-    notify:
-      restart nginx
+    # notify:
+    #   restart nginx
 
   - name: create aws_router_config.yml
     template:
@@ -75,5 +81,5 @@
       owner: hacker
       group: hacker
       mode: 0755
-    notify:
-      - restart ictf-db-export-s3
+    # notify:
+    #   - restart ictf-db-export-s3

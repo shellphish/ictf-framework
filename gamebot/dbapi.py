@@ -82,8 +82,11 @@ class DBApi:
         :return: True/False depending on whether the db api is up or not.
         """
         target_url = self.__build_url(DBApi.PING_DBAPI)
-        ping_response = urllib.urlopen(target_url[0]).read()
-        return ping_response == 'lareneg'
+        try:
+            ping_response = urllib.urlopen(target_url[0]).read()
+            return ping_response == 'lareneg'
+        except IOError:
+            return False
 
     def get_tick_config(self):
         """

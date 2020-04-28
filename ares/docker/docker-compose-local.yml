@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+
+    database:
+        image: ictf_4_harden_database
+        hostname: database
+
+    gamebot:
+        image: ictf_4_harden_gamebot
+        hostname: gamebot
+        depends_on: [database]
+        
+    # scoreboard:
+    #     image: ictf_4_harden_scoreboard
+    #     hostname: scoreboard
+
+    # teaminterface:
+    #     image: ictf_4_harden_teaminterface
+    #     hostname: teaminterface
+
+    # scriptbot:
+    #     image: ictf_4_harden_scriptbot
+    #     hostname: scriptbot
+
+    # router:
+    #     image: ictf_4_harden_router
+    #     hostname: router

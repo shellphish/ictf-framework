@@ -46,3 +46,12 @@ services:
             context: ../
         entrypoint: "/bin/bash"
         working_dir: /opt/ictf/scriptbot
+
+    cast_router:
+        image: ictf_3_cast_router
+        hostname: cast_router
+        build:
+            dockerfile: ./hephaestus/3_cast_router/Dockerfile
+            context: ../
+        entrypoint: "/bin/bash"
+        working_dir: /opt/ictf/router

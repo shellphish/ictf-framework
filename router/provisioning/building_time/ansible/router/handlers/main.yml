@@ -1,0 +1,14 @@
+- name: restart apparmor
+  service: name=apparmor state=restarted
+
+- name: restart ictf-tcpdump
+  service: name=ictf-tcpdump state=restarted
+
+- name: restart ictf-pcap-s3
+  service: name=ictf-pcap-s3 state=restarted
+
+- name: reload iptables
+  service: name=netfilter-persistent state=restarted
+
+- name: reload sysconfig
+  command: sysctl --system

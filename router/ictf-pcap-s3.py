@@ -14,8 +14,6 @@ import threading
 from time import sleep
 sys.path.append(os.path.abspath(join(os.path.dirname(__file__), '..')))
 
-from common.world_constants import CfgKey
-
 SLEEP_TIME = 10
 
 MAX_LOG_SIZE = "10" #MB

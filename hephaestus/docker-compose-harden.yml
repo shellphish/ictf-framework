@@ -36,3 +36,10 @@ services:
         build:
             dockerfile: ./hephaestus/4_harden_scriptbot/Dockerfile
             context: ../
+
+    harden_router:
+        image: ictf_4_harden_router
+        hostname: router
+        build:
+            dockerfile: ./hephaestus/4_harden_router/Dockerfile
+            context: ../

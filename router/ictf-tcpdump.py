@@ -11,8 +11,6 @@ from os.path import join, basename
 
 sys.path.append(os.path.abspath(join(os.path.dirname(__file__), '..')))
 
-from common.world_constants import CfgKey
-
 # with open("aws_router_config.yml") as f:
 #     cfg = yaml.load(f)['instance']
 GAME_ID = "0"

@@ -1,4 +1,6 @@
-FROM ictf_3_cast_gamebot
+FROM ictf_base
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python-pip 
 
 COPY ./gamebot /opt/ictf/gamebot
 

@@ -257,11 +257,11 @@
         src: ./files/aws_config.yml.j2
         dest: /opt/ictf/database/aws_config.yml
 
-    - name: Fix permission for configuration file
-      file:
-        path: /opt/ictf/database/aws_config.yml
-        owner: hacker
-        group: hacker
-        mode: 0755
+    # - name: Fix permission for configuration file
+    #   file:
+    #     path: /opt/ictf/database/aws_config.yml
+    #     owner: hacker
+    #     group: hacker
+    #     mode: 0755
       # notify:
       #   - restart ictf-db-export-s3

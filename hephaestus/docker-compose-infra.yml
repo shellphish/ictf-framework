@@ -1,0 +1,46 @@
+version: '3.4'
+
+services:
+
+    ictf_database:
+        image: ictf_database
+        hostname: database
+        build:
+            dockerfile: ./hephaestus/1_database/Dockerfile
+            context: ../
+        entrypoint: /bin/bash
+
+    ictf_gamebot:
+        image: ictf_gamebot
+        hostname: gamebot
+        build:
+            dockerfile: ./hephaestus/1_gamebot/Dockerfile
+            context: ../
+        
+    ictf_scoreboard:
+        image: ictf_scoreboard
+        hostname: scoreboard
+        build:
+            dockerfile: ./hephaestus/1_scoreboard/Dockerfile
+            context: ../
+
+    ictf_teaminterface:
+        image: ictf_teaminterface
+        hostname: teaminterface
+        build:
+            dockerfile: ./hephaestus/1_teaminterface/Dockerfile
+            context: ../
+
+    ictf_scriptbot:
+        image: ictf_scriptbot
+        hostname: scriptbot
+        build:
+            dockerfile: ./hephaestus/1_scriptbot/Dockerfile
+            context: ../
+
+    ictf_router:
+        image: ictf_router
+        hostname: router
+        build:
+            dockerfile: ./hephaestus/1_router/Dockerfile
+            context: ../

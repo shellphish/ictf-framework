@@ -1,3 +1,0 @@
----
-- name: build_scoreboard
-  import_tasks: setup_scoreboard.yml

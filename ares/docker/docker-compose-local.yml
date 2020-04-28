@@ -3,11 +3,11 @@ version: '3.4'
 services:
 
     database:
-        image: ictf_4_harden_database
+        image: ictf_database
         hostname: database
 
     gamebot:
-        image: ictf_4_harden_gamebot
+        image: ictf_gamebot
         hostname: gamebot
         depends_on: [database]
         

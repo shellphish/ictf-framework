@@ -1,8 +1,8 @@
 #!/bin/bash
 
-service mysql restart
+service mysql start
 
-service nginx restart
+service nginx start
 
 ICTF_DATABASE_SETTINGS=/opt/ictf/settings/database-api.py  /usr/bin/uwsgi -c uwsgi.ini &
 

@@ -17,6 +17,9 @@ import sys
 import json
 import functools
 
+from requests.exceptions import ConnectionError
+
+
 DEBUG = True
 
 # we use the last tick since some info may not be updated in
@@ -47,7 +50,16 @@ def should_get_data(game_db):
     # get the tick from the DB
     tick_endpoint = config['tick_endpoint']['e']
     tick_key = config['tick_endpoint']['key']
-    data = game_db.get(db_endpoint + tick_endpoint, params=db_request_params).json()
+
+    try:
+        data = game_db.get(db_endpoint + tick_endpoint, params=db_request_params)
+    except ConnectionError:
+        return False
+
+    if data.status_code != 200:
+        return False
+
+    data = data.json()
     recv_tick = data[tick_key] if tick_key else data
 
     # decide whether to query the db or not
@@ -103,7 +115,15 @@ def should_update_game_static_info(game_db):
     # get team info from the DB
     static_endpoint = config['game_start']['stat']
     # game_key = 'id'
-    data = game_db.get(db_endpoint + static_endpoint, params=db_request_params).json()
+    try:
+        data = game_db.get(db_endpoint + static_endpoint, params=db_request_params)
+    except ConnectionError:
+        return False
+
+    if data.status_code != 200:
+        return False
+
+    data = data.json()
     # decide whether to refresh game info or not
     if config['game_start']['key'] in data and  data[config['game_start']['key']]=="621":
         query_db=False
@@ -140,8 +160,10 @@ def run_forever():
 
     cache = redis.StrictRedis(**redis_params)
     game_db = requests.Session()
-    if(should_update_game_static_info(game_db)) :
-         set_game_static_info(cache, game_db)
+    
+    if should_update_game_static_info(game_db):
+        set_game_static_info(cache, game_db)
+
     while True:
         while not should_get_data(game_db):
             print('.'),

@@ -11,9 +11,11 @@ services:
         hostname: gamebot
         depends_on: [database]
         
-    # scoreboard:
-    #     image: ictf_4_harden_scoreboard
-    #     hostname: scoreboard
+    scoreboard:
+        image: ictf_scoreboard
+        hostname: scoreboard
+        ports: 
+            - "80:80"
 
     # teaminterface:
     #     image: ictf_4_harden_teaminterface

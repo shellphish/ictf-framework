@@ -8,7 +8,7 @@ WORKDIR /opt/ictf/teaminterface
 
 RUN pip install -r requirements.txt
 
-RUN ansible-playbook --become --extra-vars ICTF_USER="hacker" provisioning/building_time/ansible/main.yml
+RUN ansible-playbook provisioning/ansible-provisioning.yml --become --extra-vars ICTF_USER="hacker"  --extra-vars ICTF_DB_API_ADDRESS="database"
 
 RUN chmod +x ./start.sh 
 

@@ -1,3 +1,0 @@
----
-- name: build_teaminterface
-  import_tasks: setup_teaminterface.yml

@@ -17,9 +17,11 @@ services:
         ports: 
             - "80:80"
 
-    # teaminterface:
-    #     image: ictf_4_harden_teaminterface
-    #     hostname: teaminterface
+    teaminterface:
+        image: ictf_teaminterface
+        hostname: teaminterface
+        ports: 
+            - "8080:80"
 
     # scriptbot:
     #     image: ictf_4_harden_scriptbot

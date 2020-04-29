@@ -82,10 +82,10 @@ class RegistryClient:
         self.registry_endpoint = registry_endpoint
         self.docker_client = docker.from_env()
         self.log = logging.getLogger('scriptbot.registryClient')
-        self._authenticate()
+        if not settings.IS_LOCAL_REGISTRY:
+            self._authenticate()
 
     def _authenticate(self):
-
         self.docker_client.login(
             username=self.registry_username,
             password=self.registry_password,
@@ -94,8 +94,13 @@ class RegistryClient:
 
     def pull_new_image(self, image_name):
         try:
-            path = '{}/{}'.format(self.registry_endpoint, image_name)
-            self.log.info("Pulling new image {} from {}...".format(image_name, path))
+            if not settings.IS_LOCAL_REGISTRY:
+                path = '{}/{}'.format(self.registry_endpoint, image_name)
+                self.log.info("Pulling new image {} from {}...".format(image_name, path))
+            else:
+                path = image_name
+                self.log.info("Pulling new image {} locally".format(image_name, path))
+
             res = self.docker_client.images.pull(path)
             self.log.info("Pulled image {}: {}".format(image_name, res))
         except docker.errors.APIError as ex:
@@ -143,7 +148,7 @@ class DBClient:
                 )
 
             if r.status_code == 200:
-                return json.loads(r.content)
+                return json.loads(r.content.decode('utf-8'))
 
             elif r.status_code == 502 and retry_times > 0:
                 # Retry in case of HTTP 502
@@ -1083,7 +1088,11 @@ class Scheduler(object):
                 d = dict(script)
                 d['service_name'] = self.services[d['service_id']]['service_name']
                 d['docker_image_name'] = d['service_name'] + '_scripts'
-                d['docker_image_path'] = '{}/{}'.format(self.registry.registry_endpoint, d['docker_image_name'])
+                if settings.IS_LOCAL_REGISTRY:
+                    d['docker_image_path'] = d['docker_image_name']
+                else:
+                    d['docker_image_path'] = '{}/{}'.format(self.registry.registry_endpoint, d['docker_image_name'])
+
                 self.scripts[int(script['script_id'])] = d
 
             if self.state_id == state['state_id']:
@@ -1464,11 +1473,14 @@ if __name__ == "__main__":
     except Exception as e:
         print(e)
         pass
-
+    
     logging.basicConfig(
-        filename=settings.LOG_PATH,
         level=settings.LOG_LEVEL,
         format='%(levelname)-1s | %(asctime)-23s | %(name)-24s | %(message)s',
+        handlers = [
+            logging.FileHandler(settings.LOG_PATH),
+            logging.StreamHandler()
+        ]
     )
 
     main()

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python scriptbot.py
+python3 scriptbot.py

@@ -1,10 +1,6 @@
 coloredlogs
 nose
-pexpect
-pwntools
-pycrypto
+pycryptodome
 requests
 nclib
 docker
-setuptools==44.0.0
-nose

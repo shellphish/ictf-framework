@@ -22,10 +22,22 @@ services:
         hostname: teaminterface
         ports: 
             - "8080:80"
+{% for scriptbot_id in range(1, num_scriptbots + 1) %}
+    scriptbot{{ scriptbot_id }}:
+        image: ictf_scriptbot
+        hostname: scriptbot{{ scriptbot_id }}
 
-    # scriptbot:
-    #     image: ictf_4_harden_scriptbot
-    #     hostname: scriptbot
+        volumes:
+            - type: bind
+              source: /var/run/docker.sock
+              target: /var/run/docker.sock
+
+        environment:
+            - BOT_ID={{ scriptbot_id }}
+            - ALL_BOTS={{ num_scriptbots }}
+            - IS_LOCAL_REGISTRY=1
+            - API_SECRET={{ api_secret }}
+{% endfor %}
 
     # router:
     #     image: ictf_4_harden_router

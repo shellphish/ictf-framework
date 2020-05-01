@@ -90,3 +90,4 @@ basehost/build/*
 basehost/packer_cache/*
 basehost/iso/*
 **/game_config.json
+/**/vpnkeys

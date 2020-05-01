@@ -9,7 +9,6 @@ services:
     gamebot:
         image: ictf_gamebot
         hostname: gamebot
-        depends_on: [database]
         
     scoreboard:
         image: ictf_scoreboard
@@ -22,6 +21,10 @@ services:
         hostname: teaminterface
         ports: 
             - "8080:80"
+    router:
+        image: ictf_router
+        hostname: router
+        privileged: true
 {% for scriptbot_id in range(1, num_scriptbots + 1) %}
     scriptbot{{ scriptbot_id }}:
         image: ictf_scriptbot
@@ -38,7 +41,3 @@ services:
             - IS_LOCAL_REGISTRY=1
             - API_SECRET={{ api_secret }}
 {% endfor %}
-
-    # router:
-    #     image: ictf_4_harden_router
-    #     hostname: router

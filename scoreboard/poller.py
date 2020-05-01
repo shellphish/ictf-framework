@@ -151,6 +151,17 @@ def set_game_tick(cache, game_db):
     cache.set('tick', json.dumps(data))
     print "[*] Updated tick " + str(data['tick_id'])
 
+def db_is_not_ready(game_db):
+    try:
+        data = game_db.get(db_endpoint + "/game/state")
+    except ConnectionError:
+        return False
+
+    if data.status_code != 200:
+        return False
+    
+    return True
+
 def run_forever():
     redis_params = {
         "host": config['redis_host'],
@@ -160,6 +171,10 @@ def run_forever():
 
     cache = redis.StrictRedis(**redis_params)
     game_db = requests.Session()
+
+    while db_is_not_ready(game_db):
+        print "the databse is not ready yet... sleeping for 5 seconds"
+        time.sleep(5)
     
     if should_update_game_static_info(game_db):
         set_game_static_info(cache, game_db)

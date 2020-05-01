@@ -918,17 +918,24 @@ class Scheduler(object):
         if verbose:
             self.log.setLevel(logging.DEBUG)
 
-        try:
-            self.teams = self.get_teams()
+        is_db_ready = False
 
-        except DBClientError as ex:
-            self.log.error(
-                "An unexpected exception occurred when loading team info from database: %s\n%s,",
-                str(ex),
-                str(traceback.format_exc())
-            )
+        while not is_db_ready:
+            time.sleep(5)
+            try:
+                self.teams = self.get_teams()
+                is_db_ready = True
 
-            sys.exit(-1)
+            except DBClientError as ex:
+                # self.log.error(
+                #     "An unexpected exception occurred when loading team info from database: %s\n%s,",
+                #     str(ex),
+                #     str(traceback.format_exc())
+                # )
+
+                # sys.exit(-1)
+                self.log.info("The database is not ready yet...")
+                continue
 
         # seed
         random.seed(time.time())

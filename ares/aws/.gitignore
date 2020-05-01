@@ -2,5 +2,4 @@ ssh_config
 ./ssh_config
 ictf_game_vars.auto.tfvars.json
 result_provision.json
-vpnkeys/
 ecr_password

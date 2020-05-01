@@ -30,8 +30,7 @@ def spawn_local_game(game_config_path, secrets_path):
     with open(os.path.join(secrets_path, 'database-api', 'secret'), 'r') as f:
         api_secret = f.read().strip()
 
-    # num_scriptbot = int(math.ceil(len(game_config["teams"]) / 10.0))
-    num_scriptbots = 3 
+    num_scriptbots = int(math.ceil(len(game_config["teams"]) / 10.0))
 
     jinja_env = Environment(
         loader=FileSystemLoader(searchpath='./'),
@@ -50,7 +49,7 @@ def spawn_local_game(game_config_path, secrets_path):
 Configuration for docker-compose successfully generated in ./{0}
 
 Spawn the infrastructure locally with the following command:
-    - docker-compose -f {0} up
+    - docker-compose -f {0} up --remove-orphans
 
 Destroy the infrastructure locally with the following command:
     - docker-compose -f {0} down

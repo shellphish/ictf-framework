@@ -1,6 +1,6 @@
 #!/bin/bash
 
-service openvpn restart
+service openvpn start
 
 python ictf-tcpdump.py &
 

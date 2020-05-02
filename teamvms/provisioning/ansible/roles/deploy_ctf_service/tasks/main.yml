@@ -1,0 +1,35 @@
+---
+- name: set service directory permissions
+  file:
+    path: "{{GUEST_SERVICES_PATH}}/{{SERVICE_NAME}}/"
+    state: directory
+    owner: ctf
+    group: ctf 
+    mode: 0755
+
+- name: set ro folder permissions & owner
+  file:
+    path: "{{GUEST_SERVICES_PATH}}/{{SERVICE_NAME}}/ro"
+    owner: "ctf"
+    group: "ctf"
+    state: directory
+    mode: 0755
+    recurse: yes
+
+- name: set rw folder permissions & owner
+  file:
+    path: "{{GUEST_SERVICES_PATH}}/{{SERVICE_NAME}}/rw"
+    owner: "ctf"
+    group: "ctf"
+    state: directory
+    mode: 0777
+    recurse: yes
+
+- name: set append folder permissions & owner
+  file:
+    path: "{{GUEST_SERVICES_PATH}}/{{SERVICE_NAME}}/append"
+    owner: "ctf"
+    group: "ctf"
+    state: directory
+    mode: 01754
+    recurse: yes

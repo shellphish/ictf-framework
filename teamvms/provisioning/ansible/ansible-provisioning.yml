@@ -1,0 +1,115 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  vars:
+    - GUEST_SERVICES_PATH: /opt/ictf/services 
+
+  tasks:
+    
+    - name: fail if SERVICES is not specified
+      fail:
+        msg: "the teamvm requires SERVICES to be set"
+      when: SERVICES is not defined
+
+    - name: install docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.23.1/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: 0755
+
+    - name: add user to docker group
+      command: usermod -aG docker ctf
+
+    ########################    CREATE SERVICE BASE DIRECTORY   ###############################
+    - name: create service directory
+      file:
+        path: "{{ GUEST_SERVICES_PATH }}"
+        owner: ctf
+        group: ctf
+        state: directory
+        mode: 0755
+
+    ########################          DEPLOY THE SERVICES       ###############################
+    - name: deploy CTF services
+      include_role:
+        name: deploy_ctf_service
+      vars:
+        SERVICE_NAME: "{{item}}"
+      with_items: "{{ SERVICES }}"
+
+    - name: Generate docker-compose.yml
+      template:
+        src: ./files/docker-compose.yml.j2
+        dest: "{{GUEST_SERVICES_PATH}}/docker-compose.yml"
+
+    # see: https://github.com/betrcode/ansible-run-in-parallel
+    - name: build service docker files in parallel
+      shell: "docker-compose build --parallel"
+      args:
+        chdir: "{{GUEST_SERVICES_PATH}}"
+      # async: 6000  # Maximum runtime in seconds. Adjust as needed.
+      # poll: 0  # Fire and continue (never poll)
+
+    # - name: Wait for the docker containers to be built
+    #   async_status:
+    #     jid: "{{ item.ansible_job_id }}"
+    #   register: _jobs
+    #   until: _jobs.finished
+    #   delay: 10             # Check every 10 seconds
+    #   retries: 1000         # Retry up to 1000 times
+    #   with_items: "{{ _build_docker_files.results }}"
+
+    ########################    SETUP bindfs for append-only    ###############################
+    # - name: setup bindfs for the append only dir
+    #   lineinfile:
+    #     path: /etc/fstab
+    #     line: "{{guest_services_path}}/{{item}}/append {{GUEST_SERVICES_PATH}}/{{item}}/append fuse.bindfs force-user=root,perms=u=rwD:g=r:dg=rwx:o=D"
+    #   #shell: "bindfs -u root -p 'u=rwD:g=r:dg=rwx:o=D' {{guest_services_path}}/{{service_name}}/append {{guest_services_path}}/{{service_name}}/append"
+
+    #   with_items: "{{services}}"
+
+    ########################            CLEAN UP YO SHIT        ###############################
+    - name: prune docker cache
+      shell: docker system prune --volumes -f
+
+    # - name: setting {{ TEAM_ID }} hostname
+    #   hostname:
+    #     name: "team{{ TEAM_ID }}"
+
+    - name: generate .ssh directory
+      file:
+        path: /home/ctf/.ssh
+        state: directory
+        owner: ctf
+        group: ctf
+
+    # - name: copy over authorized_keys
+    #   copy:
+    #     src: /home/hacker/authorized_keys
+    #     dest: /root/.ssh/authorized_keys
+    #     owner: root
+    #     group: root
+    #     mode: 0644
+
+    - name: create openvpn log directory
+      file:
+        path:  /var/log/openvpn
+        state: directory
+        owner: root
+        group: root
+        mode:  0755
+
+    # - name: move openvpn config
+    #   template:
+    #     src:   /opt/ictf/openvpn.conf.j2
+    #     dest:  /etc/openvpn/client.conf
+    #     owner: root
+    #     group: root
+    #     mode:  0644
+
+    # - name: reload openvpn config
+    #   command: systemctl daemon-reload
+
+    # - name: restart openvpn
+    #   command: systemctl restart openvpn

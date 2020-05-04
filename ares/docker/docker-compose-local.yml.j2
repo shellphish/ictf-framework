@@ -21,7 +21,7 @@ services:
         hostname: teaminterface
         ports: 
             - "8080:80"
-            
+
     router:
         image: ictf_router
         hostname: router
@@ -41,4 +41,22 @@ services:
             - ALL_BOTS={{ num_scriptbots }}
             - IS_LOCAL_REGISTRY=1
             - API_SECRET={{ api_secret }}
+{% endfor %}
+{% for team_id in range(1, num_teams + 1) %}
+    teamvm{{ team_id }}:
+        image: ictf_teamvm
+        hostname: team{{ scriptbot_id }}
+
+        volumes:
+            - type: bind
+              source: /var/run/docker.sock
+              target: /var/run/docker.sock
+
+        environment:
+            - TEAM_ID={{ team_id }}
+
+        ports:
+        {% for service_id in services_ids %}
+            - "{{ 10000 + service_id }}:{{ 10000 + service_id }}"
+        {% endfor %}
 {% endfor %}

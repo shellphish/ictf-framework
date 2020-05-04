@@ -48,6 +48,7 @@
       shell: "docker-compose build --parallel"
       args:
         chdir: "{{GUEST_SERVICES_PATH}}"
+      when: LOCAL is not defined
       # async: 6000  # Maximum runtime in seconds. Adjust as needed.
       # poll: 0  # Fire and continue (never poll)
 
@@ -72,6 +73,7 @@
     ########################            CLEAN UP YO SHIT        ###############################
     - name: prune docker cache
       shell: docker system prune --volumes -f
+      when: LOCAL is not defined
 
     # - name: setting {{ TEAM_ID }} hostname
     #   hostname:

@@ -4,6 +4,7 @@ import argparse
 import os
 import json
 import shutil
+import shlex
 
 SERVICE_DEST_DIR = '../teamvms/bundled_services'
 
@@ -36,8 +37,9 @@ def build_teamvm(game_config_path):
             shutil.copytree(os.path.join(services_dir, service['name'], "service"), os.path.join(SERVICE_DEST_DIR, service['name']))
             active_services.append(service['name'])
 
-    os.system("docker-compose -f ./docker-compose-teamvm.yml build --build-arg SERVICES={}".format(json.dumps({ 'SERVICES': active_services })))
-    # print("docker-compose -f ./docker-compose-teamvm.yml build --build-arg SERVICES='{}'".format(json.dumps({ 'SERVICES': active_services })))
+    cmd = "docker-compose -f ./docker-compose-teamvm.yml build --build-arg services='{}'".format(json.dumps({ 'SERVICES': active_services, 'LOCAL': True }))
+    # os.system(shlex.quote(cmd))
+    print(cmd)
 
 
 if __name__ == '__main__':

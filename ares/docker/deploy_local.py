@@ -31,6 +31,8 @@ def spawn_local_game(game_config_path, secrets_path):
         api_secret = f.read().strip()
 
     num_scriptbots = int(math.ceil(len(game_config["teams"]) / 10.0))
+    num_teams = len(game_config['teams']) 
+    active_services = [service for service in game_config['services'] if service['state'] == 'enabled']
 
     jinja_env = Environment(
         loader=FileSystemLoader(searchpath='./'),
@@ -42,7 +44,9 @@ def spawn_local_game(game_config_path, secrets_path):
     with open(DOCKER_COMPOSE_OUTPUT_FILE, 'w') as out_f:
         out_f.write(template.render(
             num_scriptbots=num_scriptbots,
-            api_secret=api_secret 
+            num_teams=num_teams,
+            api_secret=api_secret,
+            services_ids=range(1, len(active_services) + 1)
         ))
     
     print('''

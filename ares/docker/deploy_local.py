@@ -72,7 +72,9 @@ Spawn the infrastructure locally with the following command:
 
 Destroy the infrastructure locally with the following command:
     - docker-compose -f {0} down -v --remove-orphans
-    '''.format(DOCKER_COMPOSE_OUTPUT_FILE))
+
+To start the game: http://localhost:5000/game/insert?secret={1}
+    '''.format(DOCKER_COMPOSE_OUTPUT_FILE, api_secret))
 
 
 if __name__ == '__main__':

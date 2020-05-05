@@ -12,6 +12,8 @@ services:
     database:
         image: ictf_database
         hostname: database
+        ports:
+            - "5000:80"
 
     gamebot:
         image: ictf_gamebot
@@ -29,10 +31,10 @@ services:
         ports: 
             - "8080:80"
 
-    router:
-        image: ictf_router
-        hostname: router
-        privileged: true
+#    router:
+#        image: ictf_router
+#        hostname: router
+#        privileged: true
 {% for scriptbot_id in range(1, num_scriptbots + 1) %}
     scriptbot{{ scriptbot_id }}:
         image: ictf_scriptbot
@@ -50,7 +52,7 @@ services:
             - API_SECRET={{ api_secret }}
 {% endfor %}
 {% for team_id in range(1, num_teams + 1) %}
-    teamvm{{ team_id }}:
+    team{{ team_id }}:
         image: ictf_teamvm
         hostname: team{{ team_id }}
 

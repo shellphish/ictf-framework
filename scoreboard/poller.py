@@ -86,7 +86,11 @@ def set_game_info(cache, game_db):
     for v in config['dynamic_endpoints']['latest']:
         if DEBUG:
             print "[*] Requesting " + v
-        tmp = game_db.get(db_endpoint + v, params=db_request_params).json()
+        # FIXME: This thing needs to be rewritten from scratch
+        try:
+            tmp = game_db.get(db_endpoint + v, params=db_request_params).json()
+        except:
+            return
         data.update(tmp)
         if DEBUG:
             print "[*] Updated " + ''.join(tmp.keys())
@@ -95,7 +99,11 @@ def set_game_info(cache, game_db):
     for v in config['dynamic_endpoints']['previous_tick']:
         if DEBUG:
             print "[*] Requesting " + v
-        tmp = game_db.get(db_endpoint + v + str(last_tick), params=db_request_params).json()
+        # FIXME: This thing needs to be rewritten from scratch
+        try:
+            tmp = game_db.get(db_endpoint + v + str(last_tick), params=db_request_params).json()
+        except:
+            return
         data.update(tmp)
         if DEBUG:
             print "[*] Updated " + ''.join(tmp.keys())

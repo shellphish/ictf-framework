@@ -97,12 +97,12 @@ class RegistryClient:
             if not settings.IS_LOCAL_REGISTRY:
                 path = '{}/{}'.format(self.registry_endpoint, image_name)
                 self.log.info("Pulling new image {} from {}...".format(image_name, path))
+                res = self.docker_client.images.pull(path)
+                self.log.info("Pulled image {}: {}".format(image_name, res))
             else:
                 path = image_name
-                self.log.info("Pulling new image {} locally".format(image_name, path))
+                self.log.info("The framework is running locally... there is no need to pull the image {}".format(image_name))
 
-            res = self.docker_client.images.pull(path)
-            self.log.info("Pulled image {}: {}".format(image_name, res))
         except docker.errors.APIError as ex:
             raise RegistryClientPullError("Error during pull of {}: {}".format(image_name, ex))
 
@@ -210,7 +210,7 @@ class DBClient:
                 )
 
             if r.status_code == 200:
-                return json.loads(r.content)
+                return json.loads(r.content.decode('utf-8'))
 
             elif r.status_code == 502 and retry_times > 0:
                 # Retry in case of HTTP 502
@@ -488,7 +488,14 @@ class ScriptExecutor(threading.Thread):
         return True
 
     def get_execution_arguments(self):
-        arg_prefix = ["docker", "run", "--rm", "--network", "host" ]
+        arg_prefix = ["docker", "run", "--rm"]
+        # The networking changes if we are running locally because we want to use
+        # THe dns service provided by docker compose
+        if settings.IS_LOCAL_REGISTRY:
+            arg_prefix += ['--network=docker_default']
+        # Otherwise we use the VPN when we run remotely
+        else:
+            arg_prefix = ["--network", "host" ]
         arg_prefix += ['-e', 'TERM=linux', '-e', 'TERMINFO=/etc/terminfo']
         arg_prefix += [self.script_image_path]
         # PROPOSAL: prepend timeout --signal=SIGKILL str(self.timeout)
@@ -797,9 +804,17 @@ class ScriptExecutor(threading.Thread):
             # Expected exceptions
 
             if stderr is None:
-                stderr = ''
+                stderr = b''
+
+            if isinstance(stderr, bytes):
+                stderr = stderr.decode('utf-8').strip()
+
             if stdout is None:
-                stdout = ''
+                stdout = b''
+
+            if isinstance(stdout, bytes):
+                stdout = stdout.decode('utf-8').strip()
+
             self.result = {
                 'error': ERROR_SCRIPT_EXECUTION[0],
                 'error_msg': ERROR_SCRIPT_EXECUTION[1] + \
@@ -817,9 +832,16 @@ class ScriptExecutor(threading.Thread):
             # Unexpected exceptions
 
             if stderr is None:
-                stderr = ''
+                stderr = b''
+
+            if isinstance(stderr, bytes):
+                stderr = stderr.decode('utf-8').strip()
+
             if stdout is None:
-                stdout = ''
+                stdout = b''
+
+            if isinstance(stdout, bytes):
+                stdout = stdout.decode('utf-8').strip()
 
             error_msg = ERROR_SCRIPT_EXECUTION[1] + \
                          " Exception at ScriptExec.run(): " + \
@@ -918,25 +940,6 @@ class Scheduler(object):
         if verbose:
             self.log.setLevel(logging.DEBUG)
 
-        is_db_ready = False
-
-        while not is_db_ready:
-            time.sleep(5)
-            try:
-                self.teams = self.get_teams()
-                is_db_ready = True
-
-            except DBClientError as ex:
-                # self.log.error(
-                #     "An unexpected exception occurred when loading team info from database: %s\n%s,",
-                #     str(ex),
-                #     str(traceback.format_exc())
-                # )
-
-                # sys.exit(-1)
-                self.log.info("The database is not ready yet...")
-                continue
-
         # seed
         random.seed(time.time())
         self.log.info('#' * 80)
@@ -958,6 +961,7 @@ class Scheduler(object):
         """
         sorted_list = sorted([ int(i) for i in team_id_list ])
         result = [ ]
+        self.log.info("IN PICK TEAMS : %r", sorted_list)
 
         # Fix setting when testing scriptbot locally
         scriptbot_num = settings.ALL_BOTS
@@ -1406,10 +1410,6 @@ class Scheduler(object):
 
         while True:
             state = self.db.get_game_state()
-            if not 'game_id' in state:
-                self.log.info('Game not ready, waiting')
-                time.sleep(10)
-                continue
 
             self.execute_round(state)
 
@@ -1438,6 +1438,20 @@ class Scheduler(object):
 
         self._script_executors.append(script_executor)
 
+    def wait_game_is_ready(self):
+        while True:
+            try:
+                state = self.db.get_game_state()
+                if not 'game_id' in state:
+                    self.log.info('Game not ready, waiting')
+                    time.sleep(5)
+                    continue
+                return 
+            except DBClientError as ex:
+                self.log.info("The database is not ready yet...")
+                time.sleep(5)
+                continue
+
 
 def main():
 
@@ -1461,7 +1475,9 @@ def main():
         os.chmod("/var/log/scriptbot/error.log", 0o666)
 
     s = Scheduler()
-
+    s.wait_game_is_ready()
+    s.teams = s.get_teams()
+    s.log.info("RETRIEVED TEAMS : %r", s.teams)
     s.run()
 
 if __name__ == "__main__":

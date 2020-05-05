@@ -4,7 +4,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y iptraf python-pip python-d
 
 COPY ./router /opt/ictf/router
 COPY ./common/teamhosts /etc/hosts
-COPY ./hephaestus/vpnkeys/openvpn.zip /opt/ictf/openvpn.zip
+#COPY ./hephaestus/vpnkeys/openvpn.zip /opt/ictf/openvpn.zip
 
 WORKDIR /opt/ictf/router
 

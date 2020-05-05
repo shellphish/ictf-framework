@@ -46,5 +46,5 @@
     #     - restart ictf-tcpdump
     #     - restart ictf-pcap-s3
 
-    - name: extract openvpn config directory
-      command: unzip -d /etc/openvpn /opt/ictf/openvpn.zip
+    #- name: extract openvpn config directory
+    #  command: unzip -d /etc/openvpn /opt/ictf/openvpn.zip

@@ -1,5 +1,12 @@
 version: '3.4'
 
+volumes:
+{% for team_id in range(1, num_teams + 1) %}
+    {% for service_name in service_names %}
+    volume_{{ service_name }}_{{ team_id }}:
+    {% endfor %}
+{% endfor %}
+
 services:
 
     database:
@@ -45,18 +52,27 @@ services:
 {% for team_id in range(1, num_teams + 1) %}
     teamvm{{ team_id }}:
         image: ictf_teamvm
-        hostname: team{{ scriptbot_id }}
+        hostname: team{{ team_id }}
 
         volumes:
-            - type: bind
-              source: /var/run/docker.sock
-              target: /var/run/docker.sock
+        {% for service_name in service_names %}
+            - volume_{{ service_name }}_{{ team_id }}:/opt/ictf/services/{{ service_name }}
+        {% endfor %}
 
         environment:
             - TEAM_ID={{ team_id }}
+        
+        entrypoint: /bin/bash -c "{{ teamvm_entrypoints[team_id - 1] }}"
 
-        ports:
-        {% for service_id in services_ids %}
-            - "{{ 10000 + service_id }}:{{ 10000 + service_id }}"
-        {% endfor %}
+{% endfor %}
+
+{% for team_id in range(1, num_teams + 1) %}
+    {% for service_name in service_names %}
+    chall_{{ service_name }}_{{ team_id }}:
+        image: {{ service_name }}
+        hostname: chall_{{ service_name }}_{{ team_id }}
+
+        volumes:
+            - volume_{{ service_name }}_{{ team_id }}:/home/chall/service/
+    {% endfor %}
 {% endfor %}

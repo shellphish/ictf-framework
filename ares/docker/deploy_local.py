@@ -32,13 +32,26 @@ def spawn_local_game(game_config_path, secrets_path):
 
     num_scriptbots = int(math.ceil(len(game_config["teams"]) / 10.0))
     num_teams = len(game_config['teams']) 
-    active_services = [service for service in game_config['services'] if service['state'] == 'enabled']
+    active_services = [service['name'] for service in game_config['services'] if service['state'] == 'enabled']
 
     jinja_env = Environment(
         loader=FileSystemLoader(searchpath='./'),
         autoescape=select_autoescape(['yml'])
     )
 
+    teamvm_entrypoints = []
+
+    for team_id in range(1, len(game_config['teams'] ) + 1):
+        teamvm_entry = []
+        for service_id, service_name in enumerate(active_services):
+            exposed_port = 10000 + service_id + 1
+            portforward_cmd = "socat TCP-LISTEN:{},fork TCP:chall_{}_{}:6666".format(exposed_port, service_name, team_id)
+            teamvm_entry.append(portforward_cmd)
+        
+        final_teamvm_entry = " & ".join(teamvm_entry)
+        teamvm_entrypoints.append(final_teamvm_entry)
+
+    print(teamvm_entrypoints)
     template = jinja_env.get_template(DOCKER_COMPOSE_TEMPLATE)
 
     with open(DOCKER_COMPOSE_OUTPUT_FILE, 'w') as out_f:
@@ -46,17 +59,19 @@ def spawn_local_game(game_config_path, secrets_path):
             num_scriptbots=num_scriptbots,
             num_teams=num_teams,
             api_secret=api_secret,
-            services_ids=range(1, len(active_services) + 1)
+            # services_ids=range(1, len(active_services) + 1)
+            service_names=active_services,
+            teamvm_entrypoints=teamvm_entrypoints
         ))
     
     print('''
 Configuration for docker-compose successfully generated in ./{0}
 
 Spawn the infrastructure locally with the following command:
-    - docker-compose -f {0} up --remove-orphans
+    - docker-compose -f {0} up
 
 Destroy the infrastructure locally with the following command:
-    - docker-compose -f {0} down
+    - docker-compose -f {0} down -v --remove-orphans
     '''.format(DOCKER_COMPOSE_OUTPUT_FILE))
 
 

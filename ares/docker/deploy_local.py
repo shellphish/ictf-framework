@@ -12,9 +12,6 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 DOCKER_COMPOSE_TEMPLATE = "docker-compose-local.yml.j2"
 DOCKER_COMPOSE_OUTPUT_FILE = "docker-compose-local.generated.yml"
 
-STAGE_1_MACHINES = ["database", "gamebot", "scoreboard", "teaminterface"]
-STAGE_2_MACHINES = ["scriptbot"]
-
 def spawn_local_game(game_config_path, secrets_path):
     if not os.path.exists(game_config_path):
         print("The specified game_config path does not exist")

@@ -34,6 +34,8 @@ def build_teamvm(game_config_path):
             os.system('make -C {} bundle'.format(os.path.join(services_dir, service['name'])))
             print("\n")
             os.system('make -C {} scriptbot_scripts SERVICE_NAME={}'.format(os.path.join(services_dir, service['name']), service['name']))
+            print("\n")
+            os.system('docker build -t {} {}'.format(service['name'], os.path.join(services_dir, service['name'], 'service')))
             shutil.copytree(os.path.join(services_dir, service['name'], "service"), os.path.join(SERVICE_DEST_DIR, service['name']))
             active_services.append(service['name'])
 

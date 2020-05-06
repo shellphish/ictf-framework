@@ -114,7 +114,7 @@ def create_all_services(db_api_url_base, db_secret, services_info, services_fold
 
 
 if __name__ == "__main__":
-    game_config = json.load(open(sys.argv[3], 'r'))
+    game_config = json.load(open(sys.argv[2], 'r'))
 
     db_api = sys.argv[1]  # passed by terraform
     database_api_secret_path = SECRETS_FOLDER + "database-api/secret"

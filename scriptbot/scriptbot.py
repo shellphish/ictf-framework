@@ -29,6 +29,7 @@ import docker
 import traceback
 import threading
 import resource
+import logstash
 from collections import defaultdict
 
 import requests
@@ -41,6 +42,9 @@ ERROR_WRONG_FLAG = (0x100, "Incorrect flag.")
 ERROR_MISSING_FLAG = (0x101, "Missing 'FLAG' field.")
 ERROR_DB = (0x102, "DB error.")
 ERROR_SCRIPT_KILLED = (0x103, "Script was killed by the scheduler.")
+
+LOGSTASH_PORT = 1717
+LOGSTASH_IP = "localhost"
 
 verbose = False
 DEBUG = False
@@ -82,6 +86,7 @@ class RegistryClient:
         self.registry_endpoint = registry_endpoint
         self.docker_client = docker.from_env()
         self.log = logging.getLogger('scriptbot.registryClient')
+        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         if not settings.IS_LOCAL_REGISTRY:
             self._authenticate()
 
@@ -112,6 +117,8 @@ class DBClient:
         self.host = host
         self.pwd = pwd
         self.log = logging.getLogger('scriptbot.dbclient')
+        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+
 
     def _query(self, api, authentication=True):
         """
@@ -447,6 +454,8 @@ class ScriptExecutor(threading.Thread):
         self.ip = ip
         self.port = int(port)
         self.log = logging.getLogger('scriptbot.script_exec')
+        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+
         self.db = DBClient() if db_client is None else db_client
         self.stop = False
         self.flag_meta = {}
@@ -935,6 +944,8 @@ class Scheduler(object):
             'script_tot': 0
         }
         self.log = logging.getLogger('scriptbot.scheduler')
+        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+
         self.is_synchronous = is_synchronous
 
         if verbose:
@@ -1459,6 +1470,8 @@ def main():
     soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
     if soft < 65536 or hard < 65536:
         l = logging.getLogger('main')
+        l.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+
         l.warning('Open file limits (soft %d, hard %d) are too low. 65536 recommended. ' +
                   'Will increase soft limit. ' +
                   'You might want to adjust hard limit as well.',
@@ -1498,11 +1511,11 @@ if __name__ == "__main__":
         pass
     
     logging.basicConfig(
-        level=settings.LOG_LEVEL,
+        level="INFO",
         format='%(levelname)-1s | %(asctime)-23s | %(name)-24s | %(message)s',
         handlers = [
             logging.FileHandler(settings.LOG_PATH),
-            logging.StreamHandler()
+            logging.StreamHandler(),
         ]
     )
 

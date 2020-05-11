@@ -10,6 +10,8 @@ received info in a redis-based queue.
 __author__ = "Nilo Redini"
 __email__ = "nredini@cs.ucsb.edu"
 
+import logging
+import logstash
 import time
 import redis
 import requests
@@ -34,7 +36,7 @@ def guard(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            print "[!] Error: " + str(e)
+            log.warning("[!] Error: " + str(e))
             return None
     return wrapper
 
@@ -69,7 +71,7 @@ def should_get_data(game_db):
         init_web_interface = False
     elif current_tick != recv_tick:
         if DEBUG:
-            print "[*] Tick Changed: " + str(recv_tick)
+            log.info("[*] Tick Changed: " + str(recv_tick))
         last_tick = recv_tick - 1
         current_tick = recv_tick
         query_db = True
@@ -85,7 +87,7 @@ def set_game_info(cache, game_db):
     # requesting latest endpoints
     for v in config['dynamic_endpoints']['latest']:
         if DEBUG:
-            print "[*] Requesting " + v
+            log.info("[*] Requesting " + v)
         # FIXME: This thing needs to be rewritten from scratch
         try:
             tmp = game_db.get(db_endpoint + v, params=db_request_params).json()
@@ -93,12 +95,12 @@ def set_game_info(cache, game_db):
             return
         data.update(tmp)
         if DEBUG:
-            print "[*] Updated " + ''.join(tmp.keys())
+            log.info("[*] Updated " + ''.join(tmp.keys()))
 
     # requesting previous endpoints
     for v in config['dynamic_endpoints']['previous_tick']:
         if DEBUG:
-            print "[*] Requesting " + v
+            log.info("[*] Requesting " + v)
         # FIXME: This thing needs to be rewritten from scratch
         try:
             tmp = game_db.get(db_endpoint + v + str(last_tick), params=db_request_params).json()
@@ -106,7 +108,7 @@ def set_game_info(cache, game_db):
             return
         data.update(tmp)
         if DEBUG:
-            print "[*] Updated " + ''.join(tmp.keys())
+            log.info("[*] Updated " + ''.join(tmp.keys()))
 
     # add the tick
     tick_endpoint = config['tick_endpoint']['e']
@@ -119,7 +121,7 @@ def set_game_info(cache, game_db):
 def should_update_game_static_info(game_db):
     query_db = True
 
-    print "Refreshing game info "
+    log.info("Refreshing game info ")
     # get team info from the DB
     static_endpoint = config['game_start']['stat']
     # game_key = 'id'
@@ -137,7 +139,7 @@ def should_update_game_static_info(game_db):
         query_db=False
     else:
         if DEBUG:
-            print "[*] game info refreshed "
+            log.info("[*] game info refreshed ")
 
     return query_db
 
@@ -149,7 +151,7 @@ def set_game_static_info(cache, game_db):
     # print "setting game static info"
     for v in config['static_endpoints']:
         tmp = game_db.get(db_endpoint + v, params=db_request_params).json()
-        print tmp
+        log.info(tmp)
         data.update(tmp)
     cache.set('static', json.dumps(data))
 
@@ -157,7 +159,7 @@ def set_game_static_info(cache, game_db):
 def set_game_tick(cache, game_db):
     data = game_db.get(db_endpoint + config['tick_endpoint']['e'], params=db_request_params).json()
     cache.set('tick', json.dumps(data))
-    print "[*] Updated tick " + str(data['tick_id'])
+    log.info("[*] Updated tick " + str(data['tick_id']))
 
 def db_is_not_ready(game_db):
     try:
@@ -181,7 +183,7 @@ def run_forever():
     game_db = requests.Session()
 
     while db_is_not_ready(game_db):
-        print "the databse is not ready yet... sleeping for 5 seconds"
+        log.info("the database is not ready yet... sleeping for 5 seconds")
         time.sleep(5)
     
     if should_update_game_static_info(game_db):
@@ -189,7 +191,6 @@ def run_forever():
 
     while True:
         while not should_get_data(game_db):
-            print('.'),
             time.sleep(config['polling_sleep_time'])
         if(should_update_game_static_info(game_db)) :
            set_game_static_info(cache, game_db)
@@ -200,12 +201,25 @@ def run_forever():
 config = None
 db_endpoint = None
 db_request_params = None
+
+MAIN_LOG_LEVEL = logging.DEBUG
+LOG_FMT = '%(levelname)s - %(asctime)s (%(name)s): %(msg)s'
+LOGSTASH_PORT = 1717
+LOGSTASH_IP = "localhost"
+
+log = logging.getLogger('scoreboard_poller')
+log.setLevel(MAIN_LOG_LEVEL)
+log_handler = logging.StreamHandler()
+log.addHandler(log_handler)
+log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         msg = "Usage: " + sys.argv[0] + " config_file"
         sys.exit(msg)
 
-    print "[*] Starting " + sys.argv[0]
+    log.info("[*] Starting with config file {}".format(sys.argv[0], sys.argv[1]))
     with open(sys.argv[1]) as data_file:
         config = json.load(data_file)
 

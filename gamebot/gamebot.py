@@ -17,11 +17,15 @@ from datetime import datetime, timedelta
 from dbapi import DBApi
 from scripts_facade import ScriptsFacade
 import time
+import logstash
 import random
 import sys
 import logging
 import coloredlogs
 
+
+LOGSTASH_PORT = 1717
+LOGSTASH_IP = "localhost"
 
 def _get_ticks_configuration(db_api):
     tick_time_in_sec, configured_benign, configured_exploit, num_get_flags = db_api.get_tick_config()
@@ -55,6 +59,7 @@ def main():     # pylint:disable=missing-docstring,too-many-locals
     log_handler = logging.StreamHandler()
     log_handler.setFormatter(log_formatter)
     log.addHandler(log_handler)
+    log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
 
     log.info("Starting GameBot")
     db_api = DBApi()

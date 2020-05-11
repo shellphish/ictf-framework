@@ -3,6 +3,7 @@
 import sys
 from subprocess import check_output, CalledProcessError, Popen
 import logging
+import logstash
 import os
 import signal
 import re
@@ -24,6 +25,10 @@ OTHER_CAPTURE_DIR = BASE_CAPTURE_DIR + "/other/"
 OTHER_CAPTURE_FILE = OTHER_CAPTURE_DIR + GAME_ID + "_otherports"
 
 DEBUG_LOG_FILENAME = '/var/log/ictf-tcp-dump-service.log'
+
+LOGSTASH_PORT = 1717
+LOGSTASH_IP = "localhost"
+
 # set up formatting
 formatter = logging.Formatter('[%(asctime)s] %(levelno)s (%(process)d) %(module)s: %(message)s')
 # set up logging to STDOUT for all levels DEBUG and higher
@@ -40,6 +45,7 @@ log = logging.getLogger('MyLogger')
 log.setLevel(logging.INFO)
 log.addHandler(sh)
 log.addHandler(fh)
+log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
 
 class InterruptException(Exception):
     pass

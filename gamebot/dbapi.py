@@ -2,11 +2,14 @@ __author__ = 'machiry'
 import urllib
 import json
 import logging
+import logstash
 import coloredlogs
 import requests
 from datetime import datetime
 from settings import *
 
+LOGSTASH_PORT = 1717
+LOGSTASH_IP = "localhost"
 
 class DBApi:
 
@@ -36,6 +39,7 @@ class DBApi:
         self.db_secret = db_secret
         # Set up logging
         log = logging.getLogger('gamebot_dbapi')
+        log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         log.setLevel(log_level)
         log_formatter = coloredlogs.ColoredFormatter(DBApi.LOG_FMT)
         log_handler = logging.StreamHandler()

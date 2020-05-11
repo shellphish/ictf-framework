@@ -1,6 +1,6 @@
 FROM ictf_base
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y nginx python-pip python-virtualenv python-dev libjpeg8 libjpeg-dev zlib1g zlib1g-dev libpng-dev libmemcached-dev libmemcached-tools libgeoip1 libgeoip-dev geoip-bin geoip-database redis-server
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y nginx python-pip python-virtualenv python-dev libjpeg8 libjpeg-dev zlib1g zlib1g-dev libpng-dev libmemcached-dev libmemcached-tools libgeoip1 libgeoip-dev geoip-bin geoip-database redis-server openjdk-8-jdk openjdk-8-jdk-headless openjdk-8-jre
 
 COPY ./teaminterface /opt/ictf/teaminterface
 

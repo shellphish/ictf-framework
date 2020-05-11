@@ -34,7 +34,6 @@ services:
     logger:
         image: ictf_logger
         hostname: logger
-        entrypoint: tail -f /dev/null
         ports: 
             - "5601:5601"
 

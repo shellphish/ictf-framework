@@ -6,11 +6,14 @@ details of fetching the scripts, number of scripts to run etc and exposes a
 standard interface which can be used to fetch/update scripts to run for each tick.
 """
 import logging
+import logstash
 import random
 from datetime import datetime
 from utils import flatten_list
 import coloredlogs
 
+LOGSTASH_PORT = 1717
+LOGSTASH_IP = "localhost"
 
 class ScriptsFacade:
 
@@ -22,6 +25,7 @@ class ScriptsFacade:
 
         # Set up logging
         log = logging.getLogger('gamebot_scripts')
+        log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         log.setLevel(log_level)
         log_formatter = coloredlogs.ColoredFormatter(ScriptsFacade.LOG_FMT)
         log_handler = logging.StreamHandler()

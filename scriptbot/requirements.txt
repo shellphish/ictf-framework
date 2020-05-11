@@ -4,3 +4,4 @@ pycryptodome
 requests
 nclib
 docker
+python-logstash

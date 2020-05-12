@@ -1,6 +1,6 @@
 FROM ictf_base
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python-pip 
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python-pip ansible openjdk-8-jdk openjdk-8-jdk-headless openjdk-8-jre
 
 COPY ./gamebot /opt/ictf/gamebot
 

@@ -2,18 +2,39 @@
   remote_user: root
   become: true
 
-  handlers:
-    - name: restart prometheus
-      service: name=prometheus state=restarted
+  #handlers:
+  #  - name: restart prometheus
+  #    service: name=prometheus state=restarted
+
+  #tasks:
+  #  - name: setting hostname
+  #    hostname:
+  #      name: "gamebot"
+
+  #  - name: configure prometheus
+  #    template:
+  #      src:  /opt/ictf/logger/provisioning/prometheus.yml.j2
+  #      dest: /etc/prometheus/prometheus.yml
+  #    notify:
+  #      restart prometheus
 
   tasks:
-    - name: setting hostname
-      hostname:
-        name: "gamebot"
+     - name: install elasticsearch using remote .deb
+       apt:
+         deb: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.6.2-amd64.deb
 
-    - name: configure prometheus
-      template:
-        src:  /opt/ictf/logger/provisioning/prometheus.yml.j2
-        dest: /etc/prometheus/prometheus.yml
-      notify:
-        restart prometheus
+     - name: elasticsearch - config file
+       copy:
+        src=elasticsearch.yml
+        dest=/etc/elasticsearch/
+        owner=root group=root mode="u=rw,g=r,o=r"
+
+     - name: install kibana using remote .deb
+       apt:
+        deb: https://artifacts.elastic.co/downloads/kibana/kibana-7.6.2-amd64.deb
+
+     - name: kibana - config file
+       copy:
+        src=kibana.yml
+        dest=/etc/kibana/
+        owner=root group=root mode="u=rw,g=r,o=r"

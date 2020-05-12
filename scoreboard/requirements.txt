@@ -21,3 +21,4 @@ pyOpenSSL
 ndg-httpsclient
 pyasn1
 ujson
+python-logstash

@@ -1,17 +1,5 @@
-data "aws_ami" "logger" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    # TODO: CHANGE ME ONCE WE HAVE THE IMAGE FROM PACKER
-    values = ["harden_gamebot_16.04_*"]
-  }
-
-  owners = ["self"]
-}
-
 resource "aws_instance" "logger" {
-    ami = data.aws_ami.logger.id
+    ami = data.aws_ami.ictf_base.id
     instance_type = var.logger_instance_type
     subnet_id = aws_subnet.master_and_db_range_subnet.id
     vpc_security_group_ids = [aws_security_group.master_subnet_secgrp.id]

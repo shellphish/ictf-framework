@@ -1,34 +1,13 @@
 #  This module defines all the settings needed by the database
 
-# data "aws_ami" "database" {
-#   most_recent = true
 
-#   filter {
-#     name   = "name"
-#     values = ["harden_database_16.04_*"]
-#   }
 
-#   owners = ["self"]
-# }
-
-# data "aws_s3_bucket" "database_bucket" {
-#   bucket = "ictf-database-bucket-${var.region}"
-# }
-
-data "aws_ami" "database" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
-  }
-
-  owners = ["099720109477"]
+data "aws_s3_bucket" "database_bucket" {
+  bucket = "ictf-database-bucket-${var.region}"
 }
 
-
 resource "aws_instance" "database" {
-    ami = data.aws_ami.database.id
+    ami = data.aws_ami.ictf_base.id
     instance_type = var.database_instance_type
     subnet_id = aws_subnet.master_and_db_range_subnet.id
     vpc_security_group_ids = [aws_security_group.master_subnet_secgrp.id]
@@ -47,28 +26,25 @@ resource "aws_instance" "database" {
         Type = "Infrastructure"
     }
 
-    # connection {
-    #     user = "hacker"
-    #     private_key = file("./sshkeys/database-key.key")
-    #     host = self.public_ip
-    #     agent = false
-    # }
+    connection {
+        user = "ubuntu"
+        private_key = file("./sshkeys/database-key.key")
+        host = self.public_ip
+        agent = false
+    }
 
-    # provisioner "remote-exec" {
-    #     inline = [
-    #         "sudo pip install -q ansible",
-    #         "/usr/local/bin/ansible-playbook /opt/ictf/database/provisioning/terraform_provisioning.yml --extra-vars AWS_BUCKET_NAME=${data.aws_s3_bucket.database_bucket.id} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")} --extra-vars ICTF_USER_PASSWORD_SALT=${file("../../secrets/database-api/salt")} --extra-vars ICTF_MYSQL_DATABASE_PASSWORD=${file("../../secrets/database-api/mysql")}",
-    #         "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
-    #         "sudo service ssh restart"
-    #     ]
-    # }
+    provisioner "file" {
+        source = "../../database/provisioning/ares_provisioning"
+        destination = "~/"
+    }
 
-    # provisioner "remote-exec" {
-    #     when = destroy
-    #     inline = [
-    #         "sudo pkill -9 mysql || echo '##### SPEEEEEEEEEEED gone: FAILED TO KILL mysql.'"
-    #     ]
-    # }
+    provisioner "remote-exec" {
+        inline = [
+            "ansible-playbook ~/ares_provisioning/ansible-provisioning.yml --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_database",
+            # "chmod +x /ares_provisioning/deploy_on_ec2.sh",
+            # "./ares_provisioning/deploy_on_ec2.sh ${var.access_key} ${var.secret_key} ${var.region} 527285246025.dkr.ecr.us-west-1.amazonaws.com"
+        ]
+    }
 }
 
 # resource "null_resource" "upload_team_info" {

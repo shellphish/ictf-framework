@@ -114,7 +114,7 @@ def generate_ssh_config(terraform_path):
 
         out_f.write('Host *\n')
         out_f.write('  Port 22\n')
-        out_f.write('  User hacker\n')
+        out_f.write('  User ubuntu\n')
         out_f.write('  UserKnownHostsFile "%s/known_hosts"\n' % SSHKEYS_FOLDER)
         out_f.write('  IdentitiesOnly yes\n\n')
 

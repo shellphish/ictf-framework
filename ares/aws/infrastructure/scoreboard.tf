@@ -1,15 +1,3 @@
-//  This module defines all the settings needed by the scriptbot
-data "aws_ami" "scoreboard" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["harden_scoreboard_16.04_*"]
-  }
-
-  owners = ["self"]
-}
-
 data "aws_eip" "scoreboard_ip" {
   tags = {
     Name = "ictf-scoreboard-ip"
@@ -22,7 +10,7 @@ resource "aws_eip_association" "scoreboard_ip" {
 }
 
 resource "aws_instance" "scoreboard" {
-    ami = data.aws_ami.scoreboard.id
+    ami = data.aws_ami.ictf_base.id
     instance_type = var.scoreboard_instance_type
     subnet_id = aws_subnet.master_and_db_range_subnet.id
     vpc_security_group_ids = [aws_security_group.master_subnet_secgrp.id]

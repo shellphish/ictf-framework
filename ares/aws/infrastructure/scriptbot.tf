@@ -1,16 +1,3 @@
-//  This module defines all the settings needed by the scriptbot
-
-data "aws_ami" "scriptbot" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["harden_scriptbot_16.04_*"]
-  }
-
-  owners = ["self"]
-}
-
 data "local_file" "ecr_password" {
     filename = "./ecr_password"
     depends_on = [aws_ecr_repository.service_scriptbot_image]
@@ -22,7 +9,7 @@ locals {
 }
 
 resource "aws_instance" "scriptbot" {
-    ami           = data.aws_ami.scriptbot.id
+    ami           = data.aws_ami.ictf_base.id
     instance_type = var.scriptbot_instance_type
     count         = var.scriptbot_num
     key_name      = aws_key_pair.scriptbot-key.key_name

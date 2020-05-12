@@ -169,39 +169,10 @@
         dest=/etc/nginx/sites-enabled/ictf-database-api.conf
         owner=root group=root
         state=link
-    
-    # TODO: Change me
-    # - include_role:
-    #     name: register_service_daemon
-    #   vars:
-    #     service_name: ictf-db-export-s3
-    #     description: "Daemon periodically exporting database dumps to S3"
-    #     command: "/opt/ictf/venv/database/bin/python ictf-db-export-s3.py"
-    #     working_directory: "/opt/ictf/database"
-    #     dependencies:
-    #       - "nginx.service"
-    #       - "mysql.service"
-    
-    # TODO: Change me
-    # - include_role:
-    #     name: common_server
-    #   vars:
-    #     server_hostname: Database  
-
-
 
     # - name: setting hostname
     #   hostname:
     #     name: "database"
-
-    # - name: Add mappings to /etc/hosts
-    #   blockinfile:
-    #     dest: /etc/hosts
-    #     block: |
-    #       {{ item.ip }} {{ item.name }}
-    #     marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
-    #   with_items:
-    #     - { name: "database", ip: 127.0.0.1 }
 
     - name: install requirements
       pip:

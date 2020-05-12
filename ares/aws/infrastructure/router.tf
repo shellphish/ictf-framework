@@ -1,15 +1,3 @@
-//  This module defines all the settings needed by the database
-data "aws_ami" "router" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["harden_router_16.04_*"]
-  }
-
-  owners = ["self"]
-}
-
 data "aws_eip" "router_ip" {
   tags = {
     Name = "ictf-router-ip"
@@ -32,7 +20,7 @@ resource "aws_route" "vpn" {
 }
 
 resource "aws_instance" "router" {
-    ami = data.aws_ami.router.id
+    ami = data.aws_ami.ictf_base.id
     instance_type = var.router_instance_type
     subnet_id = aws_subnet.war_range_subnet.id
     vpc_security_group_ids = [aws_security_group.router_secgrp.id]

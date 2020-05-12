@@ -1,16 +1,5 @@
-data "aws_ami" "gamebot" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["harden_gamebot_16.04_*"]
-  }
-
-  owners = ["self"]
-}
-
 resource "aws_instance" "gamebot" {
-    ami = data.aws_ami.gamebot.id
+    ami = data.aws_ami.ictf_base.id
     instance_type = var.gamebot_instance_type
     subnet_id = aws_subnet.master_and_db_range_subnet.id
     vpc_security_group_ids = [aws_security_group.master_subnet_secgrp.id]

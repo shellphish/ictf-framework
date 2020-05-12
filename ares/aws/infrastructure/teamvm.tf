@@ -1,14 +1,3 @@
-data "aws_ami" "teamvm" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["primed_teamvm_18.04_*"]
-  }
-
-  owners = ["self"]
-}
-
 locals {
   teams_list = jsondecode(file(var.game_config_file)).teams
   teams_organizer_hosted_map = { for team in local.teams_list: team.id => team if team.organizer_hosted }
@@ -17,7 +6,7 @@ locals {
 
 resource "aws_instance" "teamvm" {
     for_each = local.teams_organizer_hosted_map 
-    ami = data.aws_ami.teamvm.id
+    ami = data.aws_ami.ictf_base.id
     instance_type = var.teamvm_instance_type
     subnet_id = aws_subnet.war_range_subnet.id
     vpc_security_group_ids = [aws_security_group.teams_secgrp.id]

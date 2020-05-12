@@ -1,16 +1,3 @@
-//  This module defines all the settings needed by the team interface
-
-data "aws_ami" "teaminterface" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["harden_teaminterface_16.04_*"]
-  }
-
-  owners = ["self"]
-}
-
 data "aws_eip" "teaminterface_ip" {
   tags = {
     Name = "ictf-teaminterface-ip"
@@ -23,7 +10,7 @@ resource "aws_eip_association" "teaminterface_ip" {
 }
 
 resource "aws_instance" "teaminterface" {
-    ami = data.aws_ami.teaminterface.id
+    ami = data.aws_ami.ictf_base.id
     instance_type = var.teaminterface_instance_type
     subnet_id = aws_subnet.master_and_db_range_subnet.id
     vpc_security_group_ids = [aws_security_group.master_subnet_secgrp.id]

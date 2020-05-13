@@ -41,8 +41,6 @@ resource "aws_instance" "database" {
     provisioner "remote-exec" {
         inline = [
             "ansible-playbook ~/ares_provisioning/ansible-provisioning.yml --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_database",
-            # "chmod +x /ares_provisioning/deploy_on_ec2.sh",
-            # "./ares_provisioning/deploy_on_ec2.sh ${var.access_key} ${var.secret_key} ${var.region} 527285246025.dkr.ecr.us-west-1.amazonaws.com"
         ]
     }
 }

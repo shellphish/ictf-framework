@@ -18,19 +18,21 @@ resource "aws_instance" "gamebot" {
         Name = "gamebot-disk"
     }
 
-    connection {
-        user = "hacker"
-        private_key = file("./sshkeys/gamebot-key.key")
-        host = self.public_ip
-        agent = false
-    }
+#     connection {
+#         user = "ubuntu"
+#         private_key = file("./sshkeys/gamebot-key.key")
+#         host = self.public_ip
+#         agent = false
+#     }
 
-    provisioner "remote-exec" {
-        inline = [
-            "sudo pip install -q ansible",
-            "/usr/local/bin/ansible-playbook /opt/ictf/gamebot/provisioning/terraform_provisioning.yml --extra-vars ICTF_API_ADDRESS=${aws_instance.database.private_ip} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")}",
-            "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
-            "sudo service ssh restart"
-        ]
-    }
+#     provisioner "file" {
+#         source = "../../gamebot/provisioning/ares_provisioning"
+#         destination = "~/"
+#     }
+
+#     provisioner "remote-exec" {
+#         inline = [
+#             "ansible-playbook ~/ares_provisioning/ansible-provisioning.yml --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_database",
+#         ]
+#     }
 }

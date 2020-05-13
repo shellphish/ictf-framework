@@ -6,6 +6,8 @@ provider "aws" {
 
 resource "aws_vpc" "ictf" {
   cidr_block = var.vpc_cdir_block
+  enable_dns_hostnames = true
+  enable_dns_support = true
 }
 
 resource "aws_internet_gateway" "ictf" {

@@ -26,23 +26,23 @@ resource "aws_instance" "database" {
         Type = "Infrastructure"
     }
 
-    connection {
-        user = "ubuntu"
-        private_key = file("./sshkeys/database-key.key")
-        host = self.public_ip
-        agent = false
-    }
+    # connection {
+    #     user = "ubuntu"
+    #     private_key = file("./sshkeys/database-key.key")
+    #     host = self.public_ip
+    #     agent = false
+    # }
 
-    provisioner "file" {
-        source = "../../database/provisioning/ares_provisioning"
-        destination = "~/"
-    }
+    # provisioner "file" {
+    #     source = "../../database/provisioning/ares_provisioning"
+    #     destination = "~/"
+    # }
 
-    provisioner "remote-exec" {
-        inline = [
-            "ansible-playbook ~/ares_provisioning/ansible-provisioning.yml --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_database",
-        ]
-    }
+    # provisioner "remote-exec" {
+    #     inline = [
+    #         "ansible-playbook ~/ares_provisioning/ansible-provisioning.yml --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_database",
+    #     ]
+    # }
 }
 
 # resource "null_resource" "upload_team_info" {

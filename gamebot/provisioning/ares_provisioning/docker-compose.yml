@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+
+    ictf_gamebot:
+        image: ictf_gamebot
+        sysctls:
+            - net.core.somaxconn=65535

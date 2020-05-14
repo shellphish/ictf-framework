@@ -501,7 +501,7 @@ class ScriptExecutor(threading.Thread):
         # The networking changes if we are running locally because we want to use
         # THe dns service provided by docker compose
         if settings.IS_LOCAL_REGISTRY:
-            arg_prefix += ['--network=docker_default']
+            arg_prefix += ['--network=docker_ictf_net']
         # Otherwise we use the VPN when we run remotely
         else:
             arg_prefix = ["--network", "host" ]

@@ -48,7 +48,6 @@ def spawn_local_game(game_config_path, secrets_path):
         final_teamvm_entry = " & ".join(teamvm_entry)
         teamvm_entrypoints.append(final_teamvm_entry)
 
-    print(teamvm_entrypoints)
     template = jinja_env.get_template(DOCKER_COMPOSE_TEMPLATE)
 
     with open(DOCKER_COMPOSE_OUTPUT_FILE, 'w') as out_f:

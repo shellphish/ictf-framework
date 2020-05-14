@@ -10,7 +10,7 @@ WORKDIR /opt/ictf/router
 
 RUN pip install --upgrade pip && pip install -r requirements2.txt
 
-RUN ansible-playbook provisioning/ansible-provisioning.yml --become --extra-vars ICTF_USER="hacker" 
+RUN ansible-playbook provisioning/ansible-provisioning.yml --become 
 
 RUN chmod +x ./start.sh
 

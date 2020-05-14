@@ -72,7 +72,7 @@ IS_LOCAL_REGISTRY = bool(os.environ['IS_LOCAL_REGISTRY'])
 # DB_HOST = '{{ICTF_API_ADDRESS}}'
 # DB_SECRET = '{{ICTF_API_SECRET}}'
 
-DB_HOST = "database"
+DB_HOST = "database.ictf"
 DB_SECRET = os.environ['API_SECRET']
 # Retry at most 2 times if we get a HTTP 502 back
 DATABASE_REQUEST_RETRIES = 2

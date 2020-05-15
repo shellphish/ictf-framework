@@ -1,5 +1,13 @@
-#  This module defines all the settings needed by the database
-
+locals {
+  database_provision_with_ansible = <<EOF
+  ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
+    --extra-vars AWS_ACCESS_KEY=${var.access_key} \
+    --extra-vars AWS_SECRET_KEY=${var.secret_key} \
+    --extra-vars AWS_REGION=${var.region} \
+    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_database \
+    --extra-vars COMPONENT_NAME=database
+  EOF
+}
 
 
 data "aws_s3_bucket" "database_bucket" {
@@ -33,16 +41,19 @@ resource "aws_instance" "database" {
         agent = false
     }
 
+    # TODO: This ansible role shold be already inside the base ictf AMI
+    #       Remove this once you have a base image
     provisioner "file" {
-        source = "../../database/provisioning/ares_provisioning"
+        source = "../../common/ares_provisioning"
         destination = "~/"
     }
 
     provisioner "remote-exec" {
         inline = [
-            "ansible-playbook ~/ares_provisioning/ansible-provisioning.yml --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_database",
+            local.database_provision_with_ansible,
         ]
     }
+
 }
 
 # resource "null_resource" "upload_team_info" {

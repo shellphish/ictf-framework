@@ -1,10 +1,11 @@
 locals {
-  provision_with_ansible = <<EOF
+  gamebot_provision_with_ansible = <<EOF
   ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
-    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_gamebot
+    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_gamebot \
+    --extra-vars COMPONENT_NAME=gamebot
   EOF
 }
 
@@ -36,14 +37,16 @@ resource "aws_instance" "gamebot" {
         agent = false
     }
 
+    # TODO: This ansible role shold be already inside the base ictf AMI
+    #       Remove this once you have a base image
     provisioner "file" {
-        source = "../../gamebot/provisioning/ares_provisioning"
+        source = "../../common/ares_provisioning"
         destination = "~/"
     }
 
     provisioner "remote-exec" {
         inline = [
-            local.provision_with_ansible,
+            local.gamebot_provision_with_ansible,
         ]
     }
 }

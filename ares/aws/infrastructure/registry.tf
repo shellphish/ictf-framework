@@ -1,7 +1,3 @@
-locals {
-  services_scripts = jsondecode(file(var.game_config_file)).services
-}
-
 resource "aws_ecr_repository" "service_scriptbot_image" {
   count = length(local.services_scripts)
   name = "${local.services_scripts[count.index].name}_scripts"

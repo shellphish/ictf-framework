@@ -1,15 +1,3 @@
-locals {
-  gamebot_provision_with_ansible = <<EOF
-  ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
-    --extra-vars AWS_ACCESS_KEY=${var.access_key} \
-    --extra-vars AWS_SECRET_KEY=${var.secret_key} \
-    --extra-vars AWS_REGION=${var.region} \
-    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_gamebot \
-    --extra-vars COMPONENT_NAME=gamebot
-  EOF
-}
-
-
 resource "aws_instance" "gamebot" {
     ami = data.aws_ami.ictf_base.id
     instance_type = var.gamebot_instance_type
@@ -31,7 +19,7 @@ resource "aws_instance" "gamebot" {
     }
 
     connection {
-        user = "ubuntu"
+        user = local.ictf_user
         private_key = file("./sshkeys/gamebot-key.key")
         host = self.public_ip
         agent = false

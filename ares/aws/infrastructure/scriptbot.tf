@@ -1,12 +1,7 @@
-data "local_file" "ecr_password" {
-    filename = "./ecr_password"
-    depends_on = [aws_ecr_repository.service_scriptbot_image]
-}
-
-
-locals {
-  registry_id = length(aws_ecr_repository.service_scriptbot_image) == 0 ? "" : aws_ecr_repository.service_scriptbot_image[0].registry_id
-}
+# data "local_file" "ecr_password" {
+#     filename = "./ecr_password"
+#     depends_on = [aws_ecr_repository.service_scriptbot_image]
+# }
 
 resource "aws_instance" "scriptbot" {
     ami           = data.aws_ami.ictf_base.id
@@ -20,7 +15,7 @@ resource "aws_instance" "scriptbot" {
     depends_on = [aws_ecr_repository.service_scriptbot_image]
 
     connection {
-        user = "hacker"
+        user = local.ictf_user
         private_key = file("./sshkeys/scriptbot-key.key")
         host = self.public_ip
         agent = false
@@ -34,17 +29,21 @@ resource "aws_instance" "scriptbot" {
         Name = "scriptbot${count.index+1}-disk"
     }
 
-    provisioner "remote-exec" {
-        inline = [
-            "sudo pip install -q ansible",
-            "/usr/local/bin/ansible-playbook /opt/ictf/scriptbot/provisioning/terraform_provisioning.yml --extra-vars DOCKER_REGISTRY_USERNAME=AWS --extra-vars DOCKER_REGISTRY_PASSWORD=${data.local_file.ecr_password.content} --extra-vars DOCKER_REGISTRY_ENDPOINT=${local.registry_id}.dkr.ecr.${var.region}.amazonaws.com --extra-vars BOT_ID=${count.index + 1} --extra-vars ALL_BOTS=${var.scriptbot_num} --extra-vars ICTF_API_ADDRESS=${aws_instance.database.private_ip} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")} --extra-vars ROUTER_PRIVATE_IP=172.31.172.1 --extra-vars TEAM_COUNT=${var.teams_num}",
-            "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
-            "sudo service ssh restart"
-        ]
-    }
-
     tags = {
         Name = "scriptbot${count.index+1}"
         Type = "Infrastructure"
+    }
+
+    # TODO: This ansible role shold be already inside the base ictf AMI
+    #       Remove this once you have a base image
+    provisioner "file" {
+        source = "../../common/ares_provisioning"
+        destination = "~/"
+    }
+
+    provisioner "remote-exec" {
+        inline = [
+            local.scriptbot_provision_with_ansible
+        ]
     }
 }

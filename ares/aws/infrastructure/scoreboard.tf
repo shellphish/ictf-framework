@@ -30,18 +30,22 @@ resource "aws_instance" "scoreboard" {
     }
 
     connection {
-        user = "hacker"
+        user = local.ictf_user
         private_key = file("./sshkeys/scoreboard-key.key")
         host = self.public_ip
         agent = false
     }
 
+    # TODO: This ansible role shold be already inside the base ictf AMI
+    #       Remove this once you have a base image
+    provisioner "file" {
+        source = "../../common/ares_provisioning"
+        destination = "~/"
+    }
+
     provisioner "remote-exec" {
         inline = [
-            "sudo pip install -q ansible",
-            "/usr/local/bin/ansible-playbook /opt/ictf/scoreboard/provisioning/terraform_provisioning.yml --extra-vars ICTF_API_ADDRESS=${aws_instance.database.private_ip} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")}",
-            "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
-            "sudo service ssh restart"
+            local.scoreboard_provision_with_ansible
         ]
     }
 }

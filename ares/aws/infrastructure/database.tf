@@ -1,15 +1,3 @@
-locals {
-  database_provision_with_ansible = <<EOF
-  ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
-    --extra-vars AWS_ACCESS_KEY=${var.access_key} \
-    --extra-vars AWS_SECRET_KEY=${var.secret_key} \
-    --extra-vars AWS_REGION=${var.region} \
-    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_database \
-    --extra-vars COMPONENT_NAME=database
-  EOF
-}
-
-
 data "aws_s3_bucket" "database_bucket" {
   bucket = "ictf-database-bucket-${var.region}"
 }
@@ -35,7 +23,7 @@ resource "aws_instance" "database" {
     }
 
     connection {
-        user = "ubuntu"
+        user = local.ictf_user
         private_key = file("./sshkeys/database-key.key")
         host = self.public_ip
         agent = false
@@ -53,7 +41,6 @@ resource "aws_instance" "database" {
             local.database_provision_with_ansible,
         ]
     }
-
 }
 
 # resource "null_resource" "upload_team_info" {

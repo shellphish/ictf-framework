@@ -8,8 +8,6 @@ COPY ./scoring_ictf /opt/ictf/scoring_ictf
 
 WORKDIR /opt/ictf/database
 
-RUN chmod +x ./start.sh 
-
-RUN ansible-playbook ./provisioning/ansible-provisioning.yml --extra-vars AWS_BUCKET_NAME="aws_bucket_name" --extra-vars AWS_REGION="aws_region" --extra-vars AWS_ACCESS_KEY="aws_access_key" --extra-vars AWS_SECRET_KEY="aws_secret_key"
+RUN chmod +x ./start.sh && ansible-playbook ./provisioning/hephaestus_provisioning/ansible-provisioning.yml
 
 ENTRYPOINT ./start.sh

@@ -10,7 +10,7 @@ WORKDIR /opt/ictf/scriptbot
 
 RUN pip3 install -r requirements.txt
 
-RUN ansible-playbook provisioning/ansible-provisioning.yml
+RUN ansible-playbook provisioning/hephaestus_provisioning/ansible-provisioning.yml
 
 RUN chmod +x ./start.sh 
 

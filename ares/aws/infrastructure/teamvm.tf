@@ -29,7 +29,7 @@ resource "aws_instance" "teamvm" {
     }
 
     connection {
-        user = "hacker"
+        user = local.ictf_user
         private_key = file("./sshkeys/teamvmmaster-key.key")
         host = self.public_ip
         agent = false
@@ -63,15 +63,15 @@ resource "aws_instance" "teamvm" {
         destination = "/opt/ictf/services/start_services.yml"
     }
 
-    provisioner "remote-exec" {
-        inline = [
-            "ansible-playbook /home/hacker/terraform_provisioning.yml --extra-vars ROUTER_PRIVATE_IP=172.31.172.1 --extra-vars TEAM_ID=${each.value.id}" ,
-            "cd /opt/ictf/services && ansible-playbook start_services.yml --extra-vars TEAM_ID=team${each.value.id}",
-            "rm /opt/ictf/services/start_services.yml",
-            "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
-            "sudo service ssh restart"
-        ]
-    }
+    # provisioner "remote-exec" {
+    #     inline = [
+    #         "ansible-playbook /home/hacker/terraform_provisioning.yml --extra-vars ROUTER_PRIVATE_IP=172.31.172.1 --extra-vars TEAM_ID=${each.value.id}" ,
+    #         "cd /opt/ictf/services && ansible-playbook start_services.yml --extra-vars TEAM_ID=team${each.value.id}",
+    #         "rm /opt/ictf/services/start_services.yml",
+    #         "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
+    #         "sudo service ssh restart"
+    #     ]
+    # }
 }
 
 

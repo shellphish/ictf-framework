@@ -1,7 +1,7 @@
-# data "local_file" "ecr_password" {
-#     filename = "./ecr_password"
-#     depends_on = [aws_ecr_repository.service_scriptbot_image]
-# }
+data "local_file" "ecr_password" {
+    filename = "./ecr_password"
+    depends_on = [aws_ecr_repository.service_scriptbot_image]
+}
 
 resource "aws_instance" "scriptbot" {
     ami           = data.aws_ami.ictf_base.id
@@ -41,9 +41,15 @@ resource "aws_instance" "scriptbot" {
         destination = "~/"
     }
 
+    provisioner "file" {
+        source = "../../scriptbot/ares_provisioning/"
+        destination = "~/ares_provisioning_second_stage"
+    }
+
     provisioner "remote-exec" {
         inline = [
-            local.scriptbot_provision_with_ansible
+            local.scriptbot_common_provision_with_ansible,
+            "ansible-playbook ~/ares_provisioning_second_stage/ansible-provisioning.yml --extra-vars BOT_ID=${count.index + 1} --extra-vars ALL_BOTS=${var.scriptbot_num} --extra-vars API_SECRET=${file("../../secrets/database-api/secret")}"
         ]
     }
 }

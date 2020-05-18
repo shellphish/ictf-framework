@@ -21,6 +21,8 @@ services:
           ictf_net:
             aliases: 
               - database.ictf
+        sysctls:
+          - net.core.somaxconn=65535
 
     gamebot:
         image: ictf_gamebot
@@ -79,6 +81,9 @@ services:
             - ALL_BOTS={{ num_scriptbots }}
             - IS_LOCAL_REGISTRY=1
             - API_SECRET={{ api_secret }}
+            - REGISTRY_USERNAME="dummy"
+            - REGISTRY_PASSWORD="dummy"
+            - REGISTRY_ENDPOINT="dummy"
 
         networks: 
           ictf_net:

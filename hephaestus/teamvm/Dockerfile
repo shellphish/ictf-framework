@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update -y && \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -y --no-install-recommends && \
     apt-get install -y zip tmux screen vim emacs nano curl wget python2.7 python3 python-pip python3-pip ruby perl gcc binutils build-essential tcpdump docker.io ansible socat
 
 RUN useradd -m --uid 31337 ctf
@@ -10,7 +10,7 @@ COPY ./teamvms/bundled_services /opt/ictf/services
 
 ARG services
 
-RUN ansible-playbook /root/provisioning/ansible/ansible-provisioning.yml --extra-vars="$services"
+RUN ansible-playbook /root/provisioning/hephaestus_provisioning/ansible/ansible-provisioning.yml --extra-vars="$services"
 
 WORKDIR /opt/ictf/services
 

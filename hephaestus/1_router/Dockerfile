@@ -1,6 +1,6 @@
 FROM ictf_base
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y iptraf python-pip python-dev python3-dev build-essential awscli iptables-persistent iftop libcurl4-openssl-dev libssl-dev python-apt zip unzip openjdk-8-jdk openjdk-8-jdk-headless openjdk-8-jre
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends iptraf python-pip python-dev python3-dev build-essential awscli iptables-persistent iftop libcurl4-openssl-dev libssl-dev python-apt zip unzip openjdk-8-jdk openjdk-8-jdk-headless openjdk-8-jre
 
 COPY ./router /opt/ictf/router
 COPY ./common/teamhosts /etc/hosts

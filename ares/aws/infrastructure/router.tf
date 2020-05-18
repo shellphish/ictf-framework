@@ -43,7 +43,7 @@ resource "aws_instance" "router" {
     }
 
     connection {
-        user = "hacker"
+        user = local.ictf_user
         private_key = file("./sshkeys/router-key.key")
         host = self.public_ip
         agent = false
@@ -59,12 +59,12 @@ resource "aws_instance" "router" {
         destination = "/opt/ictf/openvpn.zip"
     }
 
-    provisioner "remote-exec" {
-        inline =  [
-            "sudo pip install -q ansible",
-            "/usr/local/bin/ansible-playbook /opt/ictf/router/provisioning/terraform_provisioning.yml --extra-vars AWS_BUCKET_NAME=${data.aws_s3_bucket.router_bucket.id} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")}",
-            "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
-            "sudo service ssh restart"
-        ]
-    }
+    # provisioner "remote-exec" {
+    #     inline =  [
+    #         "sudo pip install -q ansible",
+    #         "/usr/local/bin/ansible-playbook /opt/ictf/router/provisioning/terraform_provisioning.yml --extra-vars AWS_BUCKET_NAME=${data.aws_s3_bucket.router_bucket.id} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")}",
+    #         "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
+    #         "sudo service ssh restart"
+    #     ]
+    # }
 }

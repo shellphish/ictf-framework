@@ -42,13 +42,18 @@ locals {
     --extra-vars COMPONENT_NAME=teaminterface
   EOF
 
-  scriptbot_provision_with_ansible = <<EOF
+  scriptbot_common_provision_with_ansible = <<EOF
   ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
     --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_scriptbot \
     --extra-vars COMPONENT_NAME=scriptbot
+  EOF
+
+  scriptbot_common_provision_with_ansible = <<EOF
+  ansible-playbook ~/ares_provisioning_second_stage/ansible-provisioning.yml \
+    --extra-vars BOT_ID=scriptbot
   EOF
 
 }

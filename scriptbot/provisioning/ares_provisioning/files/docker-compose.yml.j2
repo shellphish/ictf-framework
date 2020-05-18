@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+
+    ictf_scriptbot:
+        image: ictf_scriptbot
+        sysctls:
+            - net.core.somaxconn=65535
+
+        volumes:
+            - type: bind
+              source: /var/run/docker.sock
+              target: /var/run/docker.sock
+
+        environment:
+            - BOT_ID={{ SCRIPTBOT_ID }}
+            - ALL_BOTS={{ NUM_SCRIPTBOTS }}
+            - IS_LOCAL_REGISTRY=0
+            - API_SECRET={{ API_SECRET }}
+            - REGISTRY_USERNAME={{ REGISTRY_USERNAME }}
+            - REGISTRY_PASSWORD={{ REGISTRY_PASSWORD }}
+            - REGISTRY_ENDPOINT={{ REGISTRY_ENDPOINT }}

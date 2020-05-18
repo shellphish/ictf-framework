@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+
+    ictf_teaminterface:
+        image: ictf_teaminterface
+        sysctls:
+            - net.core.somaxconn=65535
+        ports:
+            - "80:80"

@@ -1,0 +1,14 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  tasks:
+  - name: setting {{ BOT_ID }} hostname
+    hostname:
+      name: "scriptbot{{ BOT_ID }}"
+
+  - name: template docker-compose
+    template:
+      src: ./files/docker-compose.yml.j2 
+      dest: ~/docker-compose.yml
+    become_user: {{ USER }}

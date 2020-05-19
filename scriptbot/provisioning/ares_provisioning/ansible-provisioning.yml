@@ -11,4 +11,4 @@
     template:
       src: ./files/docker-compose.yml.j2 
       dest: ~/docker-compose.yml
-    become_user: {{ USER }}
+    become_user: "{{ USER }}"

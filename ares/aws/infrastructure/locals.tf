@@ -51,9 +51,4 @@ locals {
     --extra-vars COMPONENT_NAME=scriptbot
   EOF
 
-  scriptbot_common_provision_with_ansible = <<EOF
-  ansible-playbook ~/ares_provisioning_second_stage/ansible-provisioning.yml \
-    --extra-vars BOT_ID=scriptbot
-  EOF
-
 }

@@ -36,6 +36,11 @@ resource "aws_instance" "database" {
         destination = "~/"
     }
 
+    provisioner "file" {
+        source = "../../database/provisioning/ares_provisioning/docker-compose.yml"
+        destination = "~/docker-compose.yml"
+    }
+
     provisioner "remote-exec" {
         inline = [
             local.database_provision_with_ansible,

@@ -51,4 +51,8 @@ locals {
     --extra-vars COMPONENT_NAME=scriptbot
   EOF
 
+  start_service_container = <<EOF
+  docker-compose -f ~/docker-compose.yml up -d
+  EOF
+
 }

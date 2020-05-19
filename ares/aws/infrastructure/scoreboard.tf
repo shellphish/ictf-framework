@@ -43,9 +43,15 @@ resource "aws_instance" "scoreboard" {
         destination = "~/"
     }
 
+    provisioner "file" {
+        source = "../../scoreboard/provisioning/ares_provisioning/docker-compose.yml"
+        destination = "~/docker-compose.yml"
+    }
+
     provisioner "remote-exec" {
         inline = [
-            local.scoreboard_provision_with_ansible
+            local.scoreboard_provision_with_ansible,
+            local.start_service_container
         ]
     }
 }

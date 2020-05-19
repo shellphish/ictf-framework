@@ -26,11 +26,11 @@
   command: "~/deploy_on_ec2.sh {{ AWS_REGION }} {{ AWS_REGISTRY_URL }} {{ COMPONENT_NAME }}"
   become_user: "{{ USER }}"
 
-- name: copy docker-compose in home
-  copy:
-    src: "{{ USER_HOME_DIRECTORY }}/ares_provisioning/docker-compose.yml"
-    dest: "{{ USER_HOME_DIRECTORY }}/docker-compose.yml"
-  become_user: "{{ USER }}"
+# - name: copy docker-compose in home
+#   copy:
+#     src: "{{ USER_HOME_DIRECTORY }}/ares_provisioning/docker-compose.yml"
+#     dest: "{{ USER_HOME_DIRECTORY }}/docker-compose.yml"
+#   become_user: "{{ USER }}"
 
 # - name: start container
 #   shell: docker-compose up -d

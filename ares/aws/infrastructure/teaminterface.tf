@@ -43,9 +43,15 @@ resource "aws_instance" "teaminterface" {
         destination = "~/"
     }
 
+    provisioner "file" {
+        source = "../../teaminterface/provisioning/ares_provisioning/docker-compose.yml"
+        destination = "~/docker-compose.yml"
+    }
+
     provisioner "remote-exec" {
         inline = [
-            local.teaminterface_provision_with_ansible
+            local.teaminterface_provision_with_ansible,
+            local.start_service_container
         ]
     }
 }

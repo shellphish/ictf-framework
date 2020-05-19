@@ -13,8 +13,8 @@ services:
               target: /var/run/docker.sock
 
         environment:
-            - BOT_ID={{ SCRIPTBOT_ID }}
-            - ALL_BOTS={{ NUM_SCRIPTBOTS }}
+            - BOT_ID={{ BOT_ID }}
+            - ALL_BOTS={{ ALL_BOTS }}
             - IS_LOCAL_REGISTRY=0
             - API_SECRET={{ API_SECRET }}
             - REGISTRY_USERNAME={{ REGISTRY_USERNAME }}

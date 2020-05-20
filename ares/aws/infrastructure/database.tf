@@ -44,6 +44,7 @@ resource "aws_instance" "database" {
     provisioner "remote-exec" {
         inline = [
             local.database_provision_with_ansible,
+            local.start_service_container
         ]
     }
 }
@@ -51,12 +52,6 @@ resource "aws_instance" "database" {
 # resource "null_resource" "upload_team_info" {
 #     triggers = {
 #         teamvm_ids = "aws_instance.database.id"
-#     }
-
-#     connection {
-#         user = "hacker"
-#         private_key = file("./sshkeys/database-key.key")
-#         host = aws_instance.database.public_ip
 #     }
 
 #     provisioner "local-exec" {

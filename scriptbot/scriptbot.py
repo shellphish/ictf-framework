@@ -504,7 +504,7 @@ class ScriptExecutor(threading.Thread):
             arg_prefix += ['--network=docker_ictf_net']
         # Otherwise we use the VPN when we run remotely
         else:
-            arg_prefix = ["--network", "host" ]
+            arg_prefix += ["--network", "host" ]
         arg_prefix += ['-e', 'TERM=linux', '-e', 'TERMINFO=/etc/terminfo']
         arg_prefix += [self.script_image_path]
         # PROPOSAL: prepend timeout --signal=SIGKILL str(self.timeout)

@@ -1,3 +1,15 @@
+//  This module defines all the settings needed by the database
+data "aws_ami" "router" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["harden_router_16.04_*"]
+  }
+
+  owners = ["self"]
+}
+
 data "aws_eip" "router_ip" {
   tags = {
     Name = "ictf-router-ip"
@@ -20,7 +32,7 @@ resource "aws_route" "vpn" {
 }
 
 resource "aws_instance" "router" {
-    ami = data.aws_ami.ictf_base.id
+    ami = data.aws_ami.router.id
     instance_type = var.router_instance_type
     subnet_id = aws_subnet.war_range_subnet.id
     vpc_security_group_ids = [aws_security_group.router_secgrp.id]
@@ -43,7 +55,7 @@ resource "aws_instance" "router" {
     }
 
     connection {
-        user = local.ictf_user
+        user = "hacker"
         private_key = file("./sshkeys/router-key.key")
         host = self.public_ip
         agent = false
@@ -59,12 +71,12 @@ resource "aws_instance" "router" {
         destination = "/opt/ictf/openvpn.zip"
     }
 
-    # provisioner "remote-exec" {
-    #     inline =  [
-    #         "sudo pip install -q ansible",
-    #         "/usr/local/bin/ansible-playbook /opt/ictf/router/provisioning/terraform_provisioning.yml --extra-vars AWS_BUCKET_NAME=${data.aws_s3_bucket.router_bucket.id} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")}",
-    #         "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
-    #         "sudo service ssh restart"
-    #     ]
-    # }
+    provisioner "remote-exec" {
+        inline =  [
+            "sudo pip install -q ansible",
+            "/usr/local/bin/ansible-playbook /opt/ictf/router/provisioning/terraform_provisioning.yml --extra-vars AWS_BUCKET_NAME=${data.aws_s3_bucket.router_bucket.id} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")}",
+            "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
+            "sudo service ssh restart"
+        ]
+    }
 }

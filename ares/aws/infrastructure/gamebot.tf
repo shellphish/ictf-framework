@@ -32,9 +32,15 @@ resource "aws_instance" "gamebot" {
         destination = "~/"
     }
 
+    provisioner "file" {
+        source = "../../gamebot/provisioning/ares_provisioning/docker-compose.yml"
+        destination = "~/docker-compose.yml"
+    }
+
     provisioner "remote-exec" {
         inline = [
             local.gamebot_provision_with_ansible,
+            local.start_service_container
         ]
     }
 }

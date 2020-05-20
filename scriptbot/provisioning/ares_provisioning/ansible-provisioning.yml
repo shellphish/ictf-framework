@@ -7,6 +7,11 @@
     hostname:
       name: "scriptbot{{ BOT_ID }}"
 
+  - name: setting {{ BOT_ID }} hostname
+    copy:
+      src: ./files/teamhosts 
+      dest: /etc/hosts
+
   - name: template docker-compose
     template:
       src: ./files/docker-compose.yml.j2 

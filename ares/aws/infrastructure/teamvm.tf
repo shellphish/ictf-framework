@@ -1,3 +1,14 @@
+data "aws_ami" "teamvm" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["primed_teamvm_18.04_*"]
+  }
+
+  owners = ["self"]
+}
+
 locals {
   teams_list = jsondecode(file(var.game_config_file)).teams
   teams_organizer_hosted_map = { for team in local.teams_list: team.id => team if team.organizer_hosted }
@@ -6,7 +17,7 @@ locals {
 
 resource "aws_instance" "teamvm" {
     for_each = local.teams_organizer_hosted_map 
-    ami = data.aws_ami.ictf_base.id
+    ami = data.aws_ami.teamvm.id
     instance_type = var.teamvm_instance_type
     subnet_id = aws_subnet.war_range_subnet.id
     vpc_security_group_ids = [aws_security_group.teams_secgrp.id]
@@ -29,7 +40,7 @@ resource "aws_instance" "teamvm" {
     }
 
     connection {
-        user = local.ictf_user
+        user = "hacker"
         private_key = file("./sshkeys/teamvmmaster-key.key")
         host = self.public_ip
         agent = false
@@ -63,15 +74,13 @@ resource "aws_instance" "teamvm" {
         destination = "/opt/ictf/services/start_services.yml"
     }
 
-    # provisioner "remote-exec" {
-    #     inline = [
-    #         "ansible-playbook /home/hacker/terraform_provisioning.yml --extra-vars ROUTER_PRIVATE_IP=172.31.172.1 --extra-vars TEAM_ID=${each.value.id}" ,
-    #         "cd /opt/ictf/services && ansible-playbook start_services.yml --extra-vars TEAM_ID=team${each.value.id}",
-    #         "rm /opt/ictf/services/start_services.yml",
-    #         "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
-    #         "sudo service ssh restart"
-    #     ]
-    # }
+    provisioner "remote-exec" {
+        inline = [
+            "ansible-playbook /home/hacker/terraform_provisioning.yml --extra-vars ROUTER_PRIVATE_IP=172.31.172.1 --extra-vars TEAM_ID=${each.value.id}" ,
+            "cd /opt/ictf/services && ansible-playbook start_services.yml --extra-vars TEAM_ID=team${each.value.id}",
+            "rm /opt/ictf/services/start_services.yml",
+            "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
+            "sudo service ssh restart"
+        ]
+    }
 }
-
-

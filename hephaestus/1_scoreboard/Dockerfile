@@ -1,6 +1,6 @@
 FROM ictf_base
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y  python-pip python-virtualenv python-dev nginx git redis-server build-essential nodejs npm sudo openjdk-8-jdk openjdk-8-jdk-headless openjdk-8-jre uwsgi uwsgi-plugin-python
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y  python-pip python-virtualenv python-dev nginx git redis-server build-essential nodejs npm sudo uwsgi uwsgi-plugin-python
 
 COPY ./scoreboard /opt/ictf/scoreboard
 

@@ -31,10 +31,6 @@
         group: root
         mode:  0755
 
-    - name: install logstash using remote .deb
-      apt:
-       deb: https://artifacts.elastic.co/downloads/logstash/logstash-7.6.2.deb
-
     - name: logstash - config
       copy:
         src=./files/logstash.conf

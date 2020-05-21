@@ -9,21 +9,31 @@
       become: true
       with_items:
           - docker.io
-          - awscli
           - unzip
+          - prometheus-node-exporter
+          - git 
+          - wget
+          - curl 
+          - vim 
+          - iputils-ping
+          - openjdk-8-jdk
+          - openjdk-8-jdk-headless
+          - openjdk-8-jre
   
     - name: install docker-compose
       get_url:
         url: https://github.com/docker/compose/releases/download/1.25.4/docker-compose-Linux-x86_64
         dest: /usr/local/bin/docker-compose
-      mode: 0755
+        mode: 0755
 
     - name: get awscli V2
       get_url: 
         url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
-        dest: /home/ubuntu/awscliv2.zip
+        dest: /root/awscliv2.zip
 
-    - name: install awscli V2 
-      command: unzip /home/ubuntu/awscliv2.zip && sudo /hom/ubuntu/aws/install
+    # - name: install awscli V2 
+    #   command: unzip /root/awscliv2.zip && /root/aws/install
 
-         
+    - name: install logstash using remote .deb
+      apt:
+       deb: https://artifacts.elastic.co/downloads/logstash/logstash-7.6.2.deb

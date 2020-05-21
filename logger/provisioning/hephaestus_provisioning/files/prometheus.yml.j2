@@ -23,6 +23,9 @@ scrape_configs:
   scheme: http
   static_configs:
   - targets:
-{% for host in groups['all'] %}
-    - {{ host }}:9100
-{% endfor %}
+    - database.ictf:9100
+    - gamebot.ictf:9100
+    - scoreboard.ictf:9100
+    - teaminterface.ictf:9100
+    - scriptbot1.ictf:9100
+

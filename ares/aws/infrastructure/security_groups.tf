@@ -28,6 +28,22 @@ resource "aws_security_group" "master_subnet_secgrp" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 
+    # Kibana
+    ingress {
+        from_port = 5601
+        to_port = 5601
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    # Elasticsearch
+    ingress {
+        from_port = 9200
+        to_port = 9200
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
     ingress { # Prometheus Metrics
         from_port   = 9000
         to_port     = 9999

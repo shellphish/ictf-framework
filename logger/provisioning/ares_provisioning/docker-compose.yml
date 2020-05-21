@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+
+    ictf_logger:
+        image: ictf_logger
+        sysctls:
+            - net.core.somaxconn=65535
+        ports:
+            - "5601:5601"

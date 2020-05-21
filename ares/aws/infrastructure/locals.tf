@@ -51,7 +51,7 @@ locals {
     --extra-vars COMPONENT_NAME=scriptbot
   EOF
 
-  logger_common_provision_with_ansible = <<EOF
+  logger_provision_with_ansible = <<EOF
   ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \

@@ -37,7 +37,9 @@ if __name__ == '__main__':
             "teaminterface_instance_type": "t3.small",
             "teamvm_instance_type": "t3.small",
             "jobscheduler_instance_type": "t3.small",
-            "logger_instance_type": "t3.small",
+            # This instance cannot be less powerful than t3.large otherwise
+            # it won't work
+            "logger_instance_type": "t3.large",
         })
 
     with open('ictf_game_vars.auto.tfvars.json', 'w') as f:

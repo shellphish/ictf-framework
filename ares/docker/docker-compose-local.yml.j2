@@ -23,6 +23,8 @@ services:
               - database.ictf
         sysctls:
           - net.core.somaxconn=65535
+        environment:
+            - LOGSTASH_ID=database
 
     gamebot:
         image: ictf_gamebot
@@ -31,6 +33,8 @@ services:
           ictf_net:
             aliases: 
               - gamebot.ictf
+        environment:
+            - LOGSTASH_ID=gamebot
         
     scoreboard:
         image: ictf_scoreboard
@@ -41,6 +45,8 @@ services:
           ictf_net:
             aliases: 
               - scoreboard.ictf
+        environment:
+            - LOGSTASH_ID=scoreboard
 
     teaminterface:
         image: ictf_teaminterface
@@ -51,6 +57,8 @@ services:
           ictf_net:
             aliases: 
               - teaminterface.ictf
+        environment:
+            - LOGSTASH_ID=teaminterface
 
     logger:
         image: ictf_logger
@@ -61,6 +69,8 @@ services:
           ictf_net:
             aliases: 
               - logger.ictf
+        environment:
+            - LOGSTASH_ID=logger
 
 #    router:
 #        image: ictf_router
@@ -84,6 +94,7 @@ services:
             - REGISTRY_USERNAME="dummy"
             - REGISTRY_PASSWORD="dummy"
             - REGISTRY_ENDPOINT="dummy"
+            - LOGSTASH_ID=scriptbot{{ scriptbot_id }}
 
         networks: 
           ictf_net:

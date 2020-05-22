@@ -6,3 +6,5 @@ services:
         image: ictf_gamebot
         sysctls:
             - net.core.somaxconn=65535
+        environment:
+            - LOGSTASH_ID=gamebot

@@ -8,3 +8,5 @@ services:
             - net.core.somaxconn=65535
         ports:
             - "80:80"
+        environment:
+            - LOGSTASH_ID=database

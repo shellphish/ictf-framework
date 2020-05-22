@@ -34,10 +34,10 @@
         - grafana
         - prometheus
 
-    #  - name: configure prometheus
-    #    template:
-    #     src:  prometheus.yml.j2
-    #     dest: /etc/prometheus/prometheus.yml
+    - name: configure prometheus
+      template:
+        src:  ./files/prometheus.yml.j2
+        dest: /etc/prometheus/prometheus.yml
 
     - name: install elasticsearch using remote .deb
       apt:

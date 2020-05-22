@@ -1,7 +1,7 @@
 #!/bin/bash
 
 service nginx start
-
+service prometheus-node-exporter start
 service redis-server start
 
 ulimit -n 20000

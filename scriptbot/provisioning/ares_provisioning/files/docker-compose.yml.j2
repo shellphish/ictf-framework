@@ -11,6 +11,9 @@ services:
             - type: bind
               source: /var/run/docker.sock
               target: /var/run/docker.sock
+        
+        ports:
+            - "9100:9100"
 
         environment:
             - BOT_ID={{ BOT_ID }}

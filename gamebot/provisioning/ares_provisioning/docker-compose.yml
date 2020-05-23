@@ -8,3 +8,5 @@ services:
             - net.core.somaxconn=65535
         environment:
             - LOGSTASH_ID=gamebot
+        ports:
+            - "9100:9100"

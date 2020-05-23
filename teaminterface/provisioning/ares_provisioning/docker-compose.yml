@@ -8,5 +8,7 @@ services:
             - net.core.somaxconn=65535
         ports:
             - "80:80"
+            - "9100:9100"
+
         environment:
             - LOGSTASH_ID=teaminterface

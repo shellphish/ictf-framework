@@ -45,9 +45,11 @@
 
     - name: elasticsearch - config file
       copy:
-        src=./files/elasticsearch.yml
-        dest=/etc/elasticsearch/
-        owner=root group=root mode="u=rw,g=r,o=r"
+        src: ./files/elasticsearch.yml
+        dest: /etc/elasticsearch/
+        owner: root 
+        group: root 
+        mode: "u=rw,g=r,o=r"
 
     - name: install kibana using remote .deb
       apt:
@@ -55,6 +57,36 @@
 
     - name: kibana - config file
       copy:
-        src=./files/kibana.yml
-        dest=/etc/kibana/
-        owner=root group=root mode="u=rw,g=r,o=r"
+        src: ./files/kibana.yml
+        dest: /etc/kibana/
+        owner: root 
+        group: root
+        mode: "u=rw,g=r,o=r"
+      
+    - name: add dashboards provisioning for Grafana
+      copy:
+        src: ./files/grafana_dashboards.yml
+        dest: /etc/grafana/provisioning/dashboards/
+        owner: root
+        group: grafana
+
+    - name: create dashboard directory for Grafana
+      file:
+        path: /var/lib/grafana/dashboards
+        state: directory
+        owner: grafana
+        group: grafana
+
+    - name: add ICTF Overview dashboard to Grafana
+      copy:
+        src: ./files/ictf_overview_dashboard.json
+        dest: /var/lib/grafana/dashboards/
+        owner: grafana
+        group: grafana
+
+    - name: add Prometheus datasource to Grafana
+      copy:
+        src: ./files/prometheus_datasource.yml
+        dest: /etc/grafana/provisioning/datasources/
+        owner: root
+        group: grafana

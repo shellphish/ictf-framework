@@ -45,3 +45,12 @@ resource "aws_route53_record" "teaminterface" {
   ttl     = "43200" // 12h
   records = [aws_instance.teaminterface.private_ip]
 }
+
+resource "aws_route53_record" "scriptbot" {
+  zone_id = aws_route53_zone.private.zone_id
+  count   = var.scriptbot_num
+  name    = "scriptbot${count.index+1}.ictf"
+  type    = "A"
+  ttl     = "43200" // 12h
+  records = [aws_instance.scriptbot[count.index].private_ip]
+}

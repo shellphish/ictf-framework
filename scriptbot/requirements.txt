@@ -5,3 +5,4 @@ requests
 nclib
 docker
 python-logstash
+pika

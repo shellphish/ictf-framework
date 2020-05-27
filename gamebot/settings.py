@@ -1,5 +1,8 @@
-__author__ = 'machiry'
+import os
 
 # DB settings
 DB_HOST = 'THE_API_ADDRESS_GOES_HERE'
 DB_SECRET = 'THESECRETPASSPHRASEGOESHERE'
+
+RABBIT_HOST = 'dispatcher.ictf'
+SCRIPTBOT_INSTANCES = int(os.environ['NUM_SCRIPTBOTS'])

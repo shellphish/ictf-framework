@@ -33,6 +33,9 @@ class DBApi:
     BULK_UPDATE_SERVICE_STATE = 'service/state/set/bulk'
     PING_DBAPI = 'game/ping'
 
+    GET_SCRIPTS_TO_RUN = 'scripts/get/torun'
+    GET_FULL_GAME_STATE = 'game/state'
+
     def __init__(self, db_host=DB_HOST, db_secret=DB_SECRET, log_level=logging.INFO):
 
         self.db_host = db_host
@@ -132,9 +135,9 @@ class DBApi:
             game_id = int(game_state_response['game_id'])
         else:
             game_id = None
-            
+
         return game_id
-    
+
 
     def get_all_team_ids(self):
         """
@@ -186,6 +189,25 @@ class DBApi:
         self.log.info("Got Working Scripts Response")
         return script_response["scripts"]
 
+    def get_scripts_to_run(self):
+        """
+        Get a list of all scripts to run in the current tick.
+        API: /scripts/get/torun
+        :return: a list of script execution records
+        """
+        target_url = self.__build_url(DBApi.GET_SCRIPTS_TO_RUN)
+        r = DBApi._get_json_response(target_url, target_logger=self.log)
+        return r['scripts_to_run']
+
+    def get_full_game_state(self):
+        """
+        Get the game state
+        API: /game/state
+        :return: A huge dict that contains almost everything
+        """
+        target_url = self.__build_url(DBApi.GET_FULL_GAME_STATE)
+        return DBApi._get_json_response(target_url, target_logger=self.log)
+
     def set_service_state(self, service_id, team_id, state, reason):
         """
         Sets state of particular service for particular team.
@@ -221,6 +243,13 @@ class DBApi:
         scripts_run_stats = DBApi._get_json_response(target_url, target_logger=self.log)
         self.log.debug("Time for get_scripts_run_stats api " + str(datetime.now() - old_time))
         scripts_resp = {}
+
+        from pprint import pformat
+        self.log.info('-' * 30)
+        self.log.info('SCRIPTS RESP FROM DBAPI: %s', target_url)
+        self.log.info('-' * 30)
+        self.log.info(pformat(scripts_run_stats))
+
         if "script_runs" not in scripts_run_stats:
             self.log.error("Invalid Response from DB API for:" + str(target_url))
         else:
@@ -236,6 +265,10 @@ class DBApi:
                     scripts_resp[curr_team_id] = {}
                 scripts_resp[curr_team_id][curr_service_id] = (num_success, num_runs, not_ran)
 
+        self.log.info('-' * 30)
+        self.log.info('SCRIPTS_RESP')
+        self.log.info('-' * 30)
+        self.log.info(pformat(scripts_resp))
         return scripts_resp
 
     def bulk_update_team_service_state(self, bulk_info):

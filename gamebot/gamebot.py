@@ -16,12 +16,13 @@ __version__ = "0.1.1"
 from datetime import datetime, timedelta
 from dbapi import DBApi
 from scripts_facade import ScriptsFacade
-import time
+
+import coloredlogs
+import logging
 import logstash
 import random
 import sys
-import logging
-import coloredlogs
+import time
 
 
 LOGSTASH_PORT = 1717
@@ -63,21 +64,18 @@ def main():     # pylint:disable=missing-docstring,too-many-locals
 
     log.info("Starting GameBot")
     db_api = DBApi()
+
     # Check DB connection.
-
-    is_db_up = False
-
-    while not is_db_up:
+    while True:
         if db_api.check_connection():
             log.info("Connection to DB Verified.")
-            is_db_up = True
+            break
         else:
             log.fatal("Looks like DB is Down. Unable to verify db connection.")
             time.sleep(5)
 
     scripts_interface = ScriptsFacade(db_api)
     log.info("Initialization Complete")
-
     log.info("Check to see if there's a game running")
 
     while True:
@@ -90,8 +88,10 @@ def main():     # pylint:disable=missing-docstring,too-many-locals
         current_tick, seconds_left = db_api.get_current_tick_info()
 
         if current_tick != 0:
-            log.info("We must be picking up from the last run. Sleep for {} seconds until the next tick.".
-                     format(seconds_left))
+            log.info(
+                "We must be picking up from the last run. "
+                "Sleep for {} seconds until the next tick.".format(seconds_left)
+            )
             time.sleep(seconds_left)
 
         log.warning("Starting Main Loop")
@@ -105,7 +105,7 @@ def main():     # pylint:disable=missing-docstring,too-many-locals
                 log.info("Game is paused, breaking out of main loop")
                 break
 
-            # Create a new tick and Decide what scripts to run against each team
+            # Create a new tick and decide what scripts to run against each team
             sleep_time, num_benign, num_exploit, num_get_flags = _get_ticks_configuration(db_api)
 
             # Update script to be run, we should update these first as scriptbot

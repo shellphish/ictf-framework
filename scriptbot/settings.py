@@ -5,12 +5,17 @@ Settings for scheduler/scriptbot.
 """
 import os
 
+VERBOSE = False
+DEBUG   = False
+
 #logging settings
 import logging
 LOG_LEVEL = logging.INFO
 LOG_PATH = '/var/log/scriptbot/scheduler.log'
 STATUS_PATH = '/var/log/scriptbot/scheduler.status.json'
 
+LOGSTASH_IP = "localhost"
+LOGSTASH_PORT = 1717
 
 #sudo command
 #make sure scriptbot runner has sudoer privilege
@@ -53,7 +58,6 @@ SCRIPT_TIMEOUT_SOFT = 60 # 1 minute, roughly 1/3 of the length of a tick
 SCRIPT_TIMEOUT_HARD = SCRIPT_TIMEOUT_SOFT + 10 # give the script 10 seconds to die and traceback
 SETUP_SLEEP = 5 #seconds
 STATE_CHECK_INTERVAL = 2
-STATE_EXPIRE_MIN = SCRIPT_TIMEOUT_SOFT #seconds
 SET_GET_FLAG_TIME_DIFFERENCE_MIN = 3.0
 
 
@@ -63,6 +67,11 @@ REGISTRY_PASSWORD = os.environ['REGISTRY_PASSWORD']
 REGISTRY_ENDPOINT = os.environ['REGISTRY_ENDPOINT']
 IS_LOCAL_REGISTRY = int(os.environ['IS_LOCAL_REGISTRY']) == 1
 
+# RabbitMQ settings
+# RABBIT_USERNAME = os.environ['RABBIT_USERNAME']
+# RABBIT_PASSWORD = os.environ['RABBIT_PASSWORD']
+# RABBIT_HOST     = os.environ['RABBIT_HOST']
+RABBIT_HOST = 'dispatcher.ictf'
 
 #DB settings
 DB_HOST = "database.ictf"
@@ -71,8 +80,3 @@ DB_SECRET = os.environ['API_SECRET']
 DATABASE_REQUEST_RETRIES = 2
 # Sleep 1 second before each retry
 DATABASE_REQUEST_RETRY_INTERVAL = 1
-
-# ID of the current bot
-BOT_ID = int(os.environ["BOT_ID"])
-# Number of all bots we have
-ALL_BOTS = int(os.environ["ALL_BOTS"])

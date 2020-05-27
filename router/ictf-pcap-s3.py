@@ -45,7 +45,7 @@ log = logging.getLogger('ictf-pcap-s3')
 log.setLevel(logging.INFO)
 log.addHandler(sh)
 log.addHandler(fh)
-log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
 
 class InterruptException(Exception):
     pass

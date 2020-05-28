@@ -33,7 +33,7 @@ class DBApi:
     BULK_UPDATE_SERVICE_STATE = 'service/state/set/bulk'
     PING_DBAPI = 'game/ping'
 
-    GET_SCRIPTS_TO_RUN = 'scripts/get/torun'
+    GET_SCRIPTS_TO_RUN = 'scripts/get/torun/%s'
     GET_FULL_GAME_STATE = 'game/state'
 
     def __init__(self, db_host=DB_HOST, db_secret=DB_SECRET, log_level=logging.INFO):
@@ -189,13 +189,13 @@ class DBApi:
         self.log.info("Got Working Scripts Response")
         return script_response["scripts"]
 
-    def get_scripts_to_run(self):
+    def get_scripts_to_run(self, tick_id):
         """
         Get a list of all scripts to run in the current tick.
         API: /scripts/get/torun
         :return: a list of script execution records
         """
-        target_url = self.__build_url(DBApi.GET_SCRIPTS_TO_RUN)
+        target_url = self.__build_url(DBApi.GET_SCRIPTS_TO_RUN % str(tick_id))
         r = DBApi._get_json_response(target_url, target_logger=self.log)
         return r['scripts_to_run']
 

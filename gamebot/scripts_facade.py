@@ -64,7 +64,7 @@ class ScriptsFacade:
         scripts, services = self.load_script_meta()
 
         # Get a list of all scripts to run in the current tick
-        run_scripts = self.db_api.get_scripts_to_run()
+        run_scripts = self.db_api.get_scripts_to_run(tick_id)
         self.log.info("Got {} script execution requests".format(len(run_scripts)))
 
         teams_scripts = {}

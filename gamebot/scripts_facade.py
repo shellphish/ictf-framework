@@ -40,7 +40,7 @@ class ScriptsFacade:
         log.addHandler(log_handler)
         self.log = log
 
-        # Connect to RabbitMQ server
+        # Test connection to RabbitMQ server
         host          = settings.RABBIT_HOST
         # username    = settings.rabbit_username
         # password    = settings.rabbit_password

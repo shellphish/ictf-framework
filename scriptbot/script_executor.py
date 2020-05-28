@@ -67,24 +67,18 @@ class ScriptThread(threading.Thread):
 
         # Set logger
         self.log = logging.getLogger('scriptbot.script_exec')
-
-        LOG_FMT = '%(levelname)s - %(asctime)s (%(name)s): %(msg)s'
-
         self.log.setLevel(settings.LOG_LEVEL)
 
+        LOG_FMT = '%(levelname)s - %(asctime)s (%(name)s): %(msg)s'
         log_formatter = coloredlogs.ColoredFormatter(LOG_FMT)
-        log_handler = logging.StreamHandler()
+        log_handler = logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1)
         log_handler.setFormatter(log_formatter)
         self.log.addHandler(log_handler)
-
-
-        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
-        if settings.VERBOSE:
-            self.log.setLevel(logging.DEBUG)
-        self.log.info('ScriptExec Init')
+        self.log.info('ScriptThread Init')
 
 
     def get_status(self):
+        """ Used for printing information to the logs"""
         return str({
             'team_id'     : self.team_id,
             'script_id'   : self.script_id,
@@ -98,7 +92,8 @@ class ScriptThread(threading.Thread):
 
     def run(self):
         self.log.info(
-            '[script %d] Running. (script type: %s, target IP: %s, target port: %d, delay: %.2f s)' % (
+            "[script %d] Running. (script type: %s, target IP: %s, "
+            "target port: %d, delay: %.2f s)" % (
                 self.script_id,
                 self.script_type,
                 self.ip,
@@ -115,10 +110,12 @@ class ScriptThread(threading.Thread):
             start = time.time()
             self.log.info("[script %d] Waiting for setflag script to terminate..." % self.script_id)
             self.setflag_lock.acquire()
-            self.log.info("[script %d] setflag script terminated. Took %f seconds to wait for the lock." % (
-                          self.script_id,
-                          time.time() - start
-                          ))
+            self.log.info(
+                "[script %d] setflag script terminated. "
+                "Took %f seconds to wait for the lock." % (
+                    self.script_id,
+                    time.time() - start
+                ))
 
             # "getflag" isn't a "setflag" so release the lock before running
             try: self.setflag_lock.release()
@@ -159,7 +156,8 @@ class ScriptThread(threading.Thread):
 
             # Execute Docker command
             self.log.info(
-                '[script %d] Running container (tick: %d, script type: %s, target IP: %s, target port: %d)' % (
+                "[script %d] Running container (tick: %d, script type: %s, "
+                "target IP: %s, target port: %d)" % (
                 self.script_id,
                 self.tick_id,
                 self.script_type,
@@ -170,7 +168,8 @@ class ScriptThread(threading.Thread):
             p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = p.communicate()
             self.log.info(
-                '[script %d] Container run returned. (tick: %d, script type: %s, target IP: %s, target port: %d, self.status: %s)' % (
+                "[script %d] Container run returned. (tick: %d, "
+                "script type: %s, target IP: %s, target port: %d, self.status: %s)" % (
                 self.script_id,
                 self.tick_id,
                 self.script_type,
@@ -420,7 +419,7 @@ class ScriptThread(threading.Thread):
                             result['error_msg'] = ERROR_WRONG_FLAG[1] + error_message
 
                 elif self.script_type == 'exploit':
-                    # No longer supported, but it's not removed in case it's needed in the future
+                    # Useful for admins to test
                     if 'flag' not in result:
                         result['error'] = ERROR_MISSING_FLAG[0]
                         result['error_msg'] = ERROR_MISSING_FLAG[1]
@@ -469,7 +468,6 @@ class ScriptThread(threading.Thread):
                  self.ip, self.port, self.flag_meta['flag_id'], self.flag_meta['secret_token'], payload['flag'], self.service_name))
             else:
                 pass
-                # import ipdb; ipdb.set_trace()
 
         # Push the result to database
         self.db.push_result(self.execution_id, result, output)

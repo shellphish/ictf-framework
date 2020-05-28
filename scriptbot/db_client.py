@@ -18,6 +18,7 @@ class DBClientQueryError(DBClientError):
 
 
 class DBClient:
+
     def __init__(self, host=settings.DB_HOST, pwd=settings.DB_SECRET):
         self.host = host
         self.pwd = pwd
@@ -40,43 +41,36 @@ class DBClient:
 
         url = 'http://{}/{}'.format(self.host, api)
         params = {'secret': self.pwd} if authentication else None
-
         retry_times = settings.DATABASE_REQUEST_RETRIES
 
         while retry_times >= 0:
             try:
                 r = requests.get(url, timeout=5, params=params)
-
             except requests.exceptions.Timeout:
                 raise DBClientQueryError(
                     "Database request [GET]'%s' timed out" % (api),
                     0
                 )
-
             except requests.exceptions.RequestException as ex:
                 raise DBClientQueryError(
                     "Database request [GET]'%s' failed due to exception %s" % (api, str(ex)),
                     0
                 )
 
+            # Return JSON if successful
             if r.status_code == 200:
                 return json.loads(r.content.decode('utf-8'))
 
             elif r.status_code == 502 and retry_times > 0:
-                # Retry in case of HTTP 502
-
                 self.log.error(
-                    "Database request [GET]'%s' failed with HTTP 502. Will retry after %s seconds",
-                    api,
-                    settings.DATABASE_REQUEST_RETRY_INTERVAL,
+                    "Database request [GET]'%s' failed with HTTP 502. "
+                    "Will retry after %s seconds" %
+                    (api, settings.DATABASE_REQUEST_RETRY_INTERVAL)
                 )
 
+                # back off and pause a while before retrying
                 retry_times -= 1
-
-                # back off and pause a while
                 time.sleep(settings.DATABASE_REQUEST_RETRY_INTERVAL)
-
-                # retry...
                 continue
 
             else:
@@ -89,7 +83,7 @@ class DBClient:
 
     def _post(self, api, data, authentication=True):
         """
-        Make aaa post to the database backend
+        Make a post to the database backend
 
         :param api: The API string
         :param data: The data to post to the remote server
@@ -103,44 +97,36 @@ class DBClient:
 
         url = 'http://{}/{}'.format(self.host, api)
         params = {'secret': self.pwd} if authentication else None
-
         retry_times = settings.DATABASE_REQUEST_RETRIES
 
         while retry_times >= 0:
             try:
                 r = requests.post(url, data=data, timeout=5, params=params)
-
             except requests.exceptions.Timeout:
                 raise DBClientQueryError(
                     "Database request [POST]'%s'(data: %s) timed out" % (api, data),
                     0
                 )
-
             except requests.exceptions.RequestException as ex:
                 raise DBClientQueryError(
                     "Database request [POST]'%s'(data: %s) failed due to exception %s" % (api, data, str(ex)),
                     0
                 )
 
+            # Return JSON if successful
             if r.status_code == 200:
                 return json.loads(r.content.decode('utf-8'))
 
             elif r.status_code == 502 and retry_times > 0:
-                # Retry in case of HTTP 502
-
                 self.log.error(
-                    "Database request [POST]'%s'(data: %s) failed with HTTP 502. Will retry after %s seconds",
-                    api,
-                    data,
-                    settings.DATABASE_REQUEST_RETRY_INTERVAL,
+                    "Database request [POST]'%s'(data: %s) failed with HTTP 502. "
+                    "Will retry after %s seconds" %
+                    (api, data, settings.DATABASE_REQUEST_RETRY_INTERVAL)
                 )
 
+                # back off and pause a while before retrying
                 retry_times -= 1
-
-                # back off and pause a while
                 time.sleep(settings.DATABASE_REQUEST_RETRY_INTERVAL)
-
-                # retry...
                 continue
 
             else:
@@ -153,43 +139,6 @@ class DBClient:
                     ),
                     r.status_code
                 )
-
-
-    def get_game_state(self):
-        """
-        Get the game state
-
-        API: /game/state
-
-        :return: A huge dict that contains almost everything
-        """
-
-        state = self._query("/game/state")
-
-        # Some basic sanity checks
-        # Removing these sanity checks, because they are not true when the game is not running
-        return state
-
-
-    def get_teams(self, validated=None):
-        """
-        Get a dict of all teams from the database backend
-
-        API: /teams/info
-
-        :return: a dict of all team info
-        """
-
-        team_info = self._query("/teams/info")
-
-        teams = team_info['teams']
-
-        # Convert all team IDs to integers
-        converted = {}
-        for team_id, val in teams.items():
-            converted[int(team_id)] = val
-
-        return converted
 
 
     def generate_flag(self, team_id, service_id):
@@ -307,21 +256,3 @@ class DBClient:
 
         return False
 
-    def get_scripts_to_run(self):
-        """
-        Get a list of all scripts to run in the current tick.
-
-        API: /scripts/get/torun
-
-        :return: a list of script execution records
-        """
-
-        r = self._query("/scripts/get/torun")
-
-        if not isinstance(r, dict):
-            raise DBClientError('Expecting a dict as result, getting %s instead' % type(r))
-
-        if "scripts_to_run" not in r:
-            raise DBClientError('Expecting non-existent key "scripts_to_run" in the result dict')
-
-        return r['scripts_to_run']

@@ -1,18 +1,57 @@
 # The Scriptbot
 
-The scriptbot is responsible for checking the service status of all teams. 
-It updates flags on the vulnerable services, and checks that these flags are accessible. 
-Each service has at least one setflag, one getflag, and one benign script. 
+The scriptbot is responsible for checking the service status of all teams. It updates flags on the vulnerable services and checks that those flags are accessible. Each service has at least one setflag, one getflag, and one benign script.
 
-The setflag and getflag scripts are used to check the status of the service by setting and getting the flags, while the benign script is used to create some benign background traffic. 
-The scriptbot pulls these scripts and corresponding execution intervals from the database.
+## Scripts
 
-A json file 'team_list.json' needs to be updated with team and IP address
-information in the following format:
+Each script is one of the following:
+
+- setflag : registers a new flag with the team's service.
+- getflag : verifies that the team's service is up and functioning.
+- benign  : masks the getflag and setflag routines by hiding it in traffic.
+
+
+Note that there may be several executions of benign and getflag in the same
+tick against the same team service, but only one execution of setflag.
+Also, getflag cannot execute until setflag has run.
+
+## Tasks per Tick
+
+Each tick, the Gamebot pushes a set of scripts to be run into the RabbitMQ dispatcher.
+The dispatcher distributes the tasks to each running instance of ScriptBot. The scriptbot
+instance receives a list of teams and the corresponding scripts to run against them. Before executing the scripts, however, the Scriptbot first pulls the latest version of the scripts from the Docker registry.
+
+A task received from the dispatcher is a JSON file with two parts: 'teams' and 'services'.
+'teams' is a dict of teams that scriptbot needs to interact with.
+Each team contains a dictionary of services.
+Each service contains a list of scripts to be run against that service.
+
+The "script_id" indicates what type of script this is (eg: getflag on service X).
+The "script_type" and "script_name" indicate the name of the script (eg: getflag).
+The "execution_id" is a database ID for the results of this tick's script execution
+against the given team.
+
 
 ```json
-[
-{"team_id":1,"ip":"127.0.1.2"},
-{"team_id":2,"ip":"127.0.2.2"}
-]
+{
+    'teams' : {
+        team_id : {
+            service_id : {
+                [
+                    {
+                        'execution_id' : execution_id,
+                        'script_name' : script_name,
+                        'script_type' : script_type,
+                        'script_id' : script_id,
+                    }
+                ]
+            }
+    },
+    'services' : {
+        service_id : {
+            'service_name' : service_name,
+            'port' : service_port
+        }
+    }
+}
 ```

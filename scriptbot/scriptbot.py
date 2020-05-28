@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-A scriptbot instance receives tasks and executes them.
-A task is a set of tuples (team, service, script) where script is one of the following:
+A scriptbot instance receives tasks and executes the scripts inside them
+to verify that teams' services are up and running.
 
-- setflag : registers a new flag with the team's service.
-- getflag : verifies that the team's service is up and functioning.
-- benign  : masks the getflag and setflag routines by hiding it in traffic.
-
-Scriptbot pulls the scripts to run dynamically from a Docker Registry, while
-the tasks are received asynchronously from a RabbitMQ dispatcher.
+Scriptbot pulls the scripts to run dynamically from a Docker Registry,
+while the tasks themselves are received from a RabbitMQ dispatcher.
 """
 
 __authors__ = "Sid Senthilkumar"
@@ -18,7 +14,7 @@ __version__ = "1.0.0"
 from db_client import DBClient, DBClientError
 from registry_client import RegistryClient, RegistryClientPullError
 from script_executor import ScriptThread
-from settings import LOGSTASH_IP, LOGSTASH_PORT, VERBOSE
+from settings import LOGSTASH_IP, LOGSTASH_PORT
 import settings
 
 import coloredlogs
@@ -54,18 +50,14 @@ class Scheduler(object):
 
         self.log = logging.getLogger('scriptbot.scheduler')
         self.log.setLevel(settings.LOG_LEVEL)
-
         log_formatter = coloredlogs.ColoredFormatter(LOG_FMT)
-        log_handler = logging.StreamHandler()
+
+        log_handler = logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1)
         log_handler.setFormatter(log_formatter)
         self.log.addHandler(log_handler)
-
-        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         self.log.info('#' * 80)
+        self.log.info("Initialization")
         self.log.info('#' * 80)
-        self.log.info('Init')
-        if VERBOSE:
-            self.log.setLevel(logging.DEBUG)
 
 
     def add_setflag_lock(self, lock):
@@ -90,46 +82,11 @@ class Scheduler(object):
 
     def get_random_delay(self):
         """
-        Add random delay between execution of scripts
-        :param run_list: A list of ScriptExecution objects to be executed
-        :return: A new list of tuples (script_id, delay)
+        Adds a random delay between the execution of scripts
+        TODO: Experiment with this to make the scripts execute
+              at evenly distributed times across the interval.
         """
-        return 0
-        return random.randint(0, 90)
-
-        # TODO: What is this? it seems to return a constant value everytime...
-        run_list = self.teams
-        items = len(run_list)
-
-        interval = float(self.state_expire - settings.STATE_EXPIRE_MIN) / items
-
-        d = []
-        last_delay = None
-        for i, script_exec in enumerate(run_list):
-            script_id = script_exec.script_id
-
-            delay = i * interval + interval - random.gauss(interval, settings.SIGMA_FACTOR * interval)
-            # delay = interval - random.gauss(interval, settings.SIGMA_FACTOR * interval)
-            delay = abs(delay)
-            script_type = self.scripts[script_id]['type']
-
-            if script_type == 'setflag':
-                last_delay = delay
-
-            elif script_type == 'getflag':
-                if last_delay is not None:
-                    if (delay - last_delay) < settings.SET_GET_FLAG_TIME_DIFFERENCE_MIN:
-                        self.log.info(
-                            'delay (%.2f) - last_delay (%.2f) < SET_GET_FLAG_TIME_DIFFERENCE_MIN (%.2f)',
-                            delay,
-                            last_delay,
-                            settings.SET_GET_FLAG_TIME_DIFFERENCE_MIN
-                        )
-                        delay = last_delay + settings.SET_GET_FLAG_TIME_DIFFERENCE_MIN
-
-            d.append(delay)
-
-        return list(zip(run_list, d))
+        return random.randint(0, 5)
 
 
     def run_team(self, team_id):
@@ -178,7 +135,6 @@ class Scheduler(object):
         all_threads = []
         for team_id in self.teams:
             try:
-                self.log.info('Creating a new thread to run all scripts against team{}'.format(team_id))
                 new_threads = self.run_team(team_id)
                 all_threads.extend(new_threads)
             except Exception as ex:
@@ -197,8 +153,6 @@ class Scheduler(object):
         try:
             image_name = self.services[service_id]['docker_image_name']
             image_path = self.services[service_id]['docker_image_path']
-
-            self.log.info('SERVICE ID: {}, IMAGE NAME: {}'.format(service_id, image_name))
             self.registry.pull_new_image(image_name, image_path)
         except RegistryClientPullError as ex:
             msg = "An unexpected exception occurred when pulling from registry"
@@ -296,62 +250,55 @@ class Scheduler(object):
 
     def receive_tasks(self):
 
-        # Perform callback in new thread so we don't block IO thread
-        def callback(channel, method, properties, body, args):
-            self.log.info("Received script tasks")
-            connection = args[0]
-            thread = threading.Thread(
-                target=self.scheduler_callback,
-                args=(channel, body, method.delivery_tag, connection)
-            )
-            thread.start()
-
+        self.log.info('Connecting to RabbitMQ dispatcher')
         host        = settings.RABBIT_HOST
         # username    = settings.rabbit_username
         # password    = settings.rabbit_password
         # credentials = pika.PlainCredentials(username, password)
         conn_params = pika.ConnectionParameters(host=host) #, credentials=credentials)
-
-        self.log.info('Waiting for connection to RabbitMQ')
         while True:
             try:
                 connection = pika.BlockingConnection(conn_params)
                 self.log.info('Connected to RabbitMQ. Waiting for tasks')
                 break
             except pika.exceptions.AMQPConnectionError as ex:
-                self.log.info('The RabbitMQ server is not ready yet...')
+                self.log.info('The RabbitMQ dispatcher is not ready yet...')
                 time.sleep(5)
                 continue
 
-        # Ensure fair task scheduling between scriptbot instances
-        # Receive 1 message at a time from dispatcher
-        channel = connection.channel()
-        channel.basic_qos(prefetch_count=1)
+        # Define callback
+        def callback(channel, method, properties, body, args):
+            self.log.info("Received script tasks")
+            connection = args[0]
 
-        # Declare which queue to receive messages from
-        # Durability ensures messages are not lost if dispatcher is rebooted
-        on_message_callback = functools.partial(callback, args=(connection,))
-        channel.queue_declare(queue='scripts_queue', durable=True)
-        channel.basic_consume(queue='scripts_queue', on_message_callback=on_message_callback)
-        channel.start_consuming()
+            # Execute received tasks in new thread.
+            # Otherwise, scriptbot will disconnect from the dispatcher
+            # because it's not replying to RabbitMQ's heartbeats.
+            thread = threading.Thread(
+                target=self.scheduler_callback,
+                args=(channel, body, method.delivery_tag, connection)
+            )
 
-        channel.close()
-        connection.close()
+            # If the child threads cause scriptbot to die, the main thread should die too
+            thread.setDaemon(True)
+            thread.start()
 
+        try:
+            # Ensure fair task scheduling between scriptbot instances
+            # Receive 1 message at a time from dispatcher
+            channel = connection.channel()
+            channel.basic_qos(prefetch_count=1)
 
-    def wait_game_is_ready(self):
-        while True:
-            try:
-                state = self.db.get_game_state()
-                if 'game_id' not in state:
-                    self.log.info('Game not ready, waiting')
-                    time.sleep(5)
-                    continue
-                return
-            except DBClientError as ex:
-                self.log.info('The database is not ready yet...')
-                time.sleep(5)
-                continue
+            # Declare which queue to receive messages from
+            # Durability ensures messages are not lost if dispatcher is rebooted
+            on_message_callback = functools.partial(callback, args=(connection,))
+            channel.queue_declare(queue='scripts_queue', durable=True)
+            channel.basic_consume(queue='scripts_queue', on_message_callback=on_message_callback)
+            channel.start_consuming()
+        except Exception as e:
+            self.log.error("Scriptbot Died!")
+            channel.close()
+            connection.close()
 
 
 def main():
@@ -375,7 +322,6 @@ def main():
 
     # Retrieve and execute jobs
     s = Scheduler()
-    s.wait_game_is_ready()
     s.receive_tasks()
 
 if __name__ == "__main__":

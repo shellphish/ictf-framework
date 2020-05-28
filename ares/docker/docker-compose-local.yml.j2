@@ -36,6 +36,9 @@ services:
         environment:
             - LOGSTASH_ID=gamebot
             - NUM_SCRIPTBOTS={{ num_scriptbots }}
+            - RABBIT_ENDPOINT="dispatcher.ictf"
+            - RABBIT_USERNAME="dummy"
+            - RABBIT_PASSWORD="dummy"
 
     scoreboard:
         image: ictf_scoreboard
@@ -107,6 +110,10 @@ services:
             - REGISTRY_PASSWORD="dummy"
             - REGISTRY_ENDPOINT="dummy"
             - LOGSTASH_ID=scriptbot{{ scriptbot_id }}
+            - SCRIPTBOT_ID={{ scriptbot_id }}
+            - RABBIT_ENDPOINT="dispatcher.ictf"
+            - RABBIT_USERNAME="dummy"
+            - RABBIT_PASSWORD="dummy"
 
         networks:
           ictf_net:

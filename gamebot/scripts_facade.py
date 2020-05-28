@@ -17,10 +17,9 @@ import random
 import time
 
 from utils import flatten_list
+from settings import LOGSTASH_IP, LOGSTASH_PORT
 import settings
 
-LOGSTASH_PORT = 1717
-LOGSTASH_IP = "localhost"
 
 class ScriptsFacade:
 
@@ -41,9 +40,9 @@ class ScriptsFacade:
         self.log = log
 
         # Test connection to RabbitMQ server
-        host          = settings.RABBIT_HOST
-        # username    = settings.rabbit_username
-        # password    = settings.rabbit_password
+        host        = settings.RABBIT_ENDPOINT
+        username    = settings.RABBIT_USERNAME
+        password    = settings.RABBIT_PASSWORD
         # credentials = pika.PlainCredentials(username, password)
         self.conn_params = pika.ConnectionParameters(host=host)# , credentials=credentials)
         while True:
@@ -56,6 +55,22 @@ class ScriptsFacade:
                 time.sleep(5)
                 continue
         connection.close()
+
+
+    def load_script_meta(self):
+        services, scripts = {}, {}
+        state = self.db_api.get_full_game_state()
+
+        # Get data out of the dict
+        for service in state['services']:
+            services[int(service['service_id'])] = service
+
+        for script in state['scripts']:
+            d = dict(script)
+            d['service_name'] = services[d['service_id']]['service_name']
+            scripts[int(script['script_id'])] = d
+
+        return scripts, services
 
 
     def publish_tasks(self, tick_id):
@@ -124,24 +139,6 @@ class ScriptsFacade:
         connection.close()
 
 
-    def load_script_meta(self):
-        services = {}
-        scripts = {}
-
-        state = self.db_api.get_full_game_state()
-
-        # Get data out of the dict
-        for service in state['services']:
-            services[int(service['service_id'])] = service
-
-        for script in state['scripts']:
-            d = dict(script)
-            d['service_name'] = services[d['service_id']]['service_name']
-            scripts[int(script['script_id'])] = d
-
-        return scripts, services
-
-
     def update_scripts_to_run(self, tick_id, num_benign, num_exploit, num_get_flags):
         """
         Updated the database with scripts to run for the current tick.
@@ -204,7 +201,6 @@ class ScriptsFacade:
 
         self.log.debug("Time to get data and re-arrange scripts information:" + str(datetime.now() - old_time))
 
-        team_total_scripts = {}
         old_time = datetime.now()
         backup_old_time = datetime.now()
         for curr_team in all_teams:
@@ -251,26 +247,13 @@ class ScriptsFacade:
             # other scripts.
             curr_total_scripts = list(set_flag_scripts + others)
             # Add these to the list of scripts to be run against the team.
-            team_total_scripts[curr_team] = curr_total_scripts
+            self.db_api.update_scripts_to_run(curr_team, tick_id, curr_total_scripts)
 
-        self.log.debug("Time to re-arrange scripts for each team and services is:" + str(datetime.now() - old_time))
-
-        # Note: Although there is obvious optimization here.
-        # We can update scripts for each team as they are computed.
-        # But, Ideally we want scripts for all teams to be updated at same time.
-        # This is one way to get closer to the ideal behaviour
-        for team_id in team_total_scripts:
-            old_time = datetime.now()
-            self.log.debug("Starting to update team:" + str(team_id) + " with " +
-                           str(len(team_total_scripts[team_id])) + " scripts to run")
-            self.db_api.update_scripts_to_run(team_id, tick_id, team_total_scripts[team_id])
-            self.log.info("Updated team:" + str(team_id) + " with " + str(len(team_total_scripts[team_id])) +
-                          " scripts to run in:" + str(datetime.now() - old_time))
+        self.log.debug("Upload time to DB for each team/service's scripts:" + str(datetime.now() - old_time))
 
         # Insert tasks into queue for dispatcher to disperse
         self.publish_tasks(tick_id)
         self.log.info("Time to update all teams with scripts to run:" + str(datetime.now() - backup_old_time))
-
         return True
 
 

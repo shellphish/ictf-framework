@@ -8,8 +8,6 @@ import requests
 from datetime import datetime
 from settings import *
 
-LOGSTASH_PORT = 1717
-LOGSTASH_IP = "localhost"
 
 class DBApi:
 
@@ -38,8 +36,10 @@ class DBApi:
 
     def __init__(self, db_host=DB_HOST, db_secret=DB_SECRET, log_level=logging.INFO):
 
+        # Set up db
         self.db_host = db_host
         self.db_secret = db_secret
+
         # Set up logging
         log = logging.getLogger('gamebot_dbapi')
         log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))

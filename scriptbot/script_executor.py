@@ -1,7 +1,6 @@
 from settings import LOGSTASH_IP, LOGSTASH_PORT
 import settings
 
-import coloredlogs
 import json
 import logging
 import logstash
@@ -68,12 +67,7 @@ class ScriptThread(threading.Thread):
         # Set logger
         self.log = logging.getLogger('scriptbot.script_exec')
         self.log.setLevel(settings.LOG_LEVEL)
-
-        LOG_FMT = '%(levelname)s - %(asctime)s (%(name)s): %(msg)s'
-        log_formatter = coloredlogs.ColoredFormatter(LOG_FMT)
-        log_handler = logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1)
-        log_handler.setFormatter(log_formatter)
-        self.log.addHandler(log_handler)
+        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         self.log.info('ScriptThread Init')
 
 

@@ -17,7 +17,6 @@ from script_executor import ScriptThread
 from settings import LOGSTASH_IP, LOGSTASH_PORT
 import settings
 
-import coloredlogs
 import datetime
 import functools
 import json
@@ -46,15 +45,9 @@ class Scheduler(object):
         self.setflag_locks_list_lock = threading.Lock()
 
         # Logs
-        LOG_FMT = '%(levelname)s - %(asctime)s (%(name)s): %(msg)s'
-
         self.log = logging.getLogger('scriptbot.scheduler')
         self.log.setLevel(settings.LOG_LEVEL)
-        log_formatter = coloredlogs.ColoredFormatter(LOG_FMT)
-
-        log_handler = logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1)
-        log_handler.setFormatter(log_formatter)
-        self.log.addHandler(log_handler)
+        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         self.log.info('#' * 80)
         self.log.info("Initialization")
         self.log.info('#' * 80)
@@ -251,9 +244,9 @@ class Scheduler(object):
     def receive_tasks(self):
 
         self.log.info('Connecting to RabbitMQ dispatcher')
-        host        = settings.RABBIT_HOST
-        # username    = settings.rabbit_username
-        # password    = settings.rabbit_password
+        host        = settings.RABBIT_ENDPOINT
+        username    = settings.RABBIT_USERNAME
+        password    = settings.RABBIT_PASSWORD
         # credentials = pika.PlainCredentials(username, password)
         conn_params = pika.ConnectionParameters(host=host) #, credentials=credentials)
         while True:

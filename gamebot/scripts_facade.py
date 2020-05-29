@@ -25,7 +25,7 @@ class ScriptsFacade:
 
         # Set up logging
         log = logging.getLogger('gamebot_scripts')
-        log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+        log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         log.setLevel(log_level)
         log_formatter = coloredlogs.ColoredFormatter(ScriptsFacade.LOG_FMT)
         log_handler = logging.StreamHandler()

@@ -59,7 +59,7 @@ def main():     # pylint:disable=missing-docstring,too-many-locals
     log_handler = logging.StreamHandler()
     log_handler.setFormatter(log_formatter)
     log.addHandler(log_handler)
-    log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+    log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
 
     log.info("Starting GameBot")
     db_api = DBApi()

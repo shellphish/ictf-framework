@@ -86,7 +86,7 @@ class RegistryClient:
         self.registry_endpoint = registry_endpoint
         self.docker_client = docker.from_env()
         self.log = logging.getLogger('scriptbot.registryClient')
-        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+        self.log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         if not settings.IS_LOCAL_REGISTRY:
             self._authenticate()
 
@@ -117,7 +117,7 @@ class DBClient:
         self.host = host
         self.pwd = pwd
         self.log = logging.getLogger('scriptbot.dbclient')
-        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+        self.log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
 
 
     def _query(self, api, authentication=True):
@@ -454,7 +454,7 @@ class ScriptExecutor(threading.Thread):
         self.ip = ip
         self.port = int(port)
         self.log = logging.getLogger('scriptbot.script_exec')
-        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+        self.log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
 
         self.db = DBClient() if db_client is None else db_client
         self.stop = False
@@ -944,7 +944,7 @@ class Scheduler(object):
             'script_tot': 0
         }
         self.log = logging.getLogger('scriptbot.scheduler')
-        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+        self.log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
 
         self.is_synchronous = is_synchronous
 
@@ -1470,7 +1470,7 @@ def main():
     soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
     if soft < 65536 or hard < 65536:
         l = logging.getLogger('main')
-        l.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+        l.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
 
         l.warning('Open file limits (soft %d, hard %d) are too low. 65536 recommended. ' +
                   'Will increase soft limit. ' +

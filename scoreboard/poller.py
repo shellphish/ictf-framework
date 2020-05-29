@@ -211,7 +211,7 @@ log = logging.getLogger('scoreboard_poller')
 log.setLevel(MAIN_LOG_LEVEL)
 log_handler = logging.StreamHandler()
 log.addHandler(log_handler)
-log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
 
 
 if __name__ == "__main__":

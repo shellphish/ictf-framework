@@ -247,8 +247,8 @@ class Scheduler(object):
         host        = settings.RABBIT_ENDPOINT
         username    = settings.RABBIT_USERNAME
         password    = settings.RABBIT_PASSWORD
-        # credentials = pika.PlainCredentials(username, password)
-        conn_params = pika.ConnectionParameters(host=host) #, credentials=credentials)
+        credentials = pika.PlainCredentials(username, password)
+        conn_params = pika.ConnectionParameters(host=host, credentials=credentials)
         while True:
             try:
                 connection = pika.BlockingConnection(conn_params)

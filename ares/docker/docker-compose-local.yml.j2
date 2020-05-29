@@ -80,6 +80,9 @@ services:
     dispatcher:
       image: ictf_dispatcher
       hostname: dispatcher
+      environment:
+        - RABBIT_USERNAME=dummy
+        - RABBIT_PASSWORD=dummy
       ports:
           - "5672:5672"
           - "15672:15672"

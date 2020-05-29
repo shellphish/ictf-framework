@@ -81,7 +81,7 @@ def main():     # pylint:disable=missing-docstring,too-many-locals
     while True:
         current_game_id = db_api.get_game_state()
         if current_game_id is None:
-            log.info("Game is paused or has not started yet, sleeping, and will retry in a few")
+            log.info("Game is paused or hasn't started yet, retrying...")
             time.sleep(10)
             continue
 

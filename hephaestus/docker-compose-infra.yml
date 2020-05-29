@@ -38,12 +38,12 @@ services:
             dockerfile: ./hephaestus/1_scriptbot/Dockerfile
             context: ../
 
-    # ictf_router:
-    #     image: ictf_router
-    #     hostname: router
-    #     build:
-    #         dockerfile: ./hephaestus/1_router/Dockerfile
-    #         context: ../
+    ictf_router:
+        image: ictf_router
+        hostname: router
+        build:
+            dockerfile: ./hephaestus/1_router/Dockerfile
+            context: ../
 
     ictf_logger:
         image: ictf_logger

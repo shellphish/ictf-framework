@@ -1,0 +1,163 @@
+version: '3.4'
+
+volumes:
+
+    
+    volume_everybodys_got_something_to_hide_1:
+    
+    volume_yellow_submarine_1:
+    
+
+    
+    volume_everybodys_got_something_to_hide_2:
+    
+    volume_yellow_submarine_2:
+    
+
+    
+networks:
+    master_net:
+        ipam:
+          driver: default
+          config:
+            - subnet: 172.31.128.0/17
+    warzone_net:
+        ipam:
+          driver: default
+          config:
+            - subnet: 162.31.128.0/17
+
+services:
+
+    gamebot:
+      image: ictf_gamebot
+      hostname: prova.ictf
+      entrypoint: tail -f /dev/null
+      networks: 
+        master_net:
+    
+    scriptbot1:
+        image: ictf_scriptbot
+        hostname: scriptbot1
+        entrypoint: ./start_idle_mode.sh
+
+        environment:
+            - BOT_ID=1
+            - ALL_BOTS=1
+            - IS_LOCAL_REGISTRY=1
+            - API_SECRET=wjWvVNHgBt5_rMh565QK8lKrM
+            - REGISTRY_USERNAME="dummy"
+            - REGISTRY_PASSWORD="dummy"
+            - REGISTRY_ENDPOINT="dummy"
+            - LOGSTASH_ID=scriptbot1
+
+        networks: 
+          master_net:
+            aliases: 
+              - scriptbot1.ictf
+
+        cap_add:
+          - NET_ADMIN
+
+    router:
+        image: ictf_router
+        hostname: router
+        environment:
+            - LOGSTASH_ID=router
+        privileged: true
+        networks: 
+          master_net:
+            ipv4_address: 172.31.172.1
+            aliases: 
+              - router.ictf
+          warzone_net:
+            ipv4_address: 162.31.172.1 
+            aliases: 
+              - router.ictf
+        volumes:
+            - ./vpnkeys/openvpn.zip:/etc/openvpn/openvpn.zip
+
+    teamvm1:
+        image: ictf_teamvm
+        hostname: teamvm1
+        depends_on:
+            - router
+
+        volumes:
+        
+            - volume_everybodys_got_something_to_hide_1:/opt/ictf/services/everybodys_got_something_to_hide
+        
+            - volume_yellow_submarine_1:/opt/ictf/services/yellow_submarine
+            - ./vpnkeys/team1.ovpn:/etc/openvpn/client.conf
+        
+
+        environment:
+            - TEAM_ID=1
+        
+        entrypoint: /bin/bash -c "socat TCP-LISTEN:10001,fork TCP:chall_everybodys_got_something_to_hide_1:6666 & socat TCP-LISTEN:10002,fork TCP:chall_yellow_submarine_1:6666 & /root/start.sh"
+        privileged: true
+        networks: 
+          warzone_net:
+
+    teamvm2:
+        image: ictf_teamvm
+        hostname: teamvm2
+        depends_on:
+            - router
+
+        volumes:
+        
+            - volume_everybodys_got_something_to_hide_2:/opt/ictf/services/everybodys_got_something_to_hide
+        
+            - volume_yellow_submarine_2:/opt/ictf/services/yellow_submarine
+        
+            - ./vpnkeys/team2.ovpn:/etc/openvpn/client.conf
+
+        environment:
+            - TEAM_ID=2
+        
+        entrypoint: /bin/bash -c "socat TCP-LISTEN:10001,fork TCP:chall_everybodys_got_something_to_hide_2:6666 & socat TCP-LISTEN:10002,fork TCP:chall_yellow_submarine_2:6666 & /root/start.sh"
+        privileged: true
+        networks: 
+          warzone_net:
+
+    chall_everybodys_got_something_to_hide_1:
+        image: everybodys_got_something_to_hide
+        hostname: chall_everybodys_got_something_to_hide_1
+
+        volumes:
+            - volume_everybodys_got_something_to_hide_1:/home/chall/service/
+
+        networks: 
+          warzone_net:
+    
+    chall_yellow_submarine_1:
+        image: yellow_submarine
+        hostname: chall_yellow_submarine_1
+
+        volumes:
+            - volume_yellow_submarine_1:/home/chall/service/
+
+        networks: 
+          warzone_net:
+    
+    chall_everybodys_got_something_to_hide_2:
+        image: everybodys_got_something_to_hide
+        hostname: chall_everybodys_got_something_to_hide_2
+
+        volumes:
+            - volume_everybodys_got_something_to_hide_2:/home/chall/service/
+
+        networks: 
+          warzone_net:
+    
+    chall_yellow_submarine_2:
+        image: yellow_submarine
+        hostname: chall_yellow_submarine_2
+
+        volumes:
+            - volume_yellow_submarine_2:/home/chall/service/
+
+        networks: 
+          warzone_net:
+    

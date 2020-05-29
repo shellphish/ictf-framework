@@ -67,7 +67,7 @@ class ScriptThread(threading.Thread):
         # Set logger
         self.log = logging.getLogger('scriptbot.script_exec')
         self.log.setLevel(settings.LOG_LEVEL)
-        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+        self.log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         self.log.info('ScriptThread Init')
 
 

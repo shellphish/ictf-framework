@@ -23,7 +23,7 @@ class DBClient:
         self.host = host
         self.pwd = pwd
         self.log = logging.getLogger('scriptbot.dbclient')
-        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+        self.log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
 
 
     def _query(self, api, authentication=True):

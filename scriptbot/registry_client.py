@@ -22,7 +22,7 @@ class RegistryClient:
         self.registry_endpoint = registry_endpoint
         self.docker_client = docker.from_env()
         self.log = logging.getLogger('scriptbot.registryClient')
-        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+        self.log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         if not settings.IS_LOCAL_REGISTRY:
             self._authenticate()
 

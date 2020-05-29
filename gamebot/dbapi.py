@@ -42,7 +42,7 @@ class DBApi:
 
         # Set up logging
         log = logging.getLogger('gamebot_dbapi')
-        log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+        log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         log.setLevel(log_level)
         log_formatter = coloredlogs.ColoredFormatter(DBApi.LOG_FMT)
         log_handler = logging.StreamHandler()

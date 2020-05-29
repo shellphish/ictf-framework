@@ -47,7 +47,7 @@ class Scheduler(object):
         # Logs
         self.log = logging.getLogger('scriptbot.scheduler')
         self.log.setLevel(settings.LOG_LEVEL)
-        self.log.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+        self.log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         self.log.info('#' * 80)
         self.log.info("Initialization")
         self.log.info('#' * 80)
@@ -300,7 +300,7 @@ def main():
     soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
     if soft < 65536 or hard < 65536:
         l = logging.getLogger('main')
-        l.addHandler(logstash.LogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
+        l.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         l.warning(
             'Open file limits (soft %d, hard %d) are too low. 65536 recommended. '
             'Will increase soft limit. '

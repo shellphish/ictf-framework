@@ -167,7 +167,8 @@ def scripts_uploadid(upload_id):
 
 
 @app.route("/scripts/get/torun")
-def get_scripts_to_run():
+@app.route("/scripts/get/torun/<int:tick_id>")
+def get_scripts_to_run(tick_id=None):
     """
     The ``/scripts/get/torun`` endpoint requires authentication.
      By default, it returns all scripts that needs to be run for current tick.
@@ -189,11 +190,14 @@ def get_scripts_to_run():
     cursor = mysql.cursor()
 
     # Get basic information about the game, like tick info and services
-    current_tick, tick_start, seconds_to_next_tick, _ = get_current_tick(cursor)
+    if tick_id is None:
+        current_tick, tick_start, seconds_to_next_tick, _ = get_current_tick(cursor)
+        tick_id = current_tick
+
     cursor.execute("""SELECT id, script_id, against_team_id, tick_id
                       FROM script_runs
                       WHERE error is NULL AND tick_id = %s""",
-                   (current_tick,))
+                   (tick_id,))
     return json.dumps({"scripts_to_run": cursor.fetchall()})
 
 

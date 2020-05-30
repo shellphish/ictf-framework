@@ -16,11 +16,10 @@ services:
             - "9100:9100"
 
         environment:
-            - BOT_ID={{ BOT_ID }}
-            - ALL_BOTS={{ ALL_BOTS }}
+            - SCRIPTBOT_ID={{ SCRIPTBOT_ID }}
             - IS_LOCAL_REGISTRY=0
             - API_SECRET={{ API_SECRET }}
             - REGISTRY_USERNAME={{ REGISTRY_USERNAME }}
             - REGISTRY_PASSWORD={{ REGISTRY_PASSWORD }}
             - REGISTRY_ENDPOINT={{ REGISTRY_ENDPOINT }}
-            - LOGSTASH_ID=scriptbot{{ BOT_ID }}
+            - LOGSTASH_ID=scriptbot{{ SCRIPTBOT_ID }}

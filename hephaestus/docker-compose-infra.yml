@@ -16,7 +16,7 @@ services:
         build:
             dockerfile: ./hephaestus/1_gamebot/Dockerfile
             context: ../
-        
+
     ictf_scoreboard:
         image: ictf_scoreboard
         hostname: scoreboard
@@ -29,6 +29,13 @@ services:
         hostname: teaminterface
         build:
             dockerfile: ./hephaestus/1_teaminterface/Dockerfile
+            context: ../
+
+    ictf_dispatcher:
+        image: ictf_dispatcher
+        hostname: dispatcher
+        build:
+            dockerfile: ./hephaestus/1_dispatcher/Dockerfile
             context: ../
 
     ictf_scriptbot:

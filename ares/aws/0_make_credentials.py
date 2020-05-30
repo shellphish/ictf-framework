@@ -26,7 +26,7 @@ AWS_KEY_TEMPLATE = Template('resource "aws_key_pair" "$keyname" { \n\
 }\n')
 
 # Define the Vms
-VM_NAMES = ['database', 'router', 'gamebot', 'scoreboard', 'teaminterface', 'scriptbot', 'teamvmmaster', 'jobscheduler', 'logger']
+VM_NAMES = ['database', 'router', 'gamebot', 'scoreboard', 'teaminterface', 'scriptbot', 'teamvmmaster', 'dispatcher', 'logger']
 
 
 def make_ssh_keys(num_teams):
@@ -67,7 +67,7 @@ def make_ssh_keys(num_teams):
     print("[+] Backup done in " + BACKUP_FOLDER + "!")
 
 
-def make_vpn_keys(num_teams, num_routers, router_public_ip):
+def make_vpn_keys(num_teams, num_routers):
     # https://gist.github.com/Soarez/9688998
     # https://superuser.com/questions/738612/openssl-ca-keyusage-extension
     EXT_TEMPLATE = """
@@ -138,7 +138,7 @@ dev tun0
 proto udp
 nobind
 
-remote {router_public_ip} {port}
+remote router.ictf {port}
 resolv-retry infinite
 
 remote-cert-tls server
@@ -236,7 +236,6 @@ mute 20
                 dh=cat(VPNKEYS_FOLDER + "dh.pem"),
                 ta=cat(VPNKEYS_FOLDER + serv + ".tls"),
                 num=n + 1,
-                router_public_ip=router_public_ip,
                 port=1101 + n
             ))
 
@@ -255,7 +254,6 @@ mute 20
                 key=cat(VPNKEYS_FOLDER + team + ".key"),
                 ta=cat(VPNKEYS_FOLDER + serv + ".tls"),
                 num=n % num_routers + 1,
-                router_public_ip=router_public_ip,
                 port=1101 + n % num_routers
             ))
 
@@ -276,9 +274,9 @@ mute 20
             ))
 
 
-def create_credentials(num_teams, num_routers, router_public_ip):
+def create_credentials(num_teams, num_routers):
     make_ssh_keys(num_teams)
-    make_vpn_keys(num_teams, num_routers, router_public_ip)
+    make_vpn_keys(num_teams, num_routers)
 
 
 if __name__ == '__main__':
@@ -289,4 +287,4 @@ if __name__ == '__main__':
     with open(args.game_config_file, 'r') as f:
         game_config = json.load(f)
 
-    create_credentials(len(game_config['teams']), game_config['game_info']['num_routers'], game_config['game_info']['router_public_ip'])
+    create_credentials(len(game_config['teams']), game_config['game_info']['num_routers'])

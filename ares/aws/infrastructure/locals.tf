@@ -60,6 +60,15 @@ locals {
     --extra-vars COMPONENT_NAME=logger
   EOF
 
+  router_provision_with_ansible = <<EOF
+  ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
+    --extra-vars AWS_ACCESS_KEY=${var.access_key} \
+    --extra-vars AWS_SECRET_KEY=${var.secret_key} \
+    --extra-vars AWS_REGION=${var.region} \
+    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_router \
+    --extra-vars COMPONENT_NAME=router
+  EOF
+
   start_service_container = <<EOF
   docker-compose -f ~/docker-compose.yml up -d
   EOF

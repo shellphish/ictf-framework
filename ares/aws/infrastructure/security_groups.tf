@@ -85,8 +85,8 @@ resource "aws_security_group" "router_secgrp" {
     }
 
     ingress {
-        from_port   = 1100
-        to_port     = 1200
+        from_port   = 1000
+        to_port     = 2000
         protocol    = "udp"
         cidr_blocks = ["0.0.0.0/0"]
     }

@@ -57,9 +57,9 @@ variable "gamebot_instance_type"  {
     type = string
 }
 
-variable "jobscheduler_instance_type"  {
+variable "dispatcher_instance_type"  {
     default = "m5.2xlarge"
-    description = "Job Scheduler AWS instance type"
+    description = "Dispatcer AWS instance type"
     type = string
 }
 

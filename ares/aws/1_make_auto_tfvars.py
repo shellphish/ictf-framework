@@ -36,7 +36,7 @@ if __name__ == '__main__':
             "gamebot_instance_type": "t3.small",
             "teaminterface_instance_type": "t3.small",
             "teamvm_instance_type": "t3.small",
-            "jobscheduler_instance_type": "t3.small",
+            "dispatcher_instance_type": "t3.small",
             # This instance cannot be less powerful than t3.large otherwise
             # it won't work
             "logger_instance_type": "t3.large",

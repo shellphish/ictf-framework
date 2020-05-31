@@ -10,4 +10,6 @@ services:
             - "5672:5672"
             - "15672:15672"
         environment:
-            - LOGSTASH_ID=dispatcher
+            - RABBIT_USERNAME=dummy
+            - RABBIT_PASSWORD=dummy
+            

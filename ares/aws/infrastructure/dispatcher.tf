@@ -39,7 +39,7 @@ resource "aws_instance" "dispatcher" {
 
     provisioner "remote-exec" {
         inline = [
-            local.database_provision_with_ansible,
+            local.dispatcher_provision_with_ansible,
             local.start_service_container
         ]
     }

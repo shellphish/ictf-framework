@@ -1,3 +1,4 @@
+wheel
 Flask-Cache==0.13.1
 Flask-HTTPAuth==2.7.0
 Flask-RESTful==0.3.4

@@ -8,5 +8,9 @@ services:
             - net.core.somaxconn=65535
         environment:
             - LOGSTASH_ID=gamebot
+            - RABBIT_ENDPOINT=dispatcher.ictf
+            - RABBIT_USERNAME=dummy
+            - RABBIT_PASSWORD=dummy
+            - NUM_SCRIPTBOTS=1
         ports:
             - "9100:9100"

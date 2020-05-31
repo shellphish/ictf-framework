@@ -10,5 +10,5 @@ services:
         environment:
             - LOGSTASH_ID=router
         volumes:
-            - /home/ubuntu/vpnkeys/openvpn.zip:/etc/openvpn/openvpn.zip
-        network: host
+            - /home/ubuntu/openvpn.zip:/etc/openvpn/openvpn.zip
+        network_mode: host

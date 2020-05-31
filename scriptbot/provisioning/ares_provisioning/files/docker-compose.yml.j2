@@ -23,3 +23,6 @@ services:
             - REGISTRY_PASSWORD={{ REGISTRY_PASSWORD }}
             - REGISTRY_ENDPOINT={{ REGISTRY_ENDPOINT }}
             - LOGSTASH_ID=scriptbot{{ SCRIPTBOT_ID }}
+            - RABBIT_ENDPOINT=dispatcher.ictf
+            - RABBIT_USERNAME=dummy
+            - RABBIT_PASSWORD=dummy

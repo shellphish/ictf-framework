@@ -3,11 +3,11 @@
   become: true
 
   tasks:
-  - name: setting {{ BOT_ID }} hostname
+  - name: setting {{ SCRIPTBOT_ID }} hostname
     hostname:
-      name: "scriptbot{{ BOT_ID }}"
+      name: "scriptbot{{ SCRIPTBOT_ID }}"
 
-  - name: setting {{ BOT_ID }} hostname
+  - name: setting {{ SCRIPTBOT_ID }} hostname
     copy:
       src: ./files/teamhosts 
       dest: /etc/hosts

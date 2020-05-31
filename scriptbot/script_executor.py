@@ -217,8 +217,8 @@ class ScriptThread(threading.Thread):
                              str(ex) +
                              str(traceback.format_exc()) +
                              " | script details: " + self.get_status() +
-                             " | script output: stdout:\n" + stdout +
-                             "\n | stderr:\n" + stderr
+                             " | script output: stdout:\n" + decoded_stdout +
+                             "\n | stderr:\n" + decoded_stderr
             }
 
             if not isinstance(ex, SchedulerError):

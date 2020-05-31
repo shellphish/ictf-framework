@@ -133,7 +133,8 @@ class ScriptThread(threading.Thread):
 
 
     def run_script(self):
-        stdout, stderr = ('', '')
+        stdout, stderr = '', ''
+        decoded_stdout, decoded_sterr = '', ''
         args = None
         script_outputs = {}
 
@@ -201,13 +202,13 @@ class ScriptThread(threading.Thread):
                 stderr = b''
 
             if isinstance(stderr, bytes):
-                stderr = stderr.decode('utf-8').strip()
+                decoded_stderr = stderr.decode('utf-8').strip()
 
             if stdout is None:
                 stdout = b''
 
             if isinstance(stdout, bytes):
-                stdout = stdout.decode('utf-8').strip()
+                decoded_stdout = stdout.decode('utf-8').strip()
 
             self.result = {
                 'error'     : ERROR_SCRIPT_EXECUTION[0],

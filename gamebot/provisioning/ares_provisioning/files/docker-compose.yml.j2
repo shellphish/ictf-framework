@@ -11,6 +11,6 @@ services:
             - RABBIT_ENDPOINT=dispatcher.ictf
             - RABBIT_USERNAME=dummy
             - RABBIT_PASSWORD=dummy
-            - NUM_SCRIPTBOTS=1
+            - NUM_SCRIPTBOTS={{ NUM_SCRIPTBOTS }}
         ports:
             - "9100:9100"

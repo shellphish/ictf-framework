@@ -1,0 +1,118 @@
+Host *
+  Port 22
+  User hacker
+  UserKnownHostsFile "./sshkeys//known_hosts"
+  IdentitiesOnly yes
+
+Host database
+  Hostname 54.153.33.192
+  IdentityFile "./sshkeys//database-key.key"
+
+Host dispatcher
+  Hostname 54.151.127.76
+  IdentityFile "./sshkeys//dispatcher-key.key"
+
+Host gamebot
+  Hostname 54.215.175.221
+  IdentityFile "./sshkeys//gamebot-key.key"
+
+Host logger
+  Hostname 54.219.109.189
+  IdentityFile "./sshkeys//logger-key.key"
+
+Host router
+  Hostname 52.9.63.30
+  IdentityFile "./sshkeys//router-key.key"
+
+Host scoreboard
+  Hostname 52.52.217.148
+  IdentityFile "./sshkeys//scoreboard-key.key"
+
+Host scriptbot1
+  Hostname 54.193.103.124
+  IdentityFile "./sshkeys//scriptbot-key.key"
+
+Host scriptbot10
+  Hostname 13.57.247.118
+  IdentityFile "./sshkeys//scriptbot-key.key"
+
+Host scriptbot2
+  Hostname 18.144.171.104
+  IdentityFile "./sshkeys//scriptbot-key.key"
+
+Host scriptbot3
+  Hostname 3.101.55.96
+  IdentityFile "./sshkeys//scriptbot-key.key"
+
+Host scriptbot4
+  Hostname 13.57.36.74
+  IdentityFile "./sshkeys//scriptbot-key.key"
+
+Host scriptbot5
+  Hostname 204.236.154.244
+  IdentityFile "./sshkeys//scriptbot-key.key"
+
+Host scriptbot6
+  Hostname 54.177.10.232
+  IdentityFile "./sshkeys//scriptbot-key.key"
+
+Host scriptbot7
+  Hostname 54.177.200.222
+  IdentityFile "./sshkeys//scriptbot-key.key"
+
+Host scriptbot8
+  Hostname 13.57.206.57
+  IdentityFile "./sshkeys//scriptbot-key.key"
+
+Host scriptbot9
+  Hostname 52.53.197.229
+  IdentityFile "./sshkeys//scriptbot-key.key"
+
+Host teaminterface
+  Hostname 52.53.64.114
+  IdentityFile "./sshkeys//teaminterface-key.key"
+
+Host teamvm1
+  Hostname 52.53.170.30
+  IdentityFile "./sshkeys//teamvmmaster-key.key"
+
+Host teamvm10
+  Hostname 54.183.178.90
+  IdentityFile "./sshkeys//teamvmmaster-key.key"
+
+Host teamvm11
+  Hostname 13.57.227.147
+  IdentityFile "./sshkeys//teamvmmaster-key.key"
+
+Host teamvm2
+  Hostname 54.176.108.114
+  IdentityFile "./sshkeys//teamvmmaster-key.key"
+
+Host teamvm3
+  Hostname 54.193.63.63
+  IdentityFile "./sshkeys//teamvmmaster-key.key"
+
+Host teamvm4
+  Hostname 13.57.24.185
+  IdentityFile "./sshkeys//teamvmmaster-key.key"
+
+Host teamvm5
+  Hostname 13.57.222.252
+  IdentityFile "./sshkeys//teamvmmaster-key.key"
+
+Host teamvm6
+  Hostname 54.241.85.39
+  IdentityFile "./sshkeys//teamvmmaster-key.key"
+
+Host teamvm7
+  Hostname 3.101.21.186
+  IdentityFile "./sshkeys//teamvmmaster-key.key"
+
+Host teamvm8
+  Hostname 3.101.54.118
+  IdentityFile "./sshkeys//teamvmmaster-key.key"
+
+Host teamvm9
+  Hostname 3.101.43.39
+  IdentityFile "./sshkeys//teamvmmaster-key.key"
+

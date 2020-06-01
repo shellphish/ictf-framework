@@ -10,20 +10,20 @@
 #   owners = ["self"]
 # }
 
-# data "aws_eip" "router_ip" {
-#   tags = {
-#     Name = "ictf-router-ip"
-#   }
-# }
+data "aws_eip" "router_ip" {
+  tags = {
+    Name = "ictf-router-ip"
+  }
+}
 
 data "aws_s3_bucket" "router_bucket" {
   bucket = "ictf-router-bucket-${var.region}"
 }
 
-# resource "aws_eip_association" "router_ip" {
-#     instance_id = aws_instance.router.id
-#     allocation_id = data.aws_eip.router_ip.id
-# }
+resource "aws_eip_association" "router_ip" {
+    instance_id = aws_instance.router.id
+    allocation_id = data.aws_eip.router_ip.id
+}
 
 resource "aws_route" "vpn" {
     route_table_id = aws_vpc.ictf.main_route_table_id

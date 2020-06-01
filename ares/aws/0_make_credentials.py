@@ -67,7 +67,7 @@ def make_ssh_keys(num_teams):
     print("[+] Backup done in " + BACKUP_FOLDER + "!")
 
 
-def make_vpn_keys(num_teams, num_routers):
+def make_vpn_keys(num_teams, num_routers, router_public_ip):
     # https://gist.github.com/Soarez/9688998
     # https://superuser.com/questions/738612/openssl-ca-keyusage-extension
     EXT_TEMPLATE = """
@@ -138,7 +138,7 @@ dev tun0
 proto udp
 nobind
 
-remote router.ictf {port}
+remote {router_public_ip} {port}
 resolv-retry infinite
 
 remote-cert-tls server
@@ -236,6 +236,7 @@ mute 20
                 dh=cat(VPNKEYS_FOLDER + "dh.pem"),
                 ta=cat(VPNKEYS_FOLDER + serv + ".tls"),
                 num=n + 1,
+                router_public_ip=router_public_ip,
                 port=1101 + n
             ))
 
@@ -254,6 +255,7 @@ mute 20
                 key=cat(VPNKEYS_FOLDER + team + ".key"),
                 ta=cat(VPNKEYS_FOLDER + serv + ".tls"),
                 num=n % num_routers + 1,
+                router_public_ip=router_public_ip,
                 port=1101 + n % num_routers
             ))
 
@@ -274,9 +276,9 @@ mute 20
             ))
 
 
-def create_credentials(num_teams, num_routers):
+def create_credentials(num_teams, num_routers, router_public_ip):
     make_ssh_keys(num_teams)
-    make_vpn_keys(num_teams, num_routers)
+    make_vpn_keys(num_teams, num_routers, router_public_ip)
 
 
 if __name__ == '__main__':
@@ -287,4 +289,4 @@ if __name__ == '__main__':
     with open(args.game_config_file, 'r') as f:
         game_config = json.load(f)
 
-    create_credentials(len(game_config['teams']), game_config['game_info']['num_routers'])
+    create_credentials(len(game_config['teams']), game_config['game_info']['num_routers'], game_config['game_info']['router_public_ip'])

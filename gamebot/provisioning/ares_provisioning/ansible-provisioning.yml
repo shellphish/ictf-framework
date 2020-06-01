@@ -1,0 +1,11 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  tasks:
+
+  - name: template docker-compose
+    template:
+      src: ./files/docker-compose.yml.j2 
+      dest: ~/docker-compose.yml
+    become_user: "{{ USER }}"

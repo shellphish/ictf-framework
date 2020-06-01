@@ -6,55 +6,55 @@ services:
         image: ictf_database
         hostname: database
         build:
-            dockerfile: ./hephaestus/1_database/Dockerfile
-            context: ../
+            dockerfile: ./hephaestus/containers/1_database/Dockerfile
+            context: ../../
         entrypoint: /bin/bash
 
     ictf_gamebot:
         image: ictf_gamebot
         hostname: gamebot
         build:
-            dockerfile: ./hephaestus/1_gamebot/Dockerfile
-            context: ../
+            dockerfile: ./hephaestus/containers/1_gamebot/Dockerfile
+            context: ../../
 
     ictf_scoreboard:
         image: ictf_scoreboard
         hostname: scoreboard
         build:
-            dockerfile: ./hephaestus/1_scoreboard/Dockerfile
-            context: ../
+            dockerfile: ./hephaestus/containers/1_scoreboard/Dockerfile
+            context: ../../
 
     ictf_teaminterface:
         image: ictf_teaminterface
         hostname: teaminterface
         build:
-            dockerfile: ./hephaestus/1_teaminterface/Dockerfile
-            context: ../
+            dockerfile: ./hephaestus/containers/1_teaminterface/Dockerfile
+            context: ../../
 
     ictf_dispatcher:
         image: ictf_dispatcher
         hostname: dispatcher
         build:
-            dockerfile: ./hephaestus/1_dispatcher/Dockerfile
-            context: ../
+            dockerfile: ./hephaestus/containers/1_dispatcher/Dockerfile
+            context: ../../
 
     ictf_scriptbot:
         image: ictf_scriptbot
         hostname: scriptbot
         build:
-            dockerfile: ./hephaestus/1_scriptbot/Dockerfile
-            context: ../
+            dockerfile: ./hephaestus/containers/1_scriptbot/Dockerfile
+            context: ../../
 
     ictf_router:
         image: ictf_router
         hostname: router
         build:
-            dockerfile: ./hephaestus/1_router/Dockerfile
-            context: ../
+            dockerfile: ./hephaestus/containers/1_router/Dockerfile
+            context: ../../
 
     ictf_logger:
         image: ictf_logger
         hostname: logger
         build:
-            dockerfile: ./hephaestus/1_logger/Dockerfile
-            context: ../
+            dockerfile: ./hephaestus/containers/1_logger/Dockerfile
+            context: ../../

@@ -61,31 +61,6 @@ resource "aws_instance" "router" {
         agent = false
     }
 
-    # provisioner "file" {
-    #     source = "../../router/provisioning/terraform_provisioning.yml"
-    #     destination = "/opt/ictf/router/provisioning/terraform_provisioning.yml"
-    # }
-
-    # provisioner "file" {
-    #     source = "./vpnkeys/openvpn.zip"
-    #     destination = "/opt/ictf/openvpn.zip"
-    # }
-
-    # provisioner "remote-exec" {
-    #     inline =  [
-    #         "sudo pip install -q ansible",
-    #         "/usr/local/bin/ansible-playbook /opt/ictf/router/provisioning/terraform_provisioning.yml --extra-vars AWS_BUCKET_NAME=${data.aws_s3_bucket.router_bucket.id} --extra-vars AWS_REGION=${var.region} --extra-vars AWS_ACCESS_KEY=${var.access_key} --extra-vars AWS_SECRET_KEY=${var.secret_key} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")}",
-    #         "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
-    #         "sudo service ssh restart"
-    #     ]
-    # }
-    # TODO: This ansible role shold be already inside the base ictf AMI
-    #       Remove this once you have a base image
-    provisioner "file" {
-        source = "../../common/ares_provisioning"
-        destination = "~/"
-    }
-
     provisioner "file" {
         source = "./vpnkeys/openvpn.zip"
         destination = "~/openvpn.zip"

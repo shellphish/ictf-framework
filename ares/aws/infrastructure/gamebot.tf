@@ -25,24 +25,7 @@ resource "aws_instance" "gamebot" {
         agent = false
     }
 
-    # TODO: This ansible role shold be already inside the base ictf AMI
-    #       Remove this once you have a base image
-    provisioner "file" {
-        source = "../../common/ares_provisioning"
-        destination = "~/"
-    }
-
-    # provisioner "file" {
-    #     source = "../../gamebot/provisioning/ares_provisioning/docker-compose.yml"
-    #     destination = "~/docker-compose.yml"
-    # }
-
-    provisioner "remote-exec" {
-        inline = [
-            "mkdir ~/ares_provisioning_second_stage"
-        ]
-    }
-
+    # this folder has already been there in the base image
     provisioner "file" {
         source = "../../gamebot/provisioning/ares_provisioning/"
         destination = "~/ares_provisioning_second_stage"

@@ -34,19 +34,7 @@ resource "aws_instance" "scriptbot" {
         Type = "Infrastructure"
     }
 
-    # TODO: This ansible role shold be already inside the base ictf AMI
-    #       Remove this once you have a base image
-    provisioner "file" {
-        source = "../../common/ares_provisioning"
-        destination = "~/"
-    }
-
-    provisioner "remote-exec" {
-        inline = [
-            "mkdir ~/ares_provisioning_second_stage"
-        ]
-    }
-
+    # this folder has already been there in the base image
     provisioner "file" {
         source = "../../scriptbot/provisioning/ares_provisioning/"
         destination = "~/ares_provisioning_second_stage"

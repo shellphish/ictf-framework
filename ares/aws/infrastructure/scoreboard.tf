@@ -36,13 +36,6 @@ resource "aws_instance" "scoreboard" {
         agent = false
     }
 
-    # TODO: This ansible role shold be already inside the base ictf AMI
-    #       Remove this once you have a base image
-    provisioner "file" {
-        source = "../../common/ares_provisioning"
-        destination = "~/"
-    }
-
     provisioner "file" {
         source = "../../scoreboard/provisioning/ares_provisioning/docker-compose.yml"
         destination = "~/docker-compose.yml"

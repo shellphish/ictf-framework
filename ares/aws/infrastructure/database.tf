@@ -29,13 +29,6 @@ resource "aws_instance" "database" {
         agent = false
     }
 
-    # TODO: This ansible role shold be already inside the base ictf AMI
-    #       Remove this once you have a base image
-    provisioner "file" {
-        source = "../../common/ares_provisioning"
-        destination = "~/"
-    }
-
     provisioner "file" {
         source = "../../database/provisioning/ares_provisioning/docker-compose.yml"
         destination = "~/docker-compose.yml"
@@ -48,18 +41,3 @@ resource "aws_instance" "database" {
         ]
     }
 }
-
-# resource "null_resource" "upload_team_info" {
-#     triggers = {
-#         teamvm_ids = "aws_instance.database.id"
-#     }
-
-#     provisioner "local-exec" {
-#         command = "python ../../database/provisioning/create_teams.py ${aws_instance.database.public_ip} ${var.game_config_file}"
-#     }
-
-#     provisioner "local-exec" {
-#         command = "python ../../database/provisioning/create_services.py ${aws_instance.database.public_ip} ${var.game_config_file}"
-#     }
-# }
-

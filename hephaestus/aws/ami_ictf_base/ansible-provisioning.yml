@@ -35,5 +35,11 @@
         url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
         dest: /root/awscliv2.zip
 
-    # - name: install awscli V2 
-    #   command: unzip /root/awscliv2.zip && /root/aws/install
+    - name: extract awscli V2 
+      unarchive: 
+        src: /root/awscliv2.zip 
+        dest: /root
+        remote_src: true
+
+    - name: install awscli V2 
+      command: /root/aws/install

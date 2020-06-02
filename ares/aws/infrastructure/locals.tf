@@ -7,7 +7,7 @@ locals {
   registry_id = length(aws_ecr_repository.service_scriptbot_image) == 0 ? "" : aws_ecr_repository.service_scriptbot_image[0].registry_id
 
   database_provision_with_ansible = <<EOF
-  ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
+  ansible-playbook ~/ares_provisioning_first_stage/ansible-provisioning.yml \
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
@@ -16,7 +16,7 @@ locals {
   EOF
 
   gamebot_provision_with_ansible = <<EOF
-  ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
+  ansible-playbook ~/ares_provisioning_first_stage/ansible-provisioning.yml \
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
@@ -25,7 +25,7 @@ locals {
   EOF
 
   scoreboard_provision_with_ansible = <<EOF
-  ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
+  ansible-playbook ~/ares_provisioning_first_stage/ansible-provisioning.yml \
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
@@ -34,7 +34,7 @@ locals {
   EOF
 
   teaminterface_provision_with_ansible = <<EOF
-  ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
+  ansible-playbook ~/ares_provisioning_first_stage/ansible-provisioning.yml \
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
@@ -43,7 +43,7 @@ locals {
   EOF
 
   scriptbot_common_provision_with_ansible = <<EOF
-  ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
+  ansible-playbook ~/ares_provisioning_first_stage/ansible-provisioning.yml \
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
@@ -52,7 +52,7 @@ locals {
   EOF
 
   logger_provision_with_ansible = <<EOF
-  ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
+  ansible-playbook ~/ares_provisioning_first_stage/ansible-provisioning.yml \
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
@@ -61,7 +61,7 @@ locals {
   EOF
 
   router_provision_with_ansible = <<EOF
-  ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
+  ansible-playbook ~/ares_provisioning_first_stage/ansible-provisioning.yml \
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
@@ -70,7 +70,7 @@ locals {
   EOF
 
   dispatcher_provision_with_ansible = <<EOF
-  ansible-playbook ~/ares_provisioning/ansible-provisioning.yml \
+  ansible-playbook ~/ares_provisioning_first_stage/ansible-provisioning.yml \
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \

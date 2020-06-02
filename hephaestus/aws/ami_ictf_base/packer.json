@@ -37,10 +37,11 @@
       },
       {
         "type": "ansible-local",
-        "playbook_file": "../../ictf-base/provisioning/ansible-provisioning.yml",
+        "playbook_file": "./ami_ictf_base/ansible-provisioning.yml",
         "extra_arguments": [
           "-e 'ansible_python_interpreter=/usr/bin/python3'",
-          "--become"
+          "--become",
+          "--extra-vars ICTF_USER={{ user `ICTF_USER` }}"
         ]
       }
     ]

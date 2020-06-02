@@ -43,3 +43,17 @@
 
     - name: install awscli V2 
       command: /root/aws/install
+
+      # This folder will be filled by PACKER with the file provisioner
+    - name: create first stage ares provisioning directory
+      file:
+        path: "~/ares_provisioning_first_stage"
+        state: directory
+      become: "{{ ICTF_USER }}"
+
+      # This folder will be filled by TERRAFORM with the file provisioner
+    - name: create second stage ares provisioning directory
+      file:
+        path: "~/ares_provisioning_second_stage"
+        state: directory
+      become: "{{ ICTF_USER }}"

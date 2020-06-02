@@ -43,6 +43,11 @@
         "--become",
         "--extra-vars ICTF_USER={{ user `ICTF_USER` }}"
       ]
+    },
+    {
+      "type": "file",
+      "source": "../../common/ares_provisioning/",
+      "destination": "~/ares_provisioning_first_stage/"
     }
   ]
 }

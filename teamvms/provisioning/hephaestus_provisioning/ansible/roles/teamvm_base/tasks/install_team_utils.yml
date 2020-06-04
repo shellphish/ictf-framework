@@ -1,26 +1,31 @@
-- name: install utils for teams
-  apt:
-    pkg:
-    - zip
-    - tmux
-    - screen
-    - vim
-    - emacs
-    - nano
-    - curl
-    - wget
-    - python2.7
-    - python3
-    - python-pip
-    - python3-pip
-    - ruby
-    - perl
-    - gcc
-    - binutils
-    - build-essential
-    - tcpdump
-    - docker.io
-    - openvpn
+
+- name: install requirements
+  package: name={{ item }} state=latest update_cache=yes
+  with_items:
+    - zip 
+    - tmux 
+    - screen 
+    - vim 
+    - emacs 
+    - nano 
+    - curl 
+    - wget 
+    - python2.7 
+    - python3 
+    - python-pip 
+    - python3-pip 
+    - ruby 
+    - perl 
+    - gcc 
+    - binutils 
+    - build-essential 
+    - tcpdump 
+    - docker.io 
+    - ansible 
+    - socat 
+    - openvpn 
+    - net-tools 
+    - iputils-ping
 
 - name: install docker-compose
   get_url:

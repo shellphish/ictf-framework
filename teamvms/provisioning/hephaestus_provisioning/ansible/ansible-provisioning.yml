@@ -4,15 +4,19 @@
 
   vars:
     - GAME_CONFIG: "{{ lookup('file', '../../../../game_config.json') | from_json }}"
-    - SERVICES: "{{ game_config | json_query('services[?state==`enabled`].name') }}"
-    - TEAM_NAMES: "{{ game_config | json_query('teams[].name') }}"
-    - HOST_SERVICES_PATH: "{{ game_config.service_metadata.host_dir }}"
-    - GUEST_SERVICES_PATH: "{{ game_config.service_metadata.guest_dir }}"
+    - SERVICES: "{{ GAME_CONFIG | json_query('services[?state==`enabled`].name') }}"
+    - TEAM_NAMES: "{{ GAME_CONFIG | json_query('teams[].name') }}"
+    - HOST_SERVICES_PATH: "{{ GAME_CONFIG.service_metadata.host_dir }}"
+    - GUEST_SERVICES_PATH: "{{ GAME_CONFIG.service_metadata.guest_dir }}"
 
   # roles:
   #   - teamvm_base
 
   tasks:
+    - name: print vars 
+      debug:
+        msg: "{{ GUEST_SERVICES_PATH }}"
+
     - name: install base dependencies
       include_role:
         name: teamvm_base
@@ -22,9 +26,9 @@
       include_role:
         name: teamvm_primed
       vars:
-        GUEST_SERVICES_PATH: {{ GUEST_SERVICES_PATH }}
-        HOST_SERVICES_PATH: {{ HOST_SERVICES_PATH }}
-        SERVICES: {{ SERVICES }}
+        PRIMER_GUEST_SERVICES_PATH: "{{ GUEST_SERVICES_PATH }}"
+        PRIMER_HOST_SERVICES_PATH: "{{ HOST_SERVICES_PATH }}"
+        PRIMER_SERVICES: "{{ SERVICES }}"
       when: PRIMER is defined
 
     # - name: fail if SERVICES is not specified

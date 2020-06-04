@@ -16,10 +16,6 @@
     msg: "the teamvm_base should not have services set"
   when: services is defined
 
-- name: update apt cache
-  apt:
-    update_cache: yes
-
 # sysctl
 - name: sysctl
   copy:

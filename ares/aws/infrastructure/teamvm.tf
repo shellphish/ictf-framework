@@ -3,7 +3,7 @@ data "aws_ami" "teamvm" {
 
   filter {
     name   = "name"
-    values = ["primed_teamvm_18.04_*"]
+    values = ["teamvm_primer"]
   }
 
   owners = ["self"]

@@ -24,8 +24,7 @@ if __name__ == '__main__':
         'game_config_file': args.game_config_path,
         'services_path':    game_config["service_metadata"]["host_dir"],
         'teams_num':        len(game_config["teams"]),
-        # 'scriptbot_num':    int(math.ceil(len(game_config["teams"]) / 10.0))
-        'scriptbot_num':    10 
+        'scriptbot_num':    int(math.ceil(len(game_config["teams"]) / 10.0))
     }
 
     if args.dev_mode:

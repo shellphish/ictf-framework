@@ -40,7 +40,7 @@ resource "aws_instance" "teamvm" {
     }
 
     connection {
-        user = "hacker"
+        user = local.ictf_user
         private_key = file("./sshkeys/teamvmmaster-key.key")
         host = self.public_ip
         agent = false

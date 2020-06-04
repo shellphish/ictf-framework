@@ -1,0 +1,5 @@
+# restart handler
+- name: "{{service_name}} restart service"
+  service:
+    name: "{{service_name}}"
+    state: restarted

@@ -1,0 +1,16 @@
+- name: "{{service_name}} - setup service daemon"
+  template:
+    src: template.service.j2
+    dest: "/etc/systemd/system/{{service_name}}.service"
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+  notify:
+    - "{{service_name}} restart service"
+
+- name: "{{service_name}} - enable service"
+  service:
+    name: "{{service_name}}.service"
+    enabled: yes
+  notify:
+    - "{{service_name}} restart service"

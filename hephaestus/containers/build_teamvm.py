@@ -6,7 +6,7 @@ import json
 import shutil
 import shlex
 
-SERVICE_DEST_DIR = '../teamvms/bundled_services'
+SERVICE_DEST_DIR = '../../teamvms/bundled_services'
 
 if not os.path.exists(SERVICE_DEST_DIR):
     os.mkdir(SERVICE_DEST_DIR)

@@ -1,93 +1,106 @@
-- hosts: localhost
+- hosts: all
   remote_user: root
   become: true
 
   vars:
-    - GUEST_SERVICES_PATH: /opt/ictf/services 
+    - GAME_CONFIG: "{{ lookup('file', '../../../../game_config.json') | from_json }}"
+    - SERVICES: "{{ game_config | json_query('services[?state==`enabled`].name') }}"
+    - TEAM_NAMES: "{{ game_config | json_query('teams[].name') }}"
+    - HOST_SERVICES_PATH: "{{ game_config.service_metadata.host_dir }}"
+    - GUEST_SERVICES_PATH: "{{ game_config.service_metadata.guest_dir }}"
+
+  # roles:
+  #   - teamvm_base
 
   tasks:
-    
-    - name: fail if SERVICES is not specified
-      fail:
-        msg: "the teamvm requires SERVICES to be set"
-      when: SERVICES is not defined
-
-    - name: install docker-compose
-      get_url:
-        url: https://github.com/docker/compose/releases/download/1.23.1/docker-compose-Linux-x86_64
-        dest: /usr/local/bin/docker-compose
-        mode: 0755
-
-    - name: add user to docker group
-      command: usermod -aG docker ctf
-
-    ########################    CREATE SERVICE BASE DIRECTORY   ###############################
-    - name: create service directory
-      file:
-        path: "{{ GUEST_SERVICES_PATH }}"
-        owner: ctf
-        group: ctf
-        state: directory
-        mode: 0755
-
-    ########################          DEPLOY THE SERVICES       ###############################
-    - name: deploy CTF services
+    - name: install base dependencies
       include_role:
-        name: deploy_ctf_service
+        name: teamvm_base
+      when: BASE is defined
+    
+    - name: install primed dependencies
+      include_role:
+        name: teamvm_primed
       vars:
-        SERVICE_NAME: "{{item}}"
-      with_items: "{{ SERVICES }}"
+        GUEST_SERVICES_PATH: {{ GUEST_SERVICES_PATH }}
+        HOST_SERVICES_PATH: {{ HOST_SERVICES_PATH }}
+        SERVICES: {{ SERVICES }}
+      when: PRIMER is defined
 
-    - name: Generate docker-compose.yml
-      template:
-        src: ./files/docker-compose.yml.j2
-        dest: "{{GUEST_SERVICES_PATH}}/docker-compose.yml"
+    # - name: fail if SERVICES is not specified
+    #   fail:
+    #     msg: "the teamvm requires SERVICES to be set"
+    #   when: SERVICES is not defined
 
-    # see: https://github.com/betrcode/ansible-run-in-parallel
-    - name: build service docker files in parallel
-      shell: "docker-compose build --parallel"
-      args:
-        chdir: "{{GUEST_SERVICES_PATH}}"
-      when: LOCAL is not defined
+    # # - name: install requirements
+    # #   package: name={{ item }} state=latest update_cache=yes
+    # #   with_items:
+    # #     - zip 
+    # #     - tmux 
+    # #     - screen 
+    # #     - vim 
+    # #     - emacs 
+    # #     - nano 
+    # #     - curl 
+    # #     - wget 
+    # #     - python2.7 
+    # #     - python3 
+    # #     - python-pip 
+    # #     - python3-pip 
+    # #     - ruby 
+    # #     - perl 
+    # #     - gcc 
+    # #     - binutils 
+    # #     - build-essential 
+    # #     - tcpdump 
+    # #     - docker.io 
+    # #     - ansible 
+    # #     - socat 
+    # #     - openvpn 
+    # #     - net-tools 
+    # #     - iputils-ping
 
-    ########################            CLEAN UP YO SHIT        ###############################
-    - name: prune docker cache
-      shell: docker system prune --volumes -f
-      when: LOCAL is not defined
+    # # - name: install docker-compose
+    # #   get_url:
+    # #     url: https://github.com/docker/compose/releases/download/1.25.4/docker-compose-Linux-x86_64
+    # #     dest: /usr/local/bin/docker-compose
+    # #     mode: 0755
 
-    - name: generate .ssh directory
-      file:
-        path: /home/ctf/.ssh
-        state: directory
-        owner: ctf
-        group: ctf
+    # # - name: add user to docker group
+    # #   command: usermod -aG docker ctf
 
-    # - name: copy over authorized_keys
-    #   copy:
-    #     src: /home/hacker/authorized_keys
-    #     dest: /root/.ssh/authorized_keys
-    #     owner: root
-    #     group: root
-    #     mode: 0644
+    # ########################    CREATE SERVICE BASE DIRECTORY   ###############################
+    # - name: create service directory
+    #   file:
+    #     path: "{{ GUEST_SERVICES_PATH }}"
+    #     owner: ctf
+    #     group: ctf
+    #     state: directory
+    #     mode: 0755
 
-    - name: create openvpn log directory
-      file:
-        path:  /var/log/openvpn
-        state: directory
-        owner: root
-        group: root
-        mode:  0755
+    # ########################          DEPLOY THE SERVICES       ###############################
+    # - name: deploy CTF services
+    #   include_role:
+    #     name: deploy_ctf_service
+    #   vars:
+    #     SERVICE_NAME: "{{item}}"
+    #   with_items: "{{ SERVICES }}"
 
-    # - name: move openvpn config
+    # - name: Generate docker-compose.yml
     #   template:
-    #     src:   /opt/ictf/openvpn.conf.j2
-    #     dest:  /etc/openvpn/client.conf
-    #     owner: root
-    #     group: root
-    #     mode:  0644
+    #     src: ./files/docker-compose.yml.j2
+    #     dest: "{{GUEST_SERVICES_PATH}}/docker-compose.yml"
 
-    # - name: reload openvpn config
-    #   command: systemctl daemon-reload
+    # - name: build service docker files in parallel
+    #   shell: "docker-compose build --parallel"
+    #   args:
+    #     chdir: "{{GUEST_SERVICES_PATH}}"
+    #   when: LOCAL is not defined
 
-    # - name: restart openvpn
-    #   command: systemctl restart openvpn
+    # ########################            CLEAN UP YO SHIT        ###############################
+    # - name: prune docker cache
+    #   shell: docker system prune --volumes -f
+    #   when: LOCAL is not defined
+
+
+

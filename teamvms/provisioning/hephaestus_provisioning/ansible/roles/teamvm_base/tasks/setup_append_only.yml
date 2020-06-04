@@ -1,0 +1,11 @@
+- name: install bindfs
+  apt:
+    name: bindfs
+
+- name: setup /etc/fuse for bindfs
+  copy:
+    src: fuse.conf
+    dest: /etc/fuse.conf
+    mode: 0644
+    owner: root
+    group: root

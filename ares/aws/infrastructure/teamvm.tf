@@ -52,7 +52,7 @@ resource "aws_instance" "teamvm" {
 
     provisioner "file" {
         source = "./sshkeys/authorized_keys_team${each.value.id}"
-        destination = "/home/hacker/authorized_keys"
+        destination = "~/authorized_keys"
     }
 
     provisioner "file" {

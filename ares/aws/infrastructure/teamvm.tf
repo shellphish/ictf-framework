@@ -57,7 +57,7 @@ resource "aws_instance" "teamvm" {
 
     provisioner "file" {
         source = "./vpnkeys/team${each.value.id}.ovpn"
-        destination = "/opt/ictf/openvpn.conf.j2"
+        destination = "~/openvpn.conf.j2"
     }
 
     provisioner "local-exec" {

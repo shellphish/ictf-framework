@@ -16,7 +16,7 @@
 
     - name: copy over authorized_keys
       copy:
-        src: /home/hacker/authorized_keys
+        src: /home/ubuntu/authorized_keys
         dest: /home/ctf/.ssh/authorized_keys
         owner: ctf
         group: ctf
@@ -24,7 +24,7 @@
 
     - name: copy over authorized_keys
       copy:
-        src: /home/hacker/authorized_keys
+        src: /home/ubuntu/authorized_keys
         dest: /root/.ssh/authorized_keys
         owner: root
         group: root
@@ -40,7 +40,7 @@
 
     - name: move openvpn config
       template:
-        src:   /opt/ictf/openvpn.conf.j2
+        src:   /home/ubuntu/openvpn.conf.j2
         dest:  /etc/openvpn/client.conf
         owner: root
         group: root

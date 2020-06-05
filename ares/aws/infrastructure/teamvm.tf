@@ -65,7 +65,7 @@ resource "aws_instance" "teamvm" {
     }
 
     provisioner "file" {
-        source = "../../teamvms/provisioning/terraform_provisioning.yml"
+        source = "../../teamvms/provisioning/ares_provisioning/ansible-provisioning.yml"
         destination = "~/terraform_provisioning.yml"
     }
 

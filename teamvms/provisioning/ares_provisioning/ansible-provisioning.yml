@@ -30,14 +30,6 @@
         group: root
         mode: 0644
 
-    - name: create openvpn log directory
-      file:
-        path:  /var/log/openvpn
-        state: directory
-        owner: root
-        group: root
-        mode:  0755
-
     - name: move openvpn config
       template:
         src:   /home/ubuntu/openvpn.conf.j2

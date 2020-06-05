@@ -1,8 +1,0 @@
-- hosts: localhost
-  remote_user: root
-  become: true
-  tasks:
-    - name: launch containers
-      shell:  sudo -u ubuntu bash -c "docker-compose up -d"
-      args:
-        chdir: /opt/ictf/services

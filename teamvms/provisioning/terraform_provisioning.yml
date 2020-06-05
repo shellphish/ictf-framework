@@ -51,3 +51,8 @@
 
     - name: restart openvpn
       command: systemctl restart openvpn
+
+    - name: launch containers
+      shell:  sudo -u ubuntu bash -c "docker-compose up -d"
+      args:
+        chdir: /opt/ictf/services

@@ -69,16 +69,9 @@ resource "aws_instance" "teamvm" {
         destination = "~/terraform_provisioning.yml"
     }
 
-    provisioner "file" {
-        source = "../../teamvms/provisioning/start_services.yml"
-        destination = "/opt/ictf/services/start_services.yml"
-    }
-
     provisioner "remote-exec" {
         inline = [
             "ansible-playbook ~/terraform_provisioning.yml --extra-vars ROUTER_PRIVATE_IP=172.31.172.1 --extra-vars TEAM_ID=${each.value.id}" ,
-            "cd /opt/ictf/services && ansible-playbook start_services.yml --extra-vars TEAM_ID=team${each.value.id}",
-            "rm /opt/ictf/services/start_services.yml",
             "sudo service ssh restart"
         ]
     }

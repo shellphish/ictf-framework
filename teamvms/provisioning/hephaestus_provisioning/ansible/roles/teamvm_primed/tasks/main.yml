@@ -40,6 +40,7 @@
     SERVICE_NAME: "{{ item }}"
     DEPLOY_GUEST_SERVICES_PATH : "{{ PRIMER_GUEST_SERVICES_PATH }}"
     DEPLOY_HOST_SERVICES_PATH: "{{ PRIMER_HOST_SERVICES_PATH }}"
+    DEPLOY_LOCAL: "{{ PRIMER_LOCAL }}"
   with_items: "{{ PRIMER_SERVICES }}"
 
 - name: Generate docker-compose.yml
@@ -51,7 +52,7 @@
   shell: "docker-compose build --parallel"
   args:
     chdir: "{{ PRIMER_GUEST_SERVICES_PATH }}"
-  when: LOCAL is not defined
+  when: PRIMER_LOCAL is not defined
 
 ########################    SETUP bindfs for append-only    ###############################
 - name: setup bindfs for the append only dir
@@ -59,10 +60,10 @@
     path: /etc/fstab
     line: "{{ PRIMER_GUEST_SERVICES_PATH }}/{{item}}/append {{ PRIMER_GUEST_SERVICES_PATH }}/{{item}}/append fuse.bindfs force-user=root,perms=u=rwD:g=r:dg=rwx:o=D"
   with_items: "{{ PRIMER_SERVICES }}"
-  when: LOCAL is not defined
+  when: PRIMER_LOCAL is not defined
 
 ########################            CLEAN UP YO SHIT        ###############################
 - name: prune docker cache
   shell: docker system prune --volumes -f
-  when: LOCAL is not defined
+  when: PRIMER_LOCAL is not defined
 

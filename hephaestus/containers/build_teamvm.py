@@ -39,7 +39,7 @@ def build_teamvm(game_config_path):
             shutil.copytree(os.path.join(services_dir, service['name'], "service"), os.path.join(SERVICE_DEST_DIR, service['name']))
             active_services.append(service['name'])
 
-    cmd = "docker-compose -f ./docker-compose-teamvm.yml build --build-arg services='{}'".format(json.dumps({ 'SERVICES': active_services, 'LOCAL': True }))
+    cmd = "docker-compose -f ./docker-compose-teamvm.yml build --build-arg services='{}'".format(json.dumps({ 'SERVICES': active_services }))
     # os.system(shlex.quote(cmd))
     print(cmd)
 

@@ -3,7 +3,7 @@
   become: true
 
   vars:
-    - GAME_CONFIG: "{{ lookup('file', '../../../../game_config.json') | from_json }}"
+    - GAME_CONFIG: "{{ lookup('file', '{{ GAME_CONFIG_PATH }}') | from_json }}"
     - SERVICES: "{{ GAME_CONFIG | json_query('services[?state==`enabled`].name') }}"
     - TEAM_NAMES: "{{ GAME_CONFIG | json_query('teams[].name') }}"
     - HOST_SERVICES_PATH: "{{ GAME_CONFIG.service_metadata.host_dir }}"
@@ -13,10 +13,6 @@
   #   - teamvm_base
 
   tasks:
-    - name: print vars 
-      debug:
-        msg: "{{ GUEST_SERVICES_PATH }}"
-
     - name: install base dependencies
       include_role:
         name: teamvm_base
@@ -29,6 +25,7 @@
         PRIMER_GUEST_SERVICES_PATH: "{{ GUEST_SERVICES_PATH }}"
         PRIMER_HOST_SERVICES_PATH: "{{ HOST_SERVICES_PATH }}"
         PRIMER_SERVICES: "{{ SERVICES }}"
+        PRIMER_LOCAL: "{{ LOCAL }}"
       when: PRIMER is defined
 
     # - name: fail if SERVICES is not specified

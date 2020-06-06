@@ -16,10 +16,9 @@ requests==2.6.0
 saferedisqueue==3.0.0
 six==1.11.0
 wsgiref==0.1.2
-ujson
-setuptools
+setuptools==44.0.0
 pyOpenSSL
 ndg-httpsclient
 pyasn1
-ujson
+ujson==2.0.0
 python-logstash

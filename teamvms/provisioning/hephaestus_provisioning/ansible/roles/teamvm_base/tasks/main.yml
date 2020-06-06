@@ -21,11 +21,13 @@
   copy:
     src=91-no-redirects.conf
     dest=/etc/sysctl.d/91-no-redirects.conf
+  when: LOCAL is not defined
 
 - name: sysctl-2
   copy:
     src=92-dmesg-restrict.conf
     dest=/etc/sysctl.d/92-dmesg-restrict.conf
+  when: LOCAL is not defined
 
 # TODO: rework this once OpenVPN comes in
 - name: hosts file for the teams
@@ -35,6 +37,7 @@
     owner: root
     group: root
     mode: 0644
+  when: LOCAL is not defined
 
 - name: setup ctf user
   user:
@@ -56,9 +59,11 @@
 
 - name: hide_proc_fs
   import_tasks: setup_proc_hiding.yml
+  when: LOCAL is not defined
 
 - name: setup append only
   import_tasks: setup_append_only.yml
+  when: LOCAL is not defined
 
 - name: create openvpn log directory
   file:
@@ -67,4 +72,3 @@
     owner: root
     group: root
     mode:  0755
-

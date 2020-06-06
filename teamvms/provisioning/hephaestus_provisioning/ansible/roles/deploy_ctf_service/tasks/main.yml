@@ -52,7 +52,7 @@
   - name: SERVICE DEPLOYMENT!
     debug:
       msg: "Currently deploying {{ SERVICE_NAME }}!"
-  
+
   - name: "create required service directories"
     local_action: "command mkdir -p '{{ HOST_SERVICES_PATH }}/{{ SERVICE_NAME }}/service/{{ SERVICE_DIR }}'"
     become: false
@@ -62,23 +62,28 @@
       - append
     loop_control:
       loop_var: SERVICE_DIR
+    when: DEPLOY_LOCAL is not defined
   
   - name: "run `make clean` to get a clean slate for the service files"
     local_action: "command make -C '{{ HOST_SERVICES_PATH }}/{{ SERVICE_NAME }}' clean"
     become: false
+    when: DEPLOY_LOCAL is not defined
   
   - name: "run `make bundle` to create the service files"
     local_action: "command make -C '{{ HOST_SERVICES_PATH }}/{{ SERVICE_NAME }}' bundle"
     become: false
+    when: DEPLOY_LOCAL is not defined
   
   - name: "run `make scriptbot_scripts` to create the docker image containing the scripts executed by scriptbot"
     local_action: "command make -C '{{ HOST_SERVICES_PATH }}/{{ SERVICE_NAME }}' scriptbot_scripts SERVICE_NAME={{ SERVICE_NAME }}"
     become: false
+    when: DEPLOY_LOCAL is not defined
   
   - name: copy over service directory to remote
     synchronize:
       src: "{{ HOST_SERVICES_PATH }}/{{ SERVICE_NAME }}/service/"
       dest: "{{ GUEST_SERVICES_PATH }}/{{ SERVICE_NAME }}/"
+    when: DEPLOY_LOCAL is not defined
   
   - name: set service directory permissions
     file:

@@ -6,8 +6,8 @@ services:
         image: ictf_teamvm
         hostname: teamvm
         build:
-            dockerfile: ./hephaestus/teamvm/Dockerfile
-            context: ../
+            dockerfile: ./hephaestus/containers/teamvm/Dockerfile
+            context: ../../
         entrypoint: /bin/bash
         volumes:
             - type: bind

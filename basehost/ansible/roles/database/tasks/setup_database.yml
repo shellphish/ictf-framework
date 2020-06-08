@@ -23,7 +23,7 @@
   pip:
     name:
       - pip
-      - setuptools
+      - setuptools==44.0.0
       - pyOpenSSL
       - ndg-httpsclient
       - pyasn1

@@ -17,11 +17,11 @@
   pip:
     name:
       - pip
-      - setuptools
+      - setuptools==44.0.0
       - pyOpenSSL
       - ndg-httpsclient
       - pyasn1
-      - ujson
+      - ujson==2.0.0
     state: latest
     extra_args: --upgrade
   become: true

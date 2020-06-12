@@ -52,7 +52,7 @@
   shell: "docker-compose build --parallel"
   args:
     chdir: "{{ PRIMER_GUEST_SERVICES_PATH }}"
-  when: PRIMER_LOCAL is not defined
+  when: PRIMER_LOCAL == false
 
 ########################    SETUP bindfs for append-only    ###############################
 - name: setup bindfs for the append only dir
@@ -60,10 +60,10 @@
     path: /etc/fstab
     line: "{{ PRIMER_GUEST_SERVICES_PATH }}/{{item}}/append {{ PRIMER_GUEST_SERVICES_PATH }}/{{item}}/append fuse.bindfs force-user=root,perms=u=rwD:g=r:dg=rwx:o=D"
   with_items: "{{ PRIMER_SERVICES }}"
-  when: PRIMER_LOCAL is not defined
+  when: PRIMER_LOCAL == false
 
 ########################            CLEAN UP YO SHIT        ###############################
 - name: prune docker cache
   shell: docker system prune --volumes -f
-  when: PRIMER_LOCAL is not defined
+  when: PRIMER_LOCAL == false
 

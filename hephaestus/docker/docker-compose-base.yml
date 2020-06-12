@@ -5,5 +5,5 @@ services:
     ictf_base:
         image: ictf_base
         build:
-            dockerfile: ./hephaestus/containers/0_ictf_base/Dockerfile
+            dockerfile: ./hephaestus/docker/0_ictf_base/Dockerfile
             context: ../../

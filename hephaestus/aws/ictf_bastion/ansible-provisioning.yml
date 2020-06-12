@@ -15,6 +15,7 @@
           - vim 
           - iputils-ping
           - python3-pip
+          - jq
 
     - pip:
         name:
@@ -27,8 +28,14 @@
         path: ~/.virtualenvs
         state: directory
       become: ubuntu
+
+    - name: create .local/bin folder
+      file:
+        path: ~/.local/bin
+        state: directory
+      become: ubuntu
     
-    - name: update bashrc for virtualenvwrapper
+    - name: update bashrc for virtualenvwrapper and add .local/bin to PATH
       lineinfile:
         dest: ~/.bash_profile
         create: True
@@ -41,6 +48,7 @@
         - { line: 'export PIP_VIRTUALENV_BASE=$WORKON_HOME', regexp: '^export PIP_VIRTUALENV_BASE='}
         - { line: 'export PIP_RESPECT_VIRTUALENV=true', regexp: '^export PIP_RESPECT_VIRTUALENV=true'}
         - { line: 'source /usr/local/bin/virtualenvwrapper.sh', regexp: '^source /usr/local/bin/virtualenvwrapper.sh'}
+        - { line: 'export PATH=/home/ubuntu/.local/bin:$PATH', regexp: '^export PATH=/home/ubuntu/.local/bin:\$PATH'}
       become: ubuntu
     
     - name: add user to docker group

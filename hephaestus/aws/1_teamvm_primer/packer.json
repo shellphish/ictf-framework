@@ -38,6 +38,7 @@
         "-e 'ansible_python_interpreter=/usr/bin/python3'",
         "--become",
         "-e PRIMER=1",
+        "-e LOCAL=False",
         "-e GAME_CONFIG_PATH=../../../../game_config.json"
       ]
     }

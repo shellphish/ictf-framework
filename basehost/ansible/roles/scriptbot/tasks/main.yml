@@ -1,3 +1,0 @@
----
-- name: build_scriptbot
-  import_tasks: setup_scriptbot.yml

@@ -1,4 +1,0 @@
-- name: restart ictf-teaminterface
-  service: name=ictf-teaminterface state=restarted
-- name: reload nginx
-  service: name=nginx state=reloaded

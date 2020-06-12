@@ -1,2 +1,0 @@
-ICTF_API_SECRET: "{{ lookup('password', '/opt/ictf/secrets/api_secret length=25') }}"
-ICTF_API_ADDRESS: "{{ lookup('password','/opt/ictf/secrets/api_address length=25') }}"

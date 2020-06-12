@@ -37,7 +37,7 @@
     },
     {
       "type": "ansible-local",
-      "playbook_file": "./ami_ictf_base/ansible-provisioning.yml",
+      "playbook_file": "./ictf_base/ansible-provisioning.yml",
       "extra_arguments": [
         "-e 'ansible_python_interpreter=/usr/bin/python3'",
         "--become",

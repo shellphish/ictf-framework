@@ -1,1 +1,0 @@
-ICTF_API_SECRET: "{{ lookup('file', '{{ICTF_FRAMEWORK_DIR_HOST}}/secrets/database-api/secret') }}"

@@ -1,7 +1,7 @@
 {
   "variables": {
     "ICTF_USER": "ubuntu",
-    "IMAGE_NAME": "teamvm_base_18.04",
+    "IMAGE_NAME": "ictf_bastion_18.04",
     "AWS_ACCESS_KEY": "{{env `AWS_ACCESS_KEY`}}",
     "AWS_SECRET_KEY": "{{env `AWS_SECRET_KEY`}}",
     "AWS_REGION": "{{ env `AWS_REGION` }}",
@@ -24,22 +24,41 @@
         ],
         "most_recent": true
       },
+      "ami_block_device_mappings": [
+        {
+          "device_name": "/dev/sda1",
+          "volume_size": 40,
+          "delete_on_termination": true
+        }
+      ],
       "ssh_username": "{{user `ICTF_USER`}}",
       "tags": {
-        "Description": "TeamVM Base - Ubuntu 18.04 AMI"
+        "Description": "iCTF Bastion - Ubuntu 18.04 AMI"
       }
     }
   ],
   "provisioners": [
     {
-      "type": "ansible",
-      "playbook_file": "../../teamvms/provisioning/hephaestus_provisioning/ansible/ansible-provisioning.yml",
+      "type": "shell",
+      "script": "./install_ansible.sh"
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "./ictf_bastion/ansible-provisioning.yml",
       "extra_arguments": [
         "-e 'ansible_python_interpreter=/usr/bin/python3'",
-        "--become",
-        "-e BASE=1",
-        "-e GAME_CONFIG_PATH=../../../../game_config.json"
+        "--become"
       ]
+    },
+    {
+      "type": "shell",
+      "inline": ["mkdir ~/ictf-framework"]
+    },
+    {
+      "type": "file",
+      "source": "../../",
+      "destination": "~/ictf-framework"
     }
+
   ]
 }

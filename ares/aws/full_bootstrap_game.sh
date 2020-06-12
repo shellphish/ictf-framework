@@ -16,8 +16,20 @@ case $IS_DEVELOP_MODE in
 esac
 
 VAR_FILE_PATH="ictf_game_vars.auto.tfvars.json"
-printf '\n[*] -----------------STEP -1: Sanity check game_config.json ----------------\n'
+printf '\n[*] -----------------STEP -2: Sanity check game_config.json ----------------\n'
 python configlint.py "$GAME_CONFIG_PATH"
+
+printf '\n[*] -----------------STEP -1: Building services scripts images ----------------\n'
+SERVICES_PATH=`cat $GAME_CONFIG_PATH | jq -r .service_metadata.host_dir`
+
+for f in $SERVICES_PATH/*/info.yaml; do
+    echo $f
+    CHALLNAME=$(basename $(dirname "$f"))
+    cd "$SERVICES_PATH/$CHALLNAME"
+    echo "Building scripts for ${CHALLNAME}"
+    SERVICE_NAME="${CHALLNAME}" make scriptbot_scripts
+    cd -
+done
 
 printf '\n[*] ---------------- STEP 0: Generate SSH & OpenVPN credentials ----------------\n'
 ./0_make_credentials.py "$GAME_CONFIG_PATH"

@@ -1,2 +1,0 @@
-- name: restart scriptbot
-  service: name=scriptbot enabled=yes state=started

@@ -1,3 +1,4 @@
+wheel
 requests
 awscli
 boto3
@@ -51,3 +52,4 @@ simplegeneric
 urllib3
 virtualenv
 zope.interface
+python-logstash

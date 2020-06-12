@@ -1,0 +1,53 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  tasks:  
+
+    - name: install basic packages
+      package: name={{ item }} state=latest update_cache=yes
+      become: true
+      with_items:
+          - docker.io
+          - unzip
+          - wget
+          - curl 
+          - vim 
+          - iputils-ping
+
+    - name: add user to docker group
+      command: usermod -aG docker {{ ICTF_USER }}
+  
+    - name: install docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.25.4/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: 0755
+
+    - name: get awscli V2
+      get_url: 
+        url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+        dest: /root/awscliv2.zip
+
+    - name: extract awscli V2 
+      unarchive: 
+        src: /root/awscliv2.zip 
+        dest: /root
+        remote_src: true
+
+    - name: install awscli V2 
+      command: /root/aws/install
+
+      # This folder will be filled by PACKER with the file provisioner
+    - name: create first stage ares provisioning directory
+      file:
+        path: "~/ares_provisioning_first_stage"
+        state: directory
+      become: "{{ ICTF_USER }}"
+
+      # This folder will be filled by TERRAFORM with the file provisioner
+    - name: create second stage ares provisioning directory
+      file:
+        path: "~/ares_provisioning_second_stage"
+        state: directory
+      become: "{{ ICTF_USER }}"

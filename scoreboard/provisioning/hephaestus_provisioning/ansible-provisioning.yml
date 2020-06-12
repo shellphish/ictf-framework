@@ -1,0 +1,156 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  vars:
+    - SCOREBOARD_DEPLOY_PATH: "/opt/ictf/scoreboard"
+    - SCOREBOARD_ASSETS_VERSION: "1.1.1"
+    - SCOREBOARD_NAME: "SWPAG"
+    - ICTF_API_SECRET: "{{ lookup('file', '/opt/ictf/secrets/database-api/secret') }}"
+    - NODE_VERSION: 6
+
+  tasks:
+    - name: create user (home directory will be created by default)
+      user: name=deploy shell=/bin/bash
+    
+    - name: create deploy directory
+      file: path="{{ SCOREBOARD_DEPLOY_PATH }}" owner=deploy recurse=yes
+    
+    - name: create gunicorn directory
+      file: path=/var/log/gunicorn state=directory group=deploy owner=deploy
+      tags: [skip_ansible_lint]
+    
+    - name: "nvm"
+      shell: curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh > /home/deploy/install.sh
+      args:
+        chdir: /home/deploy
+    
+    - name: "nvm install"
+      command: sudo -u deploy bash /home/deploy/install.sh
+      environment:
+        HOME: /home/deploy
+    
+    - name: "node"
+      shell: sudo -u deploy bash -c "source /home/deploy/.nvm/nvm.sh || true && nvm install {{ NODE_VERSION }} && nvm alias default {{ NODE_VERSION }}"
+      args:
+        executable: /bin/bash
+        creates: "/home/deploy/.nvm/versions/{{ NODE_VERSION }}"
+    
+    - name: frontend - install npm packages
+      shell: sudo -u deploy bash -c "source /home/deploy/.nvm/nvm.sh && nvm use {{ NODE_VERSION }} && npm install || true"
+      args:
+        chdir: "{{ SCOREBOARD_DEPLOY_PATH }}"
+      environment:
+        HOME: /home/deploy
+      tags: [skip_ansible_lint]
+    
+    - name: frontend - rebuild node-sass for compatibility with linux
+      shell: sudo -u deploy bash -c "source /home/deploy/.nvm/nvm.sh && nvm use {{ NODE_VERSION }} && npm rebuild node-sass"
+      args:
+        chdir: "{{ SCOREBOARD_DEPLOY_PATH }}"
+      environment:
+        HOME: /home/deploy
+      tags: [skip_ansible_lint]
+    
+    - name: frontend - compile CSS and JS assets
+      shell: sudo -u deploy bash -c "source /home/deploy/.nvm/nvm.sh && nvm use {{ NODE_VERSION }} && npm run build"
+      become: true
+      args:
+        chdir: "{{ SCOREBOARD_DEPLOY_PATH }}"
+      tags: [skip_ansible_lint]
+    
+    - name: frontend - set assets version (index.html)
+      template:
+        src: "{{ ICTF_FRAMEWORK_DIR_HOST }}/scoreboard/app/public/index.html.j2"
+        dest: "{{ SCOREBOARD_DEPLOY_PATH }}/_static/index.html"
+        owner: deploy
+    
+    - name: frontend - set assets version - FIXME
+      shell: "cp {{ SCOREBOARD_DEPLOY_PATH }}/_static/index.js {{ SCOREBOARD_DEPLOY_PATH }}/_static/index.{{ SCOREBOARD_ASSETS_VERSION }}.js && cp {{ SCOREBOARD_DEPLOY_PATH }}/_static/main.css {{ SCOREBOARD_DEPLOY_PATH }}/_static/main.{{ SCOREBOARD_ASSETS_VERSION }}.css"
+      tags: [skip_ansible_lint]
+    
+    - name: frontend - set owner to deploy for _static/
+      file:
+        path="{{ SCOREBOARD_DEPLOY_PATH }}"
+        owner=deploy
+        recurse=yes
+    
+    # setup flaskservice that provides API
+    # - include_role:
+    #     name: register_service_daemon
+    #   vars:
+    #     service_name: ictf-gunicorn
+    #     description: "Gunicorn application server handling ictf API"
+    #     command: "/opt/ictf/scoreboard/bin/run_app.sh"
+    #     working_directory: "/opt/ictf/scoreboard"
+    
+    # NGINX setup, adding a scoreboard site
+    - name: nginx - add ictf-scoreboard-app
+      copy:
+        src: "{{ ICTF_FRAMEWORK_DIR_HOST }}/scoreboard/bin/nginx/ictf-scoreboard.conf"
+        dest: /etc/nginx/sites-available/ictf-scoreboard.conf
+        owner: root 
+        group: root 
+        mode: "u=rw,g=r,o=r"
+    
+    - name: nginx - make site enabled
+      file:
+        src=/etc/nginx/sites-available/ictf-scoreboard.conf
+        dest=/etc/nginx/sites-enabled/ictf-scoreboard.conf
+        owner=root group=root
+        state=link
+    
+    - name: nginx - disable default site
+      file:
+        dest=/etc/nginx/sites-enabled/default
+        state=absent
+      # notify:
+      #   - restart nginx
+    
+    # setup polling service that connects to DB
+    # - include_role:
+    #     name: register_service_daemon
+    #   vars:
+    #     service_name: ictf-poller
+    #     description: "Service to poll for iCTF DB changes"
+    #     command: "/opt/ictf/venv/scoreboard/bin/python poller.py config.json"
+    #     working_directory: "/opt/ictf/scoreboard"
+    
+    # - include_role:
+    #     name: common_server
+    #   vars:
+    #     server_hostname: ScoreBoard
+    
+    # - include_role:
+    #     name: deploy_prometheus_node_exporter
+
+    # - name: setting hostname
+    #   hostname:
+    #     name: "scoreboard"
+
+    # - name: Add mappings to /etc/hosts
+    #   blockinfile:
+    #     dest: /etc/hosts
+    #     block: |
+    #       {{ item.ip }} {{ item.name }}
+    #     marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+    #   with_items:
+    #     - { name: "scoreboard", ip: 127.0.0.1 }
+
+    - name: frontend - ictf-database database connection config.json configuration - set API_ADDRESS
+      replace:
+        name=/opt/ictf/scoreboard/config.json
+        regexp="(THE_API_ADDRESS_GOES_HERE)"
+        replace="{{ ICTF_API_ADDRESS }}"
+
+    - name: frontend - ictf-database database connection config.json configuration - set API_SECRET
+      replace:
+        name=/opt/ictf/scoreboard/config.json
+        regexp="(THESECRETPASSPHRASEGOESHERE)"
+        replace="{{ ICTF_API_SECRET }}"
+
+    - name: logstash - config
+      copy:
+        src=./files/logstash.conf
+        dest=/etc/logstash/conf.d/syslog.conf
+        owner=root group=root mode="u=rw,g=r,o=r"

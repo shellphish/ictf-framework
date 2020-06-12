@@ -1,0 +1,29 @@
+- hosts: all
+  remote_user: root
+  become: true
+
+  vars:
+    - GAME_CONFIG: "{{ lookup('file', '{{ GAME_CONFIG_PATH }}') | from_json }}"
+    - SERVICES: "{{ GAME_CONFIG | json_query('services[?state==`enabled`].name') }}"
+    - TEAM_NAMES: "{{ GAME_CONFIG | json_query('teams[].name') }}"
+    - HOST_SERVICES_PATH: "{{ GAME_CONFIG.service_metadata.host_dir }}"
+    - GUEST_SERVICES_PATH: "{{ GAME_CONFIG.service_metadata.guest_dir }}"
+
+  # roles:
+  #   - teamvm_base
+
+  tasks:
+    - name: install base dependencies
+      include_role:
+        name: teamvm_base
+      when: BASE is defined
+    
+    - name: install primed dependencies
+      include_role:
+        name: teamvm_primed
+      vars:
+        PRIMER_GUEST_SERVICES_PATH: "{{ GUEST_SERVICES_PATH }}"
+        PRIMER_HOST_SERVICES_PATH: "{{ HOST_SERVICES_PATH }}"
+        PRIMER_SERVICES: "{{ SERVICES }}"
+        PRIMER_LOCAL: "{{ LOCAL }}"
+      when: PRIMER is defined

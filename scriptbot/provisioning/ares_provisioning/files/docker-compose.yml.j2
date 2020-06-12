@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+
+    ictf_scriptbot:
+        image: ictf_scriptbot
+        sysctls:
+            - net.core.somaxconn=65535
+
+        volumes:
+            - type: bind
+              source: /var/run/docker.sock
+              target: /var/run/docker.sock
+        
+        ports:
+            - "9100:9100"
+
+        environment:
+            - SCRIPTBOT_ID={{ SCRIPTBOT_ID }}
+            - IS_LOCAL_REGISTRY=0
+            - API_SECRET={{ API_SECRET }}
+            - REGISTRY_USERNAME={{ REGISTRY_USERNAME }}
+            - REGISTRY_PASSWORD={{ REGISTRY_PASSWORD }}
+            - REGISTRY_ENDPOINT={{ REGISTRY_ENDPOINT }}
+            - LOGSTASH_ID=scriptbot{{ SCRIPTBOT_ID }}
+            - RABBIT_ENDPOINT=dispatcher.ictf
+            - RABBIT_USERNAME=dummy
+            - RABBIT_PASSWORD=dummy

@@ -5,11 +5,20 @@ __author__ = 'machiry'
 details of fetching the scripts, number of scripts to run etc and exposes a
 standard interface which can be used to fetch/update scripts to run for each tick.
 """
-import logging
-import random
+from collections import defaultdict
 from datetime import datetime
-from utils import flatten_list
 import coloredlogs
+import itertools
+import json
+import logging
+import logstash
+import pika
+import random
+import time
+
+from utils import flatten_list
+from settings import LOGSTASH_IP, LOGSTASH_PORT
+import settings
 
 
 class ScriptsFacade:
@@ -22,13 +31,113 @@ class ScriptsFacade:
 
         # Set up logging
         log = logging.getLogger('gamebot_scripts')
+        log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         log.setLevel(log_level)
         log_formatter = coloredlogs.ColoredFormatter(ScriptsFacade.LOG_FMT)
         log_handler = logging.StreamHandler()
         log_handler.setFormatter(log_formatter)
         log.addHandler(log_handler)
-
         self.log = log
+
+        # Test connection to RabbitMQ server
+        host        = settings.RABBIT_ENDPOINT
+        username    = settings.RABBIT_USERNAME
+        password    = settings.RABBIT_PASSWORD
+        credentials = pika.PlainCredentials(username, password)
+        self.conn_params = pika.ConnectionParameters(host=host, credentials=credentials)
+        while True:
+            try:
+                connection = pika.BlockingConnection(self.conn_params)
+                log.info("Connection to RabbitMQ dispatcher verified")
+                break
+            except pika.exceptions.AMQPConnectionError as ex:
+                log.info("The RabbitMQ server is not ready yet...")
+                time.sleep(5)
+                continue
+        connection.close()
+
+
+    def load_script_meta(self):
+        services, scripts = {}, {}
+        state = self.db_api.get_full_game_state()
+
+        # Get data out of the dict
+        for service in state['services']:
+            services[int(service['service_id'])] = service
+
+        for script in state['scripts']:
+            d = dict(script)
+            d['service_name'] = services[d['service_id']]['service_name']
+            scripts[int(script['script_id'])] = d
+
+        return scripts, services
+
+
+    def publish_tasks(self, tick_id):
+
+        # Get meta-information on all the scripts
+        scripts, services = self.load_script_meta()
+
+        # Get a list of all scripts to run in the current tick
+        run_scripts = self.db_api.get_scripts_to_run(tick_id)
+        self.log.info("Got {} script execution requests".format(len(run_scripts)))
+
+        teams_scripts = {}
+        for run_script in run_scripts:
+            execution_id   = run_script['id']
+            script_id      = run_script['script_id']
+            target_team_id = run_script['against_team_id']
+            script_meta    = scripts[script_id]
+            service_id     = script_meta['service_id']
+
+            if target_team_id not in teams_scripts:
+                teams_scripts[target_team_id] = defaultdict(list)
+
+            teams_scripts[target_team_id][service_id].append(
+                {
+                    'execution_id' : execution_id,
+                    'script_id'    : script_id,
+                    'script_type'  : script_meta['type'],
+                    'script_name'  : script_meta['script_name'],
+                }
+            )
+
+        # Push work into scripts_queue in equal size chunks
+        chunks = settings.SCRIPTBOT_INSTANCES
+        chunkdict = {}
+        chunksize = len(teams_scripts) // chunks
+        items = iter(teams_scripts.items())
+        list_of_chunks = [dict(itertools.islice(items, chunksize)) for _ in range(chunks-1)]
+        list_of_chunks.append(dict(items))
+
+        # Create metadict with copy of "services" dict and tick_id
+        task_list = []
+        for scripts_to_run in list_of_chunks:
+            task = {
+                'teams'    : scripts_to_run,
+                'services' : services,
+                'tick_id'  : tick_id,
+            }
+            task_list.append(json.dumps(task))
+
+        # Create channel and publish tasks
+        # Durability ensures messages are not lost if dispatcher is rebooted
+        connection = pika.BlockingConnection(self.conn_params)
+        channel = connection.channel()
+        channel.queue_declare(queue='scripts_queue', durable=True)
+        for task in task_list:
+            channel.basic_publish(
+                exchange='',
+                routing_key='scripts_queue',
+                body=task,
+                properties=pika.BasicProperties(
+                    delivery_mode = 2, # make message persistent
+                )
+            )
+            connection.process_data_events()
+        channel.close()
+        connection.close()
+
 
     def update_scripts_to_run(self, tick_id, num_benign, num_exploit, num_get_flags):
         """
@@ -92,7 +201,6 @@ class ScriptsFacade:
 
         self.log.debug("Time to get data and re-arrange scripts information:" + str(datetime.now() - old_time))
 
-        team_total_scripts = {}
         old_time = datetime.now()
         backup_old_time = datetime.now()
         for curr_team in all_teams:
@@ -139,25 +247,15 @@ class ScriptsFacade:
             # other scripts.
             curr_total_scripts = list(set_flag_scripts + others)
             # Add these to the list of scripts to be run against the team.
-            team_total_scripts[curr_team] = curr_total_scripts
+            self.db_api.update_scripts_to_run(curr_team, tick_id, curr_total_scripts)
 
-        self.log.debug("Time to re-arrange scripts for each team and services is:" + str(datetime.now() - old_time))
+        self.log.debug("Upload time to DB for each team/service's scripts:" + str(datetime.now() - old_time))
 
-        # Note: Although there is obvious optimization here.
-        # We can update scripts for each team as they are computed.
-        # But, Ideally we want scripts for all teams to be updated at same time.
-        # This is one way to get closer to the ideal behaviour
-        for team_id in team_total_scripts:
-            old_time = datetime.now()
-            self.log.debug("Starting to update team:" + str(team_id) + " with " +
-                           str(len(team_total_scripts[team_id])) + " scripts to run")
-            self.db_api.update_scripts_to_run(team_id, tick_id, team_total_scripts[team_id])
-            self.log.info("Updated team:" + str(team_id) + " with " + str(len(team_total_scripts[team_id])) +
-                          " scripts to run in:" + str(datetime.now() - old_time))
-
+        # Insert tasks into queue for dispatcher to disperse
+        self.publish_tasks(tick_id)
         self.log.info("Time to update all teams with scripts to run:" + str(datetime.now() - backup_old_time))
-
         return True
+
 
     def update_state_of_services(self, tick_id):
         """
@@ -223,9 +321,3 @@ class ScriptsFacade:
         self.log.info("Time to set states of all services across all teams:" + str(datetime.now() - old_time))
 
         return True
-
-
-
-
-
-

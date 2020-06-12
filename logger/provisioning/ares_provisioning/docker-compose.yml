@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+
+    ictf_logger:
+        image: ictf_logger
+        sysctls:
+            - net.core.somaxconn=65535
+        ports:
+            - "3000:3000"
+            - "5601:5601"
+            - "9000-9999:9000-9999"
+        environment:
+            - LOGSTASH_ID=logger

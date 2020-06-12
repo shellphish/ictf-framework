@@ -1,0 +1,6 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  roles:
+    - common_provisioning

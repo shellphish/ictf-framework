@@ -1,0 +1,40 @@
+---
+- name: setting hostname
+  hostname:
+    name: "{{ COMPONENT_NAME }}"
+
+- name: create .aws directory
+  file:
+    path: "{{ USER_HOME_DIRECTORY }}/.aws"
+    state: directory
+  become_user: "{{ USER }}"
+
+- name: setting permission for deploy script
+  template: 
+    src: aws_credentials.j2
+    dest: "{{ USER_HOME_DIRECTORY }}/.aws/credentials"
+  become_user: "{{ USER }}"
+
+- name: Fix permission for deploy script
+  copy: 
+    src: deploy_on_ec2.sh
+    dest: ~/
+    mode: a+x
+  become_user: "{{ USER }}"
+
+- name: login to docker and pull private image
+  command: "~/deploy_on_ec2.sh {{ AWS_REGION }} {{ AWS_REGISTRY_URL }} {{ COMPONENT_NAME }}"
+  become_user: "{{ USER }}"
+
+# - name: copy docker-compose in home
+#   copy:
+#     src: "{{ USER_HOME_DIRECTORY }}/ares_provisioning/docker-compose.yml"
+#     dest: "{{ USER_HOME_DIRECTORY }}/docker-compose.yml"
+#   become_user: "{{ USER }}"
+
+# - name: start container
+#   shell: docker-compose up -d
+#   args:
+#     chdir: "{{ USER_HOME_DIRECTORY }}"
+#   become_user: "{{ USER }}"
+    

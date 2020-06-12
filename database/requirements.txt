@@ -2,6 +2,7 @@
 #uwsgi
 #boto3
 #pyyaml
+wheel
 Flask==0.12.2
 uWSGI==2.0.15
 PyYAML==3.12

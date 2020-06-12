@@ -1,3 +1,0 @@
-ICTF_API_SECRET: "{{ lookup('file', '/opt/ictf/secrets/database-api/secret') }}"
-ICTF_USER_PASSWORD_SALT: "{{ lookup('file', '/opt/ictf/secrets/database-api/salt') }}"
-ICTF_MYSQL_DATABASE_PASSWORD: "{{ lookup('file', '/opt/ictf/secrets/database-api/mysql') }}"

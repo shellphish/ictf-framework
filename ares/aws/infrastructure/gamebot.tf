@@ -1,16 +1,5 @@
-data "aws_ami" "gamebot" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["harden_gamebot_16.04_*"]
-  }
-
-  owners = ["self"]
-}
-
 resource "aws_instance" "gamebot" {
-    ami = data.aws_ami.gamebot.id
+    ami = data.aws_ami.ictf_base.id
     instance_type = var.gamebot_instance_type
     subnet_id = aws_subnet.master_and_db_range_subnet.id
     vpc_security_group_ids = [aws_security_group.master_subnet_secgrp.id]
@@ -30,18 +19,23 @@ resource "aws_instance" "gamebot" {
     }
 
     connection {
-        user = "hacker"
+        user = local.ictf_user
         private_key = file("./sshkeys/gamebot-key.key")
         host = self.public_ip
         agent = false
     }
 
+    # this folder has already been there in the base image
+    provisioner "file" {
+        source = "../../gamebot/provisioning/ares_provisioning/"
+        destination = "~/ares_provisioning_second_stage"
+    }
+
     provisioner "remote-exec" {
         inline = [
-            "sudo pip install -q ansible",
-            "/usr/local/bin/ansible-playbook /opt/ictf/gamebot/provisioning/terraform_provisioning.yml --extra-vars ICTF_API_ADDRESS=${aws_instance.database.private_ip} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")}",
-            "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
-            "sudo service ssh restart"
+            local.gamebot_provision_with_ansible,
+            "ansible-playbook ~/ares_provisioning_second_stage/ansible-provisioning.yml --extra-vars NUM_SCRIPTBOTS=${var.scriptbot_num} --extra-vars USER=ubuntu",
+            local.start_service_container
         ]
     }
 }

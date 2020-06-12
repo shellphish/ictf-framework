@@ -1,0 +1,26 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  vars:
+    - ICTF_API_SECRET: "{{ lookup('file', '/opt/ictf/secrets/database-api/secret') }}"
+
+  tasks:
+
+  - name: ictf-database database connection settings.py configuration - set ICTF_API_ADDRESS
+    replace:
+      name=/opt/ictf/gamebot/settings.py
+      regexp="(THE_API_ADDRESS_GOES_HERE)"
+      replace="{{ ICTF_API_ADDRESS }}"
+
+  - name: ictf-database database connection config.json configuration - set API_SECRET
+    replace:
+      name=/opt/ictf/gamebot/settings.py
+      regexp="(THESECRETPASSPHRASEGOESHERE)"
+      replace="{{ ICTF_API_SECRET }}"
+
+  - name: logstash - config
+    copy:
+        src=./files/logstash.conf
+        dest=/etc/logstash/conf.d/syslog.conf
+        owner=root group=root mode="u=rw,g=r,o=r"

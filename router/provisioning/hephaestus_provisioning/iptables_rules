@@ -1,0 +1,36 @@
+*mangle
+:PREROUTING ACCEPT [1785:490998]
+:INPUT ACCEPT [1513:458274]
+:FORWARD ACCEPT [132:8112]
+:OUTPUT ACCEPT [1522:458870]
+:POSTROUTING ACCEPT [1654:466982]
+-A POSTROUTING -o tun+ -j TTL --ttl-set 64
+COMMIT
+
+*filter
+:INPUT ACCEPT [1513:458274]
+:FORWARD ACCEPT [80:4800]
+:OUTPUT ACCEPT [1522:458870]
+:TEAM - [0:0]
+-A INPUT -i tun+ -j TEAM
+-A FORWARD -i tun+ -j TEAM
+-A TEAM -f -j DROP
+-A TEAM -p tcp -m tcp --tcp-flags FIN,SYN,RST,PSH,ACK,URG FIN,SYN,RST,PSH,ACK,URG -j DROP
+-A TEAM -p tcp -m tcp --tcp-flags FIN,SYN,RST,PSH,ACK,URG NONE -j DROP
+-A TEAM -p tcp -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A TEAM -p tcp -m state --state NEW -m tcp ! --dport 10000:10100 -j DROP
+-A TEAM ! -d 10.9.0.0/16 -p tcp -m state --state NEW -j DROP
+-A TEAM -p tcp -m state --state NEW -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -j DROP
+-A TEAM -p tcp -m state --state NEW -j ACCEPT
+-A TEAM -d 10.9.0.0/16 -p icmp -m icmp --icmp-type 8 -j ACCEPT
+-A TEAM -p icmp -m icmp --icmp-type 0 -j ACCEPT
+-A TEAM -j DROP
+COMMIT
+
+*nat
+:PREROUTING ACCEPT [178:26936]
+:INPUT ACCEPT [2:140]
+:OUTPUT ACCEPT [8:536]
+:POSTROUTING ACCEPT [8:536]
+-A POSTROUTING -o tun+ -j MASQUERADE
+COMMIT

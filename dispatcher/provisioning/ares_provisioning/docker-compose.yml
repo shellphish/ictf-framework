@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+
+    ictf_dispatcher:
+        image: ictf_dispatcher
+        sysctls:
+            - net.core.somaxconn=65535
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        environment:
+            - RABBIT_USERNAME=dummy
+            - RABBIT_PASSWORD=dummy
+            

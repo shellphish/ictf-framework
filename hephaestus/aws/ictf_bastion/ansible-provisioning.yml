@@ -1,0 +1,75 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  tasks:  
+
+    - name: install basic packages
+      package: name={{ item }} state=latest update_cache=yes
+      become: true
+      with_items:
+          - docker.io
+          - unzip
+          - wget
+          - curl 
+          - vim 
+          - iputils-ping
+          - python3-pip
+          - jq
+
+    - pip:
+        name:
+          - virtualenv
+          - virtualenvwrapper
+        executable: /usr/bin/pip3
+
+    - name: create virtualenvwrapper folder
+      file:
+        path: ~/.virtualenvs
+        state: directory
+      become: ubuntu
+
+    - name: create .local/bin folder
+      file:
+        path: ~/.local/bin
+        state: directory
+      become: ubuntu
+    
+    - name: update bashrc for virtualenvwrapper and add .local/bin to PATH
+      lineinfile:
+        dest: ~/.bash_profile
+        create: True
+        insertafter: EOF
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        - { line: 'export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3', regexp: '^export VIRTUALENVWRAPPER_PYTHON' }
+        - { line: 'export WORKON_HOME=$HOME/.virtualenvs', regexp: '^export WORKON_HOME' }
+        - { line: 'export PIP_VIRTUALENV_BASE=$WORKON_HOME', regexp: '^export PIP_VIRTUALENV_BASE='}
+        - { line: 'export PIP_RESPECT_VIRTUALENV=true', regexp: '^export PIP_RESPECT_VIRTUALENV=true'}
+        - { line: 'source /usr/local/bin/virtualenvwrapper.sh', regexp: '^source /usr/local/bin/virtualenvwrapper.sh'}
+        - { line: 'export PATH=/home/ubuntu/.local/bin:$PATH', regexp: '^export PATH=/home/ubuntu/.local/bin:\$PATH'}
+      become: ubuntu
+    
+    - name: add user to docker group
+      command: usermod -aG docker ubuntu
+  
+    - name: install docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.25.4/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: 0755
+
+    - name: get awscli V2
+      get_url: 
+        url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+        dest: /root/awscliv2.zip
+
+    - name: extract awscli V2 
+      unarchive: 
+        src: /root/awscliv2.zip 
+        dest: /root
+        remote_src: true
+
+    - name: install awscli V2 
+      command: /root/aws/install

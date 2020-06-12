@@ -14,4 +14,4 @@ mv terraform ~/.local/bin
 rm terraform_${VER}_linux_amd64.zip
 cd -
 
-source $1/bin/activate && pip install termcolor cmd2 pycryptodome requests pyaml docker jsonschema
+source $1/bin/activate && pip install termcolor cmd2 pycryptodome requests pyaml docker jsonschema boto3 jinja2

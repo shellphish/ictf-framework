@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+
+    ictf_base:
+        image: ictf_base
+        build:
+            dockerfile: ./hephaestus/docker/0_ictf_base/Dockerfile
+            context: ../../

@@ -3,6 +3,7 @@
 import sys
 from subprocess import check_output, CalledProcessError, Popen
 import logging
+import logstash
 import os
 import signal
 import re
@@ -14,8 +15,6 @@ import threading
 from time import sleep
 sys.path.append(os.path.abspath(join(os.path.dirname(__file__), '..')))
 
-from common.world_constants import CfgKey
-
 SLEEP_TIME = 10
 
 MAX_LOG_SIZE = "10" #MB
@@ -26,6 +25,10 @@ OTHER_CAPTURE_DIR = BASE_CAPTURE_DIR + "/other/"
 OTHER_CAPTURE_FILE = OTHER_CAPTURE_DIR + "ictf_other"
 
 DEBUG_LOG_FILENAME = '/var/log/ictf-pcap-s3.log'
+
+LOGSTASH_PORT = 1717
+LOGSTASH_IP = "localhost"
+
 # set up formatting
 formatter = logging.Formatter('[%(asctime)s] %(levelno)s (%(process)d) %(module)s: %(message)s')
 # set up logging to STDOUT for all levels DEBUG and higher
@@ -38,10 +41,11 @@ fh = logging.FileHandler(DEBUG_LOG_FILENAME)
 fh = logging.FileHandler(DEBUG_LOG_FILENAME)
 fh.setLevel(logging.INFO)
 fh.setFormatter(formatter)
-log = logging.getLogger('MyLogger')
+log = logging.getLogger('ictf-pcap-s3')
 log.setLevel(logging.INFO)
 log.addHandler(sh)
 log.addHandler(fh)
+log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
 
 class InterruptException(Exception):
     pass

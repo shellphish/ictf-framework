@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+
+    ictf_router:
+        image: ictf_router
+        privileged: true
+        sysctls:
+            - net.core.somaxconn=65535
+        environment:
+            - LOGSTASH_ID=router
+        volumes:
+            - /home/ubuntu/openvpn.zip:/etc/openvpn/openvpn.zip
+        network_mode: host

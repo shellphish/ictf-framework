@@ -1,0 +1,64 @@
+{
+  "variables": {
+    "ICTF_USER": "ubuntu",
+    "IMAGE_NAME": "ictf_bastion_18.04",
+    "AWS_ACCESS_KEY": "{{env `AWS_ACCESS_KEY`}}",
+    "AWS_SECRET_KEY": "{{env `AWS_SECRET_KEY`}}",
+    "AWS_REGION": "{{ env `AWS_REGION` }}",
+    "AWS_EC2_INSTANCE_TYPE": "t3.micro"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "ami_name": "{{ user `IMAGE_NAME`}}",
+      "access_key": "{{user `AWS_ACCESS_KEY`}}",
+      "secret_key": "{{user `AWS_SECRET_KEY`}}",
+      "instance_type": "{{user `AWS_EC2_INSTANCE_TYPE`}}",
+      "region": "{{user `AWS_REGION`}}",
+      "source_ami_filter": {
+        "filters": {
+          "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"
+        },
+        "owners": [
+          "099720109477"
+        ],
+        "most_recent": true
+      },
+      "ami_block_device_mappings": [
+        {
+          "device_name": "/dev/sda1",
+          "volume_size": 40,
+          "delete_on_termination": true
+        }
+      ],
+      "ssh_username": "{{user `ICTF_USER`}}",
+      "tags": {
+        "Description": "iCTF Bastion - Ubuntu 18.04 AMI"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "script": "./install_ansible.sh"
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "./ictf_bastion/ansible-provisioning.yml",
+      "extra_arguments": [
+        "-e 'ansible_python_interpreter=/usr/bin/python3'",
+        "--become"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": ["mkdir ~/ictf-framework"]
+    },
+    {
+      "type": "file",
+      "source": "../../",
+      "destination": "~/ictf-framework"
+    }
+
+  ]
+}

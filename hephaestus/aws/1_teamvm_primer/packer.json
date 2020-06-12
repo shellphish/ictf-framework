@@ -1,0 +1,46 @@
+{
+  "variables": {
+    "ICTF_USER": "ubuntu",
+    "IMAGE_NAME": "teamvm_primer",
+    "AWS_ACCESS_KEY": "{{env `AWS_ACCESS_KEY`}}",
+    "AWS_SECRET_KEY": "{{env `AWS_SECRET_KEY`}}",
+    "AWS_REGION": "{{ env `AWS_REGION` }}",
+    "AWS_EC2_INSTANCE_TYPE": "t3.micro"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "ami_name": "{{ user `IMAGE_NAME`}}",
+      "access_key": "{{user `AWS_ACCESS_KEY`}}",
+      "secret_key": "{{user `AWS_SECRET_KEY`}}",
+      "instance_type": "{{user `AWS_EC2_INSTANCE_TYPE`}}",
+      "region": "{{user `AWS_REGION`}}",
+      "source_ami_filter": {
+        "filters": {
+          "name": "teamvm_base_*"
+        },
+        "owners": [
+          "self"
+        ],
+        "most_recent": true
+      },
+      "ssh_username": "{{user `ICTF_USER`}}",
+      "tags": {
+        "Description": "TeamVM Primer"
+      }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "../../teamvms/provisioning/hephaestus_provisioning/ansible/ansible-provisioning.yml",
+      "extra_arguments": [
+        "-e 'ansible_python_interpreter=/usr/bin/python3'",
+        "--become",
+        "-e PRIMER=1",
+        "-e LOCAL=False",
+        "-e GAME_CONFIG_PATH=../../../../game_config.json"
+      ]
+    }
+  ]
+}

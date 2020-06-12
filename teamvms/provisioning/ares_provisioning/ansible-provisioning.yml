@@ -1,0 +1,51 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  tasks:
+    - name: setting {{ TEAM_ID }} hostname
+      hostname:
+        name: "team{{ TEAM_ID }}"
+
+    - name: generate .ssh directory
+      file:
+        path: /home/ctf/.ssh
+        state: directory
+        owner: ctf
+        group: ctf
+
+    - name: copy over authorized_keys
+      copy:
+        src: /home/ubuntu/authorized_keys
+        dest: /home/ctf/.ssh/authorized_keys
+        owner: ctf
+        group: ctf
+        mode: 0644
+
+    - name: copy over authorized_keys
+      copy:
+        src: /home/ubuntu/authorized_keys
+        dest: /root/.ssh/authorized_keys
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: move openvpn config
+      template:
+        src:   /home/ubuntu/openvpn.conf.j2
+        dest:  /etc/openvpn/client.conf
+        owner: root
+        group: root
+        mode:  0644
+
+    - name: reload openvpn config
+      command: systemctl daemon-reload
+
+    - name: restart openvpn
+      command: systemctl restart openvpn
+
+    - name: launch containers
+      shell: docker-compose up -d
+      args:
+        chdir: /opt/ictf/services
+      become_user: ctf

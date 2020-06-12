@@ -28,37 +28,55 @@ variable "router_cidr" {
 }
 
 variable "database_instance_type"  {
-    default = "t2.2xlarge"
+    default = "m5.2xlarge"
     description = "Database AWS instance type"
     type = string
 }
+
 variable "router_instance_type"  {
     default = "m5.8xlarge"
     description = "Router AWS instance type"
     type = string
 }
+
 variable "scriptbot_instance_type"  {
-    default = "t2.2xlarge"
+    default = "m5.2xlarge"
     description = "Script bot AWS instance type"
     type = string
 }
+
 variable "scoreboard_instance_type"  {
-    default = "t2.2xlarge"
+    default = "m5.2xlarge"
     description = "Scoreboard AWS instance type"
     type = string
 }
+
 variable "gamebot_instance_type"  {
-    default = "t2.2xlarge"
+    default = "m5.2xlarge"
     description = "Game bot AWS instance type"
     type = string
 }
+
+variable "dispatcher_instance_type"  {
+    default = "m5.2xlarge"
+    description = "Dispatcer AWS instance type"
+    type = string
+}
+
+variable "logger_instance_type"  {
+    default = "m5.2xlarge"
+    description = "Logger AWS instance type"
+    type = string
+}
+
 variable "teaminterface_instance_type"  {
-    default = "t2.2xlarge"
+    default = "m5.2xlarge"
     description = "Team interface AWS instance type"
     type = string
 }
+
 variable "teamvm_instance_type"  {
-    default = "t2.2xlarge"
+    default = "m5.2xlarge"
     description = "Team VM AWS instance type"
     type = string
 }

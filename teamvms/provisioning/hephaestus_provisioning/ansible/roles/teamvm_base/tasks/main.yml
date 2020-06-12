@@ -1,0 +1,74 @@
+---
+
+############################################ SANITY CHECK ##################################
+- name: fail if guest_services_path is specified
+  fail:
+    msg: "the teamvm should not have guest_services_path set"
+  when: guest_services_path is defined
+
+- name: fail if host_services_path is specified
+  fail:
+    msg: "the teamvm_base should not have host_services_path set"
+  when: host_services_path is defined
+
+- name: fail if services is specified
+  fail:
+    msg: "the teamvm_base should not have services set"
+  when: services is defined
+
+# sysctl
+- name: sysctl
+  copy:
+    src=91-no-redirects.conf
+    dest=/etc/sysctl.d/91-no-redirects.conf
+  when: LOCAL is not defined
+
+- name: sysctl-2
+  copy:
+    src=92-dmesg-restrict.conf
+    dest=/etc/sysctl.d/92-dmesg-restrict.conf
+  when: LOCAL is not defined
+
+# TODO: rework this once OpenVPN comes in
+- name: hosts file for the teams
+  copy:
+    src: teamhosts
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644
+  when: LOCAL is not defined
+
+- name: setup ctf user
+  user:
+    name: ctf
+    uid: 31337
+    shell: /bin/bash
+
+- name: generate .ssh directory
+  file:
+    path: /home/ctf/.ssh
+    state: directory
+    owner: ctf
+    group: ctf
+
+# SUBTASKS
+
+- name: install packages for the teams to use
+  import_tasks: install_team_utils.yml
+
+- name: hide_proc_fs
+  import_tasks: setup_proc_hiding.yml
+  when: LOCAL is not defined
+
+- name: setup append only
+  import_tasks: setup_append_only.yml
+  when: LOCAL is not defined
+
+- name: create openvpn log directory
+  file:
+    path:  /var/log/openvpn
+    state: directory
+    owner: root
+    group: root
+    mode:  0755

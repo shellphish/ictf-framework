@@ -2,6 +2,7 @@ __author__ = 'machiry'
 import urllib
 import json
 import logging
+import logstash
 import coloredlogs
 import requests
 from datetime import datetime
@@ -30,12 +31,18 @@ class DBApi:
     BULK_UPDATE_SERVICE_STATE = 'service/state/set/bulk'
     PING_DBAPI = 'game/ping'
 
+    GET_SCRIPTS_TO_RUN = 'scripts/get/torun/%s'
+    GET_FULL_GAME_STATE = 'game/state'
+
     def __init__(self, db_host=DB_HOST, db_secret=DB_SECRET, log_level=logging.INFO):
 
+        # Set up db
         self.db_host = db_host
         self.db_secret = db_secret
+
         # Set up logging
         log = logging.getLogger('gamebot_dbapi')
+        log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
         log.setLevel(log_level)
         log_formatter = coloredlogs.ColoredFormatter(DBApi.LOG_FMT)
         log_handler = logging.StreamHandler()
@@ -82,8 +89,11 @@ class DBApi:
         :return: True/False depending on whether the db api is up or not.
         """
         target_url = self.__build_url(DBApi.PING_DBAPI)
-        ping_response = urllib.urlopen(target_url[0]).read()
-        return ping_response == 'lareneg'
+        try:
+            ping_response = urllib.urlopen(target_url[0]).read()
+            return ping_response == 'lareneg'
+        except IOError:
+            return False
 
     def get_tick_config(self):
         """
@@ -125,9 +135,9 @@ class DBApi:
             game_id = int(game_state_response['game_id'])
         else:
             game_id = None
-            
+
         return game_id
-    
+
 
     def get_all_team_ids(self):
         """
@@ -179,6 +189,25 @@ class DBApi:
         self.log.info("Got Working Scripts Response")
         return script_response["scripts"]
 
+    def get_scripts_to_run(self, tick_id):
+        """
+        Get a list of all scripts to run in the current tick.
+        API: /scripts/get/torun
+        :return: a list of script execution records
+        """
+        target_url = self.__build_url(DBApi.GET_SCRIPTS_TO_RUN % str(tick_id))
+        r = DBApi._get_json_response(target_url, target_logger=self.log)
+        return r['scripts_to_run']
+
+    def get_full_game_state(self):
+        """
+        Get the game state
+        API: /game/state
+        :return: A huge dict that contains almost everything
+        """
+        target_url = self.__build_url(DBApi.GET_FULL_GAME_STATE)
+        return DBApi._get_json_response(target_url, target_logger=self.log)
+
     def set_service_state(self, service_id, team_id, state, reason):
         """
         Sets state of particular service for particular team.
@@ -214,6 +243,7 @@ class DBApi:
         scripts_run_stats = DBApi._get_json_response(target_url, target_logger=self.log)
         self.log.debug("Time for get_scripts_run_stats api " + str(datetime.now() - old_time))
         scripts_resp = {}
+
         if "script_runs" not in scripts_run_stats:
             self.log.error("Invalid Response from DB API for:" + str(target_url))
         else:

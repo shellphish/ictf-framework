@@ -1,0 +1,175 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  vars:
+    - ICTF_API_SECRET: "{{ lookup('file', '/opt/ictf/secrets/database-api/secret') }}"
+    - ICTF_USER_PASSWORD_SALT: "{{ lookup('file', '/opt/ictf/secrets/database-api/salt') }}"
+    - ICTF_MYSQL_DATABASE_PASSWORD: "{{ lookup('file', '/opt/ictf/secrets/database-api/mysql') }}"
+
+  tasks:  
+    - name: fail if ICTF_API_SECRET is not specified
+      fail:
+        msg: "database requires ICTF_API_SECRET to be set"
+      when: ICTF_API_SECRET is not defined
+
+    - name: fail if ICTF_MYSQL_DATABASE_PASSWORD is not specified
+      fail:
+        msg: "database requires ICTF_MYSQL_DATABASE_PASSWORD to be set"
+      when: ICTF_MYSQL_DATABASE_PASSWORD is not defined
+
+    - name: fail if ICTF_USER_PASSWORD_SALT is not specified
+      fail:
+        msg: "database requires ICTF_USER_PASSWORD_SALT to be set"
+      when: ICTF_USER_PASSWORD_SALT is not defined
+
+    - name: fail if ICTF_API_SECRET is not specified
+      fail:
+        msg: "database requires ICTF_API_SECRET to be set"
+      when: ICTF_API_SECRET is not defined
+          
+    - name: secrets directory permissions
+      file:
+        path=/opt/ictf/secrets/database-api
+        state=directory
+        owner=root group=root mode="u=rwx,g=rx,o=rx"
+    
+    - name: mysql - performance tuning
+      copy:
+        src=./files/mysql.conf
+        dest=/etc/mysql/conf.d/ictf-database.cnf
+        owner=root group=root mode="u=rw,g=r,o=r"
+    
+    - name: mysql - start MySQL service to apply new configurations
+      command: service mysql start
+    
+    - name: mysql - create ictf user
+      mysql_user:
+        name=ictf
+        host=localhost
+        password="{{ ICTF_MYSQL_DATABASE_PASSWORD }}"
+        priv=ictf.*:ALL
+    
+    - name: mysql - create ictf database
+      mysql_db:
+        db=ictf
+    
+    - name: mysql - import ictf tables
+      mysql_db:
+        db=ictf
+        state=import
+        target=/opt/ictf/database/support/schema.sql
+    
+    - name: mysql - configure DB dump area
+      file:
+        path=/media/backups/ictf
+        state=directory
+    
+    - name: mysql - configure DB dump crontab
+      cron:
+        name="dump ictf database"
+        minute="*/20"
+        hour="*"
+        user=root
+        job="mysqldump ictf | gzip > /media/backups/ictf/$(date '+\%Y\%m\%d-\%H\%M.\%S').sql.gz"
+
+    - name: install mysql-connector
+      # We have to install mysql-connector manually because the current
+      # version cannot be installed with pip without a patch:
+      # - https://bugs.mysql.com/bug.php?id=79766
+      # - https://github.com/mysql/mysql-connector-python/pull/9
+      pip:
+        name=/opt/ictf/database/support/mysql-connector-python-2.1.3/
+        virtualenv=/opt/ictf/venv/database
+
+    - name: nginx - allow worker processes, 4 per core
+      lineinfile:
+        dest=/etc/nginx/nginx.conf
+        regexp="(worker_processes).*$"
+        line="worker_processes {{ 4 * ansible_processor_cores }};"
+    
+    - name: nginx - allow more open files
+      lineinfile:
+        dest=/etc/nginx/nginx.conf
+        regexp="^worker_rlimit_nofile"
+        line="worker_rlimit_nofile 512000;"
+        insertafter="(worker_processes).*"
+    
+    - name: nginx - set worker connections to 4096
+      lineinfile:
+        dest=/etc/nginx/nginx.conf
+        regexp="(worker_connections).*$"
+        line="\tworker_connections 4096;"
+    
+    - name: nginx - disable default configuration
+      file:
+        path=/etc/nginx/sites-enabled/default
+        state=absent recurse=no
+    
+    - name: nginx - add ictf-database-api
+      copy:
+        src=./files/nginx.conf
+        dest=/etc/nginx/sites-available/ictf-database-api.conf
+        owner=root group=root mode="u=rw,g=r,o=r"
+    
+    - name: nginx - enable ictf-database-api
+      file:
+        src=/etc/nginx/sites-available/ictf-database-api.conf
+        dest=/etc/nginx/sites-enabled/ictf-database-api.conf
+        owner=root group=root
+        state=link
+
+    - name: install requirements
+      pip:
+        requirements: /opt/ictf/database/requirements.txt
+        virtualenv: /opt/ictf/venv/database
+    
+    - name: ensure /opt/ictf/settings/ exists
+      file:
+        path=/opt/ictf/settings/
+        state=directory
+    
+    - name: ictf-database-api configuration - copy defaults
+      copy:
+        src=/opt/ictf/database/settings.py
+        dest=/opt/ictf/settings/database-api.py
+    
+    - name: ensure log file exists with rw for nobody
+      copy:
+        content: ""
+        dest: /var/log/ictf-database-api.log
+        mode: 0666
+    
+    # TODO: we should be using proper templates here instead or load it or
+    #       set environment variables at best
+    - name: ictf-database-api configuration - disable DEBUG
+      replace:
+        name=/opt/ictf/settings/database-api.py
+        regexp="^(DEBUG).*$"
+        replace="\1 = False"
+    
+    - name: ictf-database-api configuration - set API_SECRET
+      replace:
+        name=/opt/ictf/settings/database-api.py
+        regexp="^(API_SECRET).*$"
+        replace="\1 = \"{{ ICTF_API_SECRET }}\""
+
+    - name: ictf-database-api configuration - set MYSQL_DATABASE_PASSWORD
+      replace:
+        name=/opt/ictf/settings/database-api.py
+        regexp="^(MYSQL_DATABASE_PASSWORD).*$"
+        replace="\1 = \"{{ ICTF_MYSQL_DATABASE_PASSWORD }}\""
+
+    - name: ictf-database-api configuration - set USER_PASSWORD_SALT
+      replace:
+        name=/opt/ictf/settings/database-api.py
+        regexp="^(USER_PASSWORD_SALT).*$"
+        replace="\1 = \"{{ ICTF_USER_PASSWORD_SALT }}\""
+
+    - name: logstash - config
+      copy:
+        src=./files/logstash.conf
+        dest=/etc/logstash/conf.d/syslog.conf
+        owner=root group=root mode="u=rw,g=r,o=r"
+    
+

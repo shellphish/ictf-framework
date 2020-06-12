@@ -14,6 +14,14 @@ output "gamebot_public_ip" {
     value = aws_instance.gamebot.public_ip
 }
 
+output "dispatcher_public_ip" {
+    value = aws_instance.dispatcher.public_ip
+}
+
+output "logger_public_ip" {
+     value = aws_instance.logger.public_ip
+}
+
 output "router_public_ip" {
     value = aws_eip_association.router_ip.public_ip
 }

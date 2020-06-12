@@ -1,8 +1,8 @@
-coloredlogs
+wheel
 nose
-pexpect
-pwntools
-pycrypto
+pycryptodome
 requests
 nclib
 docker
+python-logstash
+pika

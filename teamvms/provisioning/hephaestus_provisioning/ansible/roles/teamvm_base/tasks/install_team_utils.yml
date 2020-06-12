@@ -1,0 +1,37 @@
+
+- name: install requirements
+  package: name={{ item }} state=latest update_cache=yes
+  with_items:
+    - zip 
+    - tmux 
+    - screen 
+    - vim 
+    - emacs 
+    - nano 
+    - curl 
+    - wget 
+    - python2.7 
+    - python3 
+    - python-pip 
+    - python3-pip 
+    - ruby 
+    - perl 
+    - gcc 
+    - binutils 
+    - build-essential 
+    - tcpdump 
+    - docker.io 
+    - ansible 
+    - socat 
+    - openvpn 
+    - net-tools 
+    - iputils-ping
+
+- name: install docker-compose
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.25.4/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: 0755
+
+- name: add user to docker group
+  command: usermod -aG docker ctf

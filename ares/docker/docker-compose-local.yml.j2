@@ -1,0 +1,191 @@
+version: '3.4'
+
+volumes:
+{% for team_id in range(1, num_teams + 1) %}
+    {% for service_name in service_names %}
+    volume_{{ service_name }}_{{ team_id }}:
+    {% endfor %}
+{% endfor %}
+
+networks:
+    master_net:
+        ipam:
+          driver: default
+          config:
+            - subnet: 172.31.128.0/17
+    warzone_net:
+        ipam:
+          driver: default
+          config:
+            - subnet: 162.31.128.0/17
+
+services:
+
+    database:
+        image: ictf_database
+        hostname: database
+        ports:
+            - "5000:80"
+        networks: 
+          master_net:
+            aliases: 
+              - database.ictf
+        sysctls:
+          - net.core.somaxconn=65535
+        environment:
+            - LOGSTASH_ID=database
+
+    gamebot:
+        image: ictf_gamebot
+        hostname: gamebot
+        networks: 
+          master_net:
+            aliases: 
+              - gamebot.ictf
+        environment:
+            - LOGSTASH_ID=gamebot
+            - NUM_SCRIPTBOTS={{ num_scriptbots }}
+            - RABBIT_ENDPOINT=dispatcher.ictf
+            - RABBIT_USERNAME=dummy
+            - RABBIT_PASSWORD=dummy
+
+    scoreboard:
+        image: ictf_scoreboard
+        hostname: scoreboard
+        ports:
+            - "80:80"
+        networks: 
+          master_net:
+            aliases: 
+              - scoreboard.ictf
+        environment:
+            - LOGSTASH_ID=scoreboard
+
+    teaminterface:
+        image: ictf_teaminterface
+        hostname: teaminterface
+        ports:
+            - "8080:80"
+        networks: 
+          master_net:
+            aliases: 
+              - teaminterface.ictf
+        environment:
+            - LOGSTASH_ID=teaminterface
+
+    logger:
+        image: ictf_logger
+        hostname: logger
+        ports:
+            - "5601:5601"
+            - "3000:3000"
+        networks: 
+          master_net:
+            aliases: 
+              - logger.ictf
+        environment:
+            - LOGSTASH_ID=logger
+
+    router:
+        image: ictf_router
+        hostname: router
+        environment:
+            - LOGSTASH_ID=router
+        privileged: true
+        networks: 
+          master_net:
+            ipv4_address: 172.31.172.1
+            aliases: 
+              - router.ictf
+          warzone_net:
+            ipv4_address: 162.31.172.1 
+            aliases: 
+              - router.ictf
+        volumes:
+            - ./vpnkeys/openvpn.zip:/etc/openvpn/openvpn.zip
+
+
+    dispatcher:
+      image: ictf_dispatcher
+      hostname: dispatcher
+      environment:
+        - RABBIT_USERNAME=dummy
+        - RABBIT_PASSWORD=dummy
+      ports:
+          - "5672:5672"
+          - "15672:15672"
+      networks:
+        master_net:
+          aliases:
+            - dispatcher.ictf
+
+{% for scriptbot_id in range(1, num_scriptbots + 1) %}
+    scriptbot{{ scriptbot_id }}:
+        image: ictf_scriptbot
+        hostname: scriptbot{{ scriptbot_id }}
+
+        volumes:
+            - type: bind
+              source: /var/run/docker.sock
+              target: /var/run/docker.sock
+
+        environment:
+            - IS_LOCAL_REGISTRY=1
+            - API_SECRET={{ api_secret }}
+            - REGISTRY_USERNAME="dummy"
+            - REGISTRY_PASSWORD="dummy"
+            - REGISTRY_ENDPOINT="dummy"
+            - LOGSTASH_ID=scriptbot{{ scriptbot_id }}
+            - SCRIPTBOT_ID={{ scriptbot_id }}
+            - RABBIT_ENDPOINT=dispatcher.ictf
+            - RABBIT_USERNAME=dummy
+            - RABBIT_PASSWORD=dummy
+
+        networks: 
+          master_net:
+            aliases: 
+              - scriptbot{{ scriptbot_id }}.ictf
+
+        cap_add:
+          - NET_ADMIN
+{% endfor %}
+{% for team_id in range(1, num_teams + 1) %}
+    teamvm{{ team_id }}:
+        image: ictf_teamvm
+        hostname: team{{ team_id }}
+        depends_on:
+          - router
+
+        volumes:
+        {% for service_name in service_names %}
+            - volume_{{ service_name }}_{{ team_id }}:/opt/ictf/services/{{ service_name }}
+        {% endfor %}
+            - ./vpnkeys/team{{ team_id }}.ovpn:/etc/openvpn/client.conf
+
+        environment:
+            - TEAM_ID={{ team_id }}
+        
+        entrypoint: /bin/bash -c "{{ teamvm_entrypoints[team_id - 1] }} & /root/start.sh"
+
+        privileged: true
+
+        networks: 
+          warzone_net:
+
+{% endfor %}
+
+{% for team_id in range(1, num_teams + 1) %}
+    {% for service_name in service_names %}
+    chall_{{ service_name }}_{{ team_id }}:
+        image: {{ service_name }}
+        hostname: chall_{{ service_name }}_{{ team_id }}
+        depends_on:
+          - teamvm{{ team_id }}
+
+        volumes:
+            - volume_{{ service_name }}_{{ team_id }}:/home/chall/service/
+
+        networks: 
+          warzone_net:
+    {% endfor %}
+{% endfor %}

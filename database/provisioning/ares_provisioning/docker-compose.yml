@@ -1,0 +1,13 @@
+version: '3.4'
+
+services:
+
+    ictf_database:
+        image: ictf_database
+        sysctls:
+            - net.core.somaxconn=65535
+        ports:
+            - "80:80"
+            - "9100:9100"
+        environment:
+            - LOGSTASH_ID=database

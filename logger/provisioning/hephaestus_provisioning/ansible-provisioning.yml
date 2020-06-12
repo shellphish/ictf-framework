@@ -1,0 +1,76 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  tasks:
+    - name: install grafana key
+      apt_key:
+        url: https://packages.grafana.com/gpg.key
+        id:  0D224E82057BCEE1321424B1CA6D481DBD044C76
+
+    - name: install grafana repo
+      apt_repository:
+        repo: deb https://packages.grafana.com/oss/deb stable main
+
+    - name: install packages
+      package:
+        name:
+        - grafana
+        - prometheus
+
+    - name: configure prometheus
+      template:
+        src:  ./files/prometheus.yml.j2
+        dest: /etc/prometheus/prometheus.yml
+
+    - name: install elasticsearch using remote .deb
+      apt:
+        deb: https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.6.2-amd64.deb
+
+    - name: elasticsearch - config file
+      copy:
+        src: ./files/elasticsearch.yml
+        dest: /etc/elasticsearch/
+        owner: root 
+        group: root 
+        mode: "u=rw,g=r,o=r"
+
+    - name: install kibana using remote .deb
+      apt:
+        deb: https://artifacts.elastic.co/downloads/kibana/kibana-7.6.2-amd64.deb
+
+    - name: kibana - config file
+      copy:
+        src: ./files/kibana.yml
+        dest: /etc/kibana/
+        owner: root 
+        group: root
+        mode: "u=rw,g=r,o=r"
+      
+    - name: add dashboards provisioning for Grafana
+      copy:
+        src: ./files/grafana_dashboards.yml
+        dest: /etc/grafana/provisioning/dashboards/
+        owner: root
+        group: grafana
+
+    - name: create dashboard directory for Grafana
+      file:
+        path: /var/lib/grafana/dashboards
+        state: directory
+        owner: grafana
+        group: grafana
+
+    - name: add ICTF Overview dashboard to Grafana
+      copy:
+        src: ./files/ictf_overview_dashboard.json
+        dest: /var/lib/grafana/dashboards/
+        owner: grafana
+        group: grafana
+
+    - name: add Prometheus datasource to Grafana
+      copy:
+        src: ./files/prometheus_datasource.yml
+        dest: /etc/grafana/provisioning/datasources/
+        owner: root
+        group: grafana

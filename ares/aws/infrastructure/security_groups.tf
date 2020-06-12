@@ -28,11 +28,50 @@ resource "aws_security_group" "master_subnet_secgrp" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 
-    ingress { # Prometheus Metrics
+    # Kibana
+    ingress {
+        from_port = 5601
+        to_port = 5601
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    # Grafana
+    ingress {
+        from_port = 3000
+        to_port = 3000
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    # Elasticsearch
+    ingress {
+        from_port = 9200
+        to_port = 9200
+        protocol = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    # Prometheus Metrics
+    ingress { 
         from_port   = 9000
         to_port     = 9999
         protocol    = "tcp"
-        cidr_blocks = ["192.35.222.0/24"]
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
+    ingress {
+        from_port   = 5672
+        to_port     = 5672
+        protocol    = "tcp"
+        cidr_blocks = [var.master_and_db_zone_subnet_cidr]
+    }
+
+    ingress {
+        from_port   = 15672
+        to_port     = 15672
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
     }
 
     egress {
@@ -60,8 +99,8 @@ resource "aws_security_group" "router_secgrp" {
     }
 
     ingress {
-        from_port   = 1100
-        to_port     = 1200
+        from_port   = 1000
+        to_port     = 2000
         protocol    = "udp"
         cidr_blocks = ["0.0.0.0/0"]
     }

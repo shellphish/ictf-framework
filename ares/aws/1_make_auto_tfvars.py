@@ -29,13 +29,17 @@ if __name__ == '__main__':
 
     if args.dev_mode:
         vars.update({
-            "database_instance_type": 't2.small',
-            "router_instance_type": "t2.small",
-            "scriptbot_instance_type": "t2.small",
-            "scoreboard_instance_type": "t2.small",
-            "gamebot_instance_type": "t2.small",
-            "teaminterface_instance_type": "t2.small",
-            "teamvm_instance_type": "t2.small"
+            "database_instance_type": 't3.small',
+            "router_instance_type": "t3.small",
+            "scriptbot_instance_type": "t3.small",
+            "scoreboard_instance_type": "t3.small",
+            "gamebot_instance_type": "t3.small",
+            "teaminterface_instance_type": "t3.small",
+            "teamvm_instance_type": "t3.small",
+            "dispatcher_instance_type": "t3.small",
+            # This instance cannot be less powerful than t3.large otherwise
+            # it won't work
+            "logger_instance_type": "t3.large",
         })
 
     with open('ictf_game_vars.auto.tfvars.json', 'w') as f:

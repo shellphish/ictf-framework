@@ -1,0 +1,21 @@
+version: '3.2'
+services:
+{% for SERVICE in SERVICES %}
+      {{ SERVICE }}:
+        image: {{ SERVICE }}
+        build: ./{{ SERVICE }}
+        volumes:
+        - type: bind
+          source: ./{{ SERVICE }}/ro
+          target: /home/chall/service/ro
+          read_only: true
+        - type: bind
+          source: ./{{ SERVICE }}/rw
+          target: /home/chall/service/rw
+        - type: bind
+          source: ./{{ SERVICE }}/append
+          target: /home/chall/service/append
+        ports:
+        - "{{ 10000 + loop.index }}:6666"
+        restart: always
+{% endfor %}

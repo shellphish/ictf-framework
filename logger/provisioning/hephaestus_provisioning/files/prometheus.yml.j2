@@ -1,0 +1,80 @@
+---
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: example
+
+scrape_configs:
+- job_name: prometheus
+  scrape_interval: 5s
+  scrape_timeout: 5s
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - localhost:9090
+
+- job_name: node
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  scheme: http
+  static_configs:
+  - targets:
+    - database.ictf:9100
+    - gamebot.ictf:9100
+    - scoreboard.ictf:9100
+    - teaminterface.ictf:9100
+    - scriptbot1.ictf:9100
+    - scriptbot2.ictf:9100
+    - scriptbot3.ictf:9100
+    - scriptbot4.ictf:9100
+    - scriptbot5.ictf:9100
+    - scriptbot6.ictf:9100
+    - scriptbot7.ictf:9100
+    - scriptbot8.ictf:9100
+    - scriptbot9.ictf:9100
+    - scriptbot10.ictf:9100
+    - scriptbot11.ictf:9100
+    - scriptbot12.ictf:9100
+    - scriptbot13.ictf:9100
+    - scriptbot14.ictf:9100
+    - scriptbot15.ictf:9100
+    - scriptbot16.ictf:9100
+    - scriptbot17.ictf:9100
+    - scriptbot18.ictf:9100
+    - scriptbot19.ictf:9100
+    - scriptbot20.ictf:9100
+    - scriptbot21.ictf:9100
+    - scriptbot22.ictf:9100
+    - scriptbot23.ictf:9100
+    - scriptbot24.ictf:9100
+    - scriptbot25.ictf:9100
+    - scriptbot26.ictf:9100
+    - scriptbot27.ictf:9100
+    - scriptbot28.ictf:9100
+    - scriptbot29.ictf:9100
+    - scriptbot30.ictf:9100
+    - scriptbot31.ictf:9100
+    - scriptbot32.ictf:9100
+    - scriptbot33.ictf:9100
+    - scriptbot34.ictf:9100
+    - scriptbot35.ictf:9100
+    - scriptbot36.ictf:9100
+    - scriptbot37.ictf:9100
+    - scriptbot38.ictf:9100
+    - scriptbot39.ictf:9100
+    - scriptbot40.ictf:9100
+    - scriptbot41.ictf:9100
+    - scriptbot42.ictf:9100
+    - scriptbot43.ictf:9100
+    - scriptbot44.ictf:9100
+    - scriptbot45.ictf:9100
+    - scriptbot46.ictf:9100
+    - scriptbot47.ictf:9100
+    - scriptbot48.ictf:9100
+    - scriptbot49.ictf:9100
+    - scriptbot50.ictf:9100
+

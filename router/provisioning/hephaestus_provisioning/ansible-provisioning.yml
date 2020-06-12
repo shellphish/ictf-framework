@@ -1,0 +1,56 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  vars:
+    - ICTF_API_SECRET: "{{ lookup('file', '/opt/ictf/secrets/database-api/secret') }}"
+
+  tasks:
+
+    - name: add openvpn key
+      apt_key:
+        id:  30EBF4E73CCE63EEE124DD278E6DA8B4E158C569
+        url: https://swupdate.openvpn.net/repos/repo-public.gpg
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+
+    - name: add openvpn repo
+      apt_repository:
+        repo: deb http://build.openvpn.net/debian/openvpn/release/2.4 xenial main
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+
+    - name: install openvpn
+      apt:
+        name:  openvpn
+        state: latest
+
+    - name: create openvpn log directory
+      file:
+        path:  /var/log/openvpn
+        state: directory
+        owner: root
+        group: root
+        mode:  0755
+
+    - name: logstash - config
+      copy:
+        src=./files/logstash.conf
+        dest=/etc/logstash/conf.d/syslog.conf
+        owner=root group=root mode="u=rw,g=r,o=r"
+
+    # - name: create aws_router_config.yml
+    #   template:
+    #     src: /opt/ictf/router/provisioning/aws_config.yml.j2
+    #     dest: /opt/ictf/router/aws_config.yml
+
+    # - name: Fix permission for configuration file
+    #   file:
+    #     path: /opt/ictf/router/aws_config.yml
+    #     owner: hacker
+    #     group: hacker
+    #     mode: 0755
+    #   notify:
+    #     - restart ictf-tcpdump
+    #     - restart ictf-pcap-s3
+
+    #- name: extract openvpn config directory
+    #  command: unzip -d /etc/openvpn /opt/ictf/openvpn.zip

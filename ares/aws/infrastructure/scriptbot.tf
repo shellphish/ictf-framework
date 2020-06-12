@@ -1,28 +1,10 @@
-//  This module defines all the settings needed by the scriptbot
-
-data "aws_ami" "scriptbot" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["harden_scriptbot_16.04_*"]
-  }
-
-  owners = ["self"]
-}
-
 data "local_file" "ecr_password" {
     filename = "./ecr_password"
     depends_on = [aws_ecr_repository.service_scriptbot_image]
 }
 
-
-locals {
-  registry_id = length(aws_ecr_repository.service_scriptbot_image) == 0 ? "" : aws_ecr_repository.service_scriptbot_image[0].registry_id
-}
-
 resource "aws_instance" "scriptbot" {
-    ami           = data.aws_ami.scriptbot.id
+    ami           = data.aws_ami.ictf_base.id
     instance_type = var.scriptbot_instance_type
     count         = var.scriptbot_num
     key_name      = aws_key_pair.scriptbot-key.key_name
@@ -33,7 +15,7 @@ resource "aws_instance" "scriptbot" {
     depends_on = [aws_ecr_repository.service_scriptbot_image]
 
     connection {
-        user = "hacker"
+        user = local.ictf_user
         private_key = file("./sshkeys/scriptbot-key.key")
         host = self.public_ip
         agent = false
@@ -47,17 +29,22 @@ resource "aws_instance" "scriptbot" {
         Name = "scriptbot${count.index+1}-disk"
     }
 
-    provisioner "remote-exec" {
-        inline = [
-            "sudo pip install -q ansible",
-            "/usr/local/bin/ansible-playbook /opt/ictf/scriptbot/provisioning/terraform_provisioning.yml --extra-vars DOCKER_REGISTRY_USERNAME=AWS --extra-vars DOCKER_REGISTRY_PASSWORD=${data.local_file.ecr_password.content} --extra-vars DOCKER_REGISTRY_ENDPOINT=${local.registry_id}.dkr.ecr.${var.region}.amazonaws.com --extra-vars BOT_ID=${count.index + 1} --extra-vars ALL_BOTS=${var.scriptbot_num} --extra-vars ICTF_API_ADDRESS=${aws_instance.database.private_ip} --extra-vars ICTF_API_SECRET=${file("../../secrets/database-api/secret")} --extra-vars ROUTER_PRIVATE_IP=172.31.172.1 --extra-vars TEAM_COUNT=${var.teams_num}",
-            "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
-            "sudo service ssh restart"
-        ]
-    }
-
     tags = {
         Name = "scriptbot${count.index+1}"
         Type = "Infrastructure"
+    }
+
+    # this folder has already been there in the base image
+    provisioner "file" {
+        source = "../../scriptbot/provisioning/ares_provisioning/"
+        destination = "~/ares_provisioning_second_stage"
+    }
+ 
+    provisioner "remote-exec" {
+        inline = [
+            local.scriptbot_common_provision_with_ansible,
+            "ansible-playbook ~/ares_provisioning_second_stage/ansible-provisioning.yml --extra-vars SCRIPTBOT_ID=${count.index + 1} --extra-vars ALL_BOTS=${var.scriptbot_num} --extra-vars API_SECRET=${file("../../secrets/database-api/secret")} --extra-vars REGISTRY_USERNAME=AWS --extra-vars REGISTRY_PASSWORD=${data.local_file.ecr_password.content} --extra-vars REGISTRY_ENDPOINT=${local.registry_id}.dkr.ecr.${var.region}.amazonaws.com --extra-vars USER=ubuntu",
+            local.start_service_container
+        ]
     }
 }

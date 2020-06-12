@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+
+    ictf_teamvm:
+        image: ictf_teamvm
+        hostname: teamvm
+        build:
+            dockerfile: ./hephaestus/docker/teamvm/Dockerfile
+            context: ../../
+        entrypoint: /bin/bash
+        volumes:
+            - type: bind
+              source: /var/run/docker.sock
+              target: /var/run/docker.sock

@@ -68,7 +68,7 @@ AWS_KEY_TEMPLATE = Template('resource "aws_key_pair" "$keyname" { \n\
 }\n')
 
 # Define the Vms
-VM_NAMES = ['database', 'router', 'gamebot', 'scoreboard', 'teaminterface', 'scriptbot', 'teamvmmaster']
+VM_NAMES = ['database', 'router', 'gamebot', 'scoreboard', 'teaminterface', 'scriptbot', 'teamvmmaster', 'dispatcher', 'logger']
 
 def _execute_terraform_output(args, terraform_path):
     tf_output_process = subprocess.run(
@@ -114,7 +114,7 @@ def generate_ssh_config(terraform_path):
 
         out_f.write('Host *\n')
         out_f.write('  Port 22\n')
-        out_f.write('  User hacker\n')
+        out_f.write('  User ubuntu\n')
         out_f.write('  UserKnownHostsFile "%s/known_hosts"\n' % SSHKEYS_FOLDER)
         out_f.write('  IdentitiesOnly yes\n\n')
 

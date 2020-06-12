@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import logging
+import logstash
 import os
 import signal
 import subprocess
@@ -21,6 +22,9 @@ OTHER_CAPTURE_DIR = BASE_CAPTURE_DIR + "/other/"
 OTHER_CAPTURE_FILE = OTHER_CAPTURE_DIR + "ictf_other"
 
 DEBUG_LOG_FILENAME = '/var/log/ictf-pcap-rm.log'
+LOGSTASH_PORT = 1717
+LOGSTASH_IP = "localhost"
+
 # set up formatting
 formatter = logging.Formatter('[%(asctime)s] %(levelno)s (%(process)d) %(module)s: %(message)s')
 # set up logging to STDOUT for all levels DEBUG and higher
@@ -37,6 +41,7 @@ log = logging.getLogger('MyLogger')
 log.setLevel(logging.INFO)
 log.addHandler(sh)
 log.addHandler(fh)
+log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
 
 class InterruptException(Exception):
     pass

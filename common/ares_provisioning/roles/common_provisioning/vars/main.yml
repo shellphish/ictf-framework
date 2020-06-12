@@ -1,0 +1,3 @@
+AWS_REGISTRY_URL: "{{ AWS_REGISTRY_URL | regex_replace('/.*', '') }}"
+USER_HOME_DIRECTORY: /home/ubuntu
+USER: ubuntu

@@ -1,0 +1,11 @@
+- hosts: localhost
+  remote_user: root
+  become: true
+
+  tasks:
+  
+    - name: logstash - config
+      copy:
+        src=./files/logstash.conf
+        dest=/etc/logstash/conf.d/syslog.conf
+        owner=root group=root mode="u=rw,g=r,o=r"

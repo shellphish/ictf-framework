@@ -3,7 +3,7 @@ data "aws_ami" "teamvm" {
 
   filter {
     name   = "name"
-    values = ["primed_teamvm_18.04_*"]
+    values = ["teamvm_primer"]
   }
 
   owners = ["self"]
@@ -40,7 +40,7 @@ resource "aws_instance" "teamvm" {
     }
 
     connection {
-        user = "hacker"
+        user = local.ictf_user
         private_key = file("./sshkeys/teamvmmaster-key.key")
         host = self.public_ip
         agent = false
@@ -52,12 +52,12 @@ resource "aws_instance" "teamvm" {
 
     provisioner "file" {
         source = "./sshkeys/authorized_keys_team${each.value.id}"
-        destination = "/home/hacker/authorized_keys"
+        destination = "~/authorized_keys"
     }
 
     provisioner "file" {
         source = "./vpnkeys/team${each.value.id}.ovpn"
-        destination = "/opt/ictf/openvpn.conf.j2"
+        destination = "~/openvpn.conf.j2"
     }
 
     provisioner "local-exec" {
@@ -65,24 +65,14 @@ resource "aws_instance" "teamvm" {
     }
 
     provisioner "file" {
-        source = "../../teamvms/provisioning/terraform_provisioning.yml"
-        destination = "/home/hacker/terraform_provisioning.yml"
-    }
-
-    provisioner "file" {
-        source = "../../teamvms/provisioning/start_services.yml"
-        destination = "/opt/ictf/services/start_services.yml"
+        source = "../../teamvms/provisioning/ares_provisioning/ansible-provisioning.yml"
+        destination = "~/terraform_provisioning.yml"
     }
 
     provisioner "remote-exec" {
         inline = [
-            "ansible-playbook /home/hacker/terraform_provisioning.yml --extra-vars ROUTER_PRIVATE_IP=172.31.172.1 --extra-vars TEAM_ID=${each.value.id}" ,
-            "cd /opt/ictf/services && ansible-playbook start_services.yml --extra-vars TEAM_ID=team${each.value.id}",
-            "rm /opt/ictf/services/start_services.yml",
-            "echo 'hacker' | sudo sed -i '/^#PasswordAuthentication[[:space:]]yes/c\\PasswordAuthentication no' /etc/ssh/sshd_config",
+            "ansible-playbook ~/terraform_provisioning.yml --extra-vars ROUTER_PRIVATE_IP=172.31.172.1 --extra-vars TEAM_ID=${each.value.id}" ,
             "sudo service ssh restart"
         ]
     }
 }
-
-

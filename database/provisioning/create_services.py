@@ -114,12 +114,10 @@ def create_all_services(db_api_url_base, db_secret, services_info, services_fold
 
 
 if __name__ == "__main__":
-    game_config = json.load(open(sys.argv[3], 'r'))
+    game_config = json.load(open(sys.argv[2], 'r'))
 
     db_api = sys.argv[1]  # passed by terraform
     database_api_secret_path = SECRETS_FOLDER + "database-api/secret"
-
-    services_folder_path = sys.argv[2]  # passed by terraform
 
     if not os.path.isfile(database_api_secret_path):
         raise Exception("Missing database secrets!")
@@ -127,4 +125,4 @@ if __name__ == "__main__":
     with open(database_api_secret_path, "r") as f:
         database_api_secret = f.read().rstrip()
 
-    create_all_services('http://{}'.format(db_api), database_api_secret, game_config['services'], services_folder_path)
+    create_all_services('http://{}'.format(db_api), database_api_secret, game_config['services'], game_config["service_metadata"]['host_dir'])

@@ -54,6 +54,8 @@ resource "aws_instance" "router" {
         Name = "router-disk"
     }
 
+    depends_on = [aws_ecr_repository.ictf_router]
+
     connection {
         user = local.ictf_user
         private_key = file("./sshkeys/router-key.key")

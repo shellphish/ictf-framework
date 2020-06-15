@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import time
 import base64
 import json
 import textwrap
@@ -44,7 +45,7 @@ def populate_registry(aws_access_key, aws_secret_key, aws_region,
 
     print("[+] Logging into the registry {}.".format(registry_id))
     # docker_client = docker.from_env()
-    docker_client = docker.from_env(timeout=300)
+    docker_client = docker.from_env(timeout=1200)
     docker_client.login(
         username=registry_username,
         password=registry_password,
@@ -58,13 +59,18 @@ def populate_registry(aws_access_key, aws_secret_key, aws_region,
     docker_image = docker_client.images.get(image_name)
     docker_image.tag(repository_url)
     print("[+] Pushing image {} to registry {}".format(repository_url, registry_id))
-    docker_client.images.push(repository_url, stream=True, decode=True)
-    for status in docker_client.images.push(repository_url, stream=True, decode=True):
-        # print("[+]      Result: {}".format(status))
-        if 'error' in status:
-            raise DockerPushException("Could not push image to remote: {}".format(json.dumps(status, indent=2)))
-    else:
-        print("[+]      Result: {}".format(status))
+    docker_client.images.push(repository_url)
+    # docker_client.images.push(repository_url, stream=True, decode=True)
+    # for status in docker_client.images.push(repository_url, stream=True, decode=True):
+    #     # print("[+]      Result: {}".format(status))
+    #     if 'error' in status and status['error'] == "toomanyrequests: Rate exceeded":
+    #         time.sleep(1)
+    #         continue
+    #     elif 'error' in status:
+    #         raise DockerPushException("Could not push image to remote: {}".format(json.dumps(status, indent=2)))
+
+    # else:
+    #     print("[+]      Result: {}".format(status))
     # Housekeeping
     print("[+] Removing local image {}".format(repository_url))
     docker_client.images.remove(repository_url)

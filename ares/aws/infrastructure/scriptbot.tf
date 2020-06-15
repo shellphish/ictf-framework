@@ -12,7 +12,7 @@ resource "aws_instance" "scriptbot" {
     subnet_id = aws_subnet.master_and_db_range_subnet.id
     vpc_security_group_ids = [aws_security_group.master_subnet_secgrp.id]
 
-    depends_on = [aws_ecr_repository.service_scriptbot_image]
+    depends_on = [aws_ecr_repository.service_scriptbot_image, aws_ecr_repository.ictf_scriptbot]
 
     connection {
         user = local.ictf_user

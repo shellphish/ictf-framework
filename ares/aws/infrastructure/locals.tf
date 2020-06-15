@@ -11,7 +11,7 @@ locals {
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
-    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_database \
+    --extra-vars AWS_REGISTRY_URL=${aws_ecr_repository.ictf_database.repository_url} \
     --extra-vars COMPONENT_NAME=database
   EOF
 
@@ -20,7 +20,7 @@ locals {
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
-    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_gamebot \
+    --extra-vars AWS_REGISTRY_URL=${aws_ecr_repository.ictf_gamebot.repository_url} \
     --extra-vars COMPONENT_NAME=gamebot
   EOF
 
@@ -29,7 +29,7 @@ locals {
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
-    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_scoreboard \
+    --extra-vars AWS_REGISTRY_URL=${aws_ecr_repository.ictf_scoreboard.repository_url} \
     --extra-vars COMPONENT_NAME=scoreboard
   EOF
 
@@ -38,7 +38,7 @@ locals {
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
-    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_teaminterface \
+    --extra-vars AWS_REGISTRY_URL=${aws_ecr_repository.ictf_teaminterface.repository_url} \
     --extra-vars COMPONENT_NAME=teaminterface
   EOF
 
@@ -47,7 +47,7 @@ locals {
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
-    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_scriptbot \
+    --extra-vars AWS_REGISTRY_URL=${aws_ecr_repository.ictf_scriptbot.repository_url} \
     --extra-vars COMPONENT_NAME=scriptbot
   EOF
 
@@ -56,7 +56,7 @@ locals {
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
-    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_logger \
+    --extra-vars AWS_REGISTRY_URL=${aws_ecr_repository.ictf_logger.repository_url} \
     --extra-vars COMPONENT_NAME=logger
   EOF
 
@@ -65,7 +65,7 @@ locals {
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
-    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_router \
+    --extra-vars AWS_REGISTRY_URL=${aws_ecr_repository.ictf_router.repository_url} \
     --extra-vars COMPONENT_NAME=router
   EOF
 
@@ -74,7 +74,7 @@ locals {
     --extra-vars AWS_ACCESS_KEY=${var.access_key} \
     --extra-vars AWS_SECRET_KEY=${var.secret_key} \
     --extra-vars AWS_REGION=${var.region} \
-    --extra-vars AWS_REGISTRY_URL=527285246025.dkr.ecr.us-west-1.amazonaws.com/ictf_dispatcher \
+    --extra-vars AWS_REGISTRY_URL=${aws_ecr_repository.ictf_dispatcher.repository_url} \
     --extra-vars COMPONENT_NAME=dispatcher
   EOF
 

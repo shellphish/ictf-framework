@@ -29,6 +29,8 @@ resource "aws_instance" "scoreboard" {
         Name = "scoreboard-disk"
     }
 
+    depends_on = [aws_ecr_repository.ictf_scoreboard]
+
     connection {
         user = local.ictf_user
         private_key = file("./sshkeys/scoreboard-key.key")

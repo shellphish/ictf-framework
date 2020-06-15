@@ -18,6 +18,8 @@ resource "aws_instance" "gamebot" {
         Name = "gamebot-disk"
     }
 
+    depends_on = [aws_ecr_repository.ictf_gamebot]
+
     connection {
         user = local.ictf_user
         private_key = file("./sshkeys/gamebot-key.key")

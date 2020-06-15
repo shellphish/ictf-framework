@@ -18,6 +18,8 @@ resource "aws_instance" "dispatcher" {
         Name = "dispatcher-disk"
     }
 
+    depends_on = [aws_ecr_repository.ictf_dispatcher]
+
     connection {
         user = local.ictf_user
         private_key = file("./sshkeys/dispatcher-key.key")

@@ -18,6 +18,8 @@ resource "aws_instance" "logger" {
         Name = "logger-disk"
     }
 
+    depends_on = [aws_ecr_repository.ictf_logger]
+
     connection {
         user = local.ictf_user
         private_key = file("./sshkeys/logger-key.key")

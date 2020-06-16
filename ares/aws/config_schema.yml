@@ -16,6 +16,7 @@ properties:
           type: string
           enum:
             - "enabled"
+            - "disabled"
         name:
           type: string
   service_metadata:

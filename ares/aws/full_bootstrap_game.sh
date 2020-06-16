@@ -23,8 +23,10 @@ python configlint.py "$GAME_CONFIG_PATH"
 
 printf '\n[*] -----------------STEP -1: Building services scripts images ----------------\n'
 SERVICES_PATH=`cat $GAME_CONFIG_PATH | jq -r .service_metadata.host_dir`
+ACTIVE_SERVICES=`cat $GAME_CONFIG_PATH | jq -r '.services | to_entries[] | select(.value.state == "enabled") | .value.name'`
 
-for f in $SERVICES_PATH/*/info.yaml; do
+for a in $ACTIVE_SERVICES; do
+    f=$SERVICES_PATH/$a/info.yaml
     echo $f
     CHALLNAME=$(basename $(dirname "$f"))
     cd "$SERVICES_PATH/$CHALLNAME"

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 AWS_ACCESS_KEY="$1"
 AWS_SECRET_KEY="$2"
 AWS_REGION="$3"

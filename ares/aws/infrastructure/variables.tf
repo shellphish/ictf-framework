@@ -109,4 +109,53 @@ variable "services_path" {
 variable "game_config_file" {
     description = "Path to the game cofiguration file"
     type = string
+    
+}
+
+variable "database_registry_repository_url" {
+    description = "Registry repository url pointing to the database docker image"
+    type = string
+    default = ""
+}
+
+variable "gamebot_registry_repository_url" {
+    description = "Registry repository url pointing to the gamebot docker image"
+    type = string
+    default = ""
+}
+
+variable "scoreboard_registry_repository_url" {
+    description = "Registry repository url pointing to the scoreboard docker image"
+    type = string
+    default = ""
+}
+
+variable "teaminterface_registry_repository_url" {
+    description = "Registry repository url pointing to the teaminterface docker image"
+    type = string
+    default = ""
+}
+
+variable "scriptbot_registry_repository_url" {
+    description = "Registry repository url pointing to the scriptbot docker image"
+    type = string
+    default = ""
+}
+
+variable "logger_registry_repository_url" {
+    description = "Registry repository url pointing to the logger docker image"
+    type = string
+    default = ""
+}
+
+variable "router_registry_repository_url" {
+    description = "Registry repository url pointing to the router docker image"
+    type = string
+    default = ""
+}
+
+variable "dispatcher_registry_repository_url" {
+    description = "Registry repository url pointing to the dispatcher docker image"
+    type = string
+    default = ""
 }

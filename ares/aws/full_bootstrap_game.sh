@@ -10,6 +10,8 @@ GAME_CONFIG_PATH="$4"
 
 IS_DEVELOP_MODE=${5:-""}
 
+REGISTRY_URL="none"
+
 case $IS_DEVELOP_MODE in
   -d | --dev-mode) IS_DEVELOP_MODE="-d" ;;
   * ) IS_DEVELOP_MODE="" ;;
@@ -34,8 +36,19 @@ done
 printf '\n[*] ---------------- STEP 0: Generate SSH & OpenVPN credentials ----------------\n'
 ./0_make_credentials.py "$GAME_CONFIG_PATH"
 
+printf "\n"
+read -p "Did you prepopulate the docker registry? (yes) " choice
+case "$choice" in
+  yes ) 
+    read -p "Insert registry URL " REGISTRY_URL
+    ;;
+  * ) 
+    printf "The images will be uploaded during the infrastructure deployment"
+    ;;
+esac
+
 printf '\n[*] ---------------- STEP 1: Create terraform variables file ----------------\n'
-./1_make_auto_tfvars.py "$AWS_ACCESS_KEY" "$AWS_SECRET_KEY" "$AWS_REGION" "$GAME_CONFIG_PATH" $IS_DEVELOP_MODE
+./1_make_auto_tfvars.py "$AWS_ACCESS_KEY" "$AWS_SECRET_KEY" "$AWS_REGION" "$GAME_CONFIG_PATH" "$REGISTRY_URL" $IS_DEVELOP_MODE 
 
 printf '\n[*] ---------------- STEP 2: terraform init ----------------'
 terraform init ./infrastructure

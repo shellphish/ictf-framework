@@ -36,7 +36,7 @@ resource "aws_instance" "gamebot" {
     provisioner "remote-exec" {
         inline = [
             local.gamebot_provision_with_ansible,
-            "ansible-playbook ~/ares_provisioning_second_stage/ansible-provisioning.yml --extra-vars NUM_SCRIPTBOTS=${var.scriptbot_num} --extra-vars USER=ubuntu",
+            "ansible-playbook ~/ares_provisioning_second_stage/ansible-provisioning.yml --extra-vars NUM_SCRIPTBOTS=${var.scriptbot_num} --extra-vars USER=ubuntu --extra-vars DISPATCHER_IP=${aws_instance.dispatcher.private_ip}",
             local.start_service_container
         ]
     }

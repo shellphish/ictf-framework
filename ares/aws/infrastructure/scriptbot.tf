@@ -43,7 +43,7 @@ resource "aws_instance" "scriptbot" {
     provisioner "remote-exec" {
         inline = [
             local.scriptbot_common_provision_with_ansible,
-            "ansible-playbook ~/ares_provisioning_second_stage/ansible-provisioning.yml --extra-vars SCRIPTBOT_ID=${count.index + 1} --extra-vars ALL_BOTS=${var.scriptbot_num} --extra-vars API_SECRET=${file("../../secrets/database-api/secret")} --extra-vars REGISTRY_USERNAME=AWS --extra-vars REGISTRY_PASSWORD=${data.local_file.ecr_password.content} --extra-vars REGISTRY_ENDPOINT=${local.registry_id}.dkr.ecr.${var.region}.amazonaws.com --extra-vars USER=ubuntu",
+            "ansible-playbook ~/ares_provisioning_second_stage/ansible-provisioning.yml --extra-vars SCRIPTBOT_ID=${count.index + 1} --extra-vars ALL_BOTS=${var.scriptbot_num} --extra-vars API_SECRET=${file("../../secrets/database-api/secret")} --extra-vars REGISTRY_USERNAME=AWS --extra-vars REGISTRY_PASSWORD=${data.local_file.ecr_password.content} --extra-vars REGISTRY_ENDPOINT=${local.registry_id}.dkr.ecr.${var.region}.amazonaws.com --extra-vars USER=ubuntu --extra-vars DISPATCHER_IP=${aws_instance.dispatcher.private_ip}",
             local.start_service_container
         ]
     }

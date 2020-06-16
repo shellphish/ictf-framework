@@ -9,6 +9,7 @@ resource "aws_instance" "database" {
     vpc_security_group_ids = [aws_security_group.master_subnet_secgrp.id]
     key_name = aws_key_pair.database-key.key_name
 
+    depends_on = [aws_ecr_repository.ictf_database]
 
     root_block_device {
         volume_size = 100

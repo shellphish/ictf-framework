@@ -581,7 +581,7 @@ def script_ran(script_run_id):
 def get_latest_enabled_scripts():
     """The ``/scripts/latest/enabled`` endpoint requires authentication.
     It is used to get latest enabled scripts for all services submitted
-    by all teams including master/organizer where the team id will be
+    by all teams including main/organizer where the team id will be
     Null.
 
     The JSON response is:

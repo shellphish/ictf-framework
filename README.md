@@ -1,4 +1,4 @@
-# The iCTF Framework
+# The iCTF Framework 3.0
 
 This is the framework that [Shellphish](http://www.shellphish.net) uses to host the [iCTF](http://ictf.cs.ucsb.edu).
 
@@ -11,18 +11,14 @@ We are planning to release more technical documentation regarding each component
 
 If you have questions, please send an email to ctf-admin@lists.cs.ucsb.edu. 
 
-**DISCLAIMER**: This framework is still a work in progress and this release have to be considered as an **ALPHA** version. New pull requests and new issues are welcome :)
+**DISCLAIMER**: This framework is still a work in progress and this release have to be considered a **BETA** version. New pull requests and new issues are welcome :)
 
 ## TODOs and known issues
 
 - The codebase needs to be cleaned from old pieces of unused code.
 - Finish to port every component to python 3.
 - Finish to document the various components.
-- Logs are scattered among all different components and currently there isn't an easy way to query them.
-- Scriptbot, although it's replicated, is currently not fault tolerant.
 - Extend the framework to support multiple cloud providers other than AWS.
-- Implment a built in resource monitoring system.
-- The images building process sometimes does not terminate correctly. The solution so far is to re-execute the `make all -j` comand until it terminates.
 - The CTF cannot be run for more than 12 hours because the credentials we use to login to the docker registry will expire after such time and we currently don't have a way to renew them when the game is running.
 
 ## Database

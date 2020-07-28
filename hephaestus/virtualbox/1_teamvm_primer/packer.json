@@ -1,0 +1,33 @@
+{
+    "variables": {
+      "IMAGE_NAME": "teamvm", 
+      "ICTF_USER": "ubuntu",
+      "BASE_IMAGE_NAME": "teamvm_base_18.04.ova"
+    }, 
+    "builders": [
+      {
+        "type": "virtualbox-ovf",
+        "source_path": "./build/teamvm_base/{{user `BASE_IMAGE_NAME`}}",
+        "output_directory": "./build/teamvm_primed",
+        "vm_name": "teamvm_primed_ubuntu_18.04",
+        "ssh_username": "{{user `ICTF_USER`}}",
+        "ssh_password": "{{user `ICTF_USER`}}",
+        "shutdown_command": "echo {{user `ICTF_USER`}} | sudo -S shutdown -P now",
+        "headless": "true",
+        "format": "ova"
+      }
+    ],
+    "provisioners": [
+        {
+          "type": "ansible",
+          "playbook_file": "../../teamvms/provisioning/hephaestus_provisioning/ansible/ansible-provisioning.yml",
+          "extra_arguments": [
+            "-e 'ansible_python_interpreter=/usr/bin/python3'",
+            "--become",
+            "-e PRIMER=1",
+            "-e LOCAL=False",
+            "-e GAME_CONFIG_PATH=../../../../game_config.json"
+          ]
+        }
+      ]
+  }

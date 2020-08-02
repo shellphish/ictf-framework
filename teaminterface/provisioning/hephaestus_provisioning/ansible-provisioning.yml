@@ -4,9 +4,8 @@
 
   vars:
 
-    - ICTF_DB_API_SECRET: "{{ lookup('password','/opt/ictf/secrets/ti_secret length=25') }}"
     - ICTF_TI_SERVER_URL: "https://api.seba.net"
-    - ICTF_API_SECRET: "{{ lookup('file', '/opt/ictf/secrets/database-api/secret') }}"
+    - ICTF_DB_API_SECRET: "{{ lookup('file', '/opt/ictf/secrets/database-api/secret') }}"
     - ICTF_TI_SECRET_KEY: "{{ lookup('password','/opt/ictf/secrets/ti_secret length=25') }}"
 
     - SENDGRID_API_KEY: ""

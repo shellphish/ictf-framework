@@ -38,7 +38,7 @@
     "watchify": "3.6.1"
   },
   "dependencies": {
-    "c3": "0.4.10",
+    "c3": "0.7.20",
     "classnames": "2.2.0",
     "history": "1.13.1",
     "moment": "2.10.6",

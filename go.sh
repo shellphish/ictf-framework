@@ -1,10 +1,14 @@
-cd ./hephaestus && ./build_infra.sh && cd /home/degrigis/projects/ictf/ictf-framework-3.0 
+#!/bin/bash
+
+echo build_infra
+cd ./hephaestus/docker && ./build_infra.sh && cd - 
 
 
-
-cd ./ares/docker && ./deploy_infra.py /home/degrigis/projects/ictf/ictf-framework-3.0/game_config.json /home/degrigis/projects/ictf/ictf-framework-3.0/secrets && cd /home/degrigis/projects/ictf/ictf-framework-3.0 
+echo deploy_infra
+cd ./ares/docker && ./deploy_infra.py ../../game_config.json ../../secrets && cd ../../
  
-cd ./ares/docker &&  docker-compose -f docker-compose-local.generated.yml down -v --remove-orphans && cd /home/degrigis/projects/ictf/ictf-framework-3.0
+echo compose down
+cd ./ares/docker && docker-compose -f docker-compose-local.generated.yml down -v --remove-orphans && cd ../../
  
-
-cd ./ares/docker && docker-compose -f docker-compose-local.generated.yml up && cd /home/degrigis/projects/ictf/ictf-framework-3.0
+echo compose up
+cd ./ares/docker && docker-compose -f docker-compose-local.generated.yml up && cd ../../

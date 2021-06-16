@@ -1,3 +1,5 @@
+pyOpenSSL
+setuptools-rust
 wheel
 Flask==0.10.1
 Flask-Cache==0.13.1
@@ -17,8 +19,7 @@ saferedisqueue==3.0.0
 six==1.11.0
 wsgiref==0.1.2
 setuptools==44.0.0
-pyOpenSSL
 ndg-httpsclient
 pyasn1
-ujson==2.0.0
+ujson==1.35
 python-logstash

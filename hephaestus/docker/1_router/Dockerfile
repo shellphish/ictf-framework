@@ -1,6 +1,6 @@
 FROM ictf_base
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends iptraf python-pip python-dev python3-dev build-essential awscli iptables-persistent iftop libcurl4-openssl-dev libssl-dev python-apt zip unzip openvpn
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends iptraf python-pip python-dev python3-dev build-essential awscli iptables-persistent iftop libcurl4-openssl-dev libssl-dev python-apt zip unzip openvpn python-wheel
 
 COPY ./router /opt/ictf/router
 

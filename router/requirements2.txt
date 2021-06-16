@@ -1,3 +1,4 @@
+typing
 wheel
 requests
 awscli

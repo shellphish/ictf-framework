@@ -1,6 +1,6 @@
 FROM ictf_base
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python-pip python-virtualenv python-dev nginx git redis-server build-essential nodejs npm sudo uwsgi uwsgi-plugin-python python-wheel
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python-pip python-virtualenv python-dev nginx git redis-server build-essential nodejs npm sudo uwsgi uwsgi-plugin-python python-setuptools python-wheel
 #RUN pip install --upgrade pip
 #RUN pip --version 
 

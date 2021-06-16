@@ -1,11 +1,11 @@
-typing
+setuptools-rust
+cryptography==3.2
 wheel
 requests
 awscli
 boto3
 coloredlogs
 ipaddress
-ipython
 python-vagrant
 PyYAML
 requests

@@ -1,5 +1,6 @@
-pyOpenSSL
 setuptools-rust
+cryptography==3.2
+pyOpenSSL
 wheel
 Flask==0.10.1
 Flask-Cache==0.13.1

@@ -16,7 +16,7 @@ chardet
 Cheetah
 colorama
 configobj
-decorator
+decorator==4.4.2
 docutils
 futures
 Glances
@@ -27,6 +27,7 @@ Jinja2
 jmespath
 jsonpatch
 jsonpointer
+Markdown==1.7
 MarkupSafe
 monotonic
 oauth
@@ -34,7 +35,7 @@ packaging
 PAM
 paramiko
 pexpect
-prettytable
+prettytable==1.0.1
 psutil
 pyasn1
 pycrypto

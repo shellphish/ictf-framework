@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# ensure that secrets were already generated
+
+if [ ! -d ./secrets ]; then
+    echo -e '\e[31mERROR\e[0m: You must first generate secrets. Try ./make_secrets.sh' 1>&2;
+    exit 1;
+fi;
+
 echo build_infra
 cd ./hephaestus/docker && ./build_infra.sh && cd - 
 

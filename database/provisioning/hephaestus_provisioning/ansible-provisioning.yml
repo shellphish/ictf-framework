@@ -39,7 +39,10 @@
         src=./files/mysql.conf
         dest=/etc/mysql/conf.d/ictf-database.cnf
         owner=root group=root mode="u=rw,g=r,o=r"
-    
+
+    - name: mysql - create user
+      command: usermod -d /var/lib/mysql/ mysql
+
     - name: mysql - start MySQL service to apply new configurations
       command: service mysql start
     

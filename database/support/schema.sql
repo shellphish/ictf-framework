@@ -38,7 +38,7 @@ create table team_metadata_labels (id int not null auto_increment, primary key(i
                     label varchar(128) not null,
                     description varchar(1024) not null,
                     is_public boolean default false,
-                    key(description));
+                    key(description (512)));
 
 drop table if exists team_metadata;
 create table team_metadata (id int not null auto_increment, primary key(id),

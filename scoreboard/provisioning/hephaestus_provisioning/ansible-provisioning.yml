@@ -5,7 +5,6 @@
   vars:
     - SCOREBOARD_DEPLOY_PATH: "/opt/ictf/scoreboard"
     - SCOREBOARD_ASSETS_VERSION: "1.1.1"
-    - SCOREBOARD_NAME: "SWPAG"
     - ICTF_API_SECRET: "{{ lookup('file', '/opt/ictf/secrets/database-api/secret') }}"
     - NODE_VERSION: 6
 

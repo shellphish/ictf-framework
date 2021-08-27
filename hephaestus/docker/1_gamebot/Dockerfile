@@ -1,6 +1,6 @@
 FROM ictf_base
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python-pip python-wheel
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3-pip python3-wheel
 
 COPY ./gamebot /opt/ictf/gamebot
 

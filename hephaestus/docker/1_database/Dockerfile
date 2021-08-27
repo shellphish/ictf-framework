@@ -8,6 +8,6 @@ COPY ./scoring_ictf /opt/ictf/scoring_ictf
 
 WORKDIR /opt/ictf/database
 
-RUN chmod +x ./start.sh && ansible-playbook -vvvv ./provisioning/hephaestus_provisioning/ansible-provisioning.yml
+RUN chmod +x ./start.sh && ansible-playbook ./provisioning/hephaestus_provisioning/ansible-provisioning.yml
 
 ENTRYPOINT ./start.sh

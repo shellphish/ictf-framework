@@ -5,9 +5,10 @@
   tasks:  
 
     - name: install basic packages
-      package: name={{ item }} state=latest update_cache=yes
-      become: true
-      with_items:
+      apt:
+        update_cache: yes
+        state: latest
+        name:
           - docker.io
           - unzip
           - prometheus-node-exporter
@@ -16,9 +17,9 @@
           - curl 
           - vim 
           - iputils-ping
-          - openjdk-8-jdk
-          - openjdk-8-jdk-headless
-          - openjdk-8-jre
+          - openjdk-16-jdk
+          - openjdk-16-jdk-headless
+          - openjdk-16-jre
   
     - name: install docker-compose
       get_url:
@@ -36,4 +37,4 @@
 
     - name: install logstash using remote .deb
       apt:
-       deb: https://artifacts.elastic.co/downloads/logstash/logstash-7.6.2.deb
+       deb: https://artifacts.elastic.co/downloads/logstash/logstash-7.14.0-amd64.deb

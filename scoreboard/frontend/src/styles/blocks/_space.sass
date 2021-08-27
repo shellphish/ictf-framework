@@ -1,0 +1,18 @@
+@each $amount in ( 1, 2, 3, 4, 5, 6, 7, 8 )
+  @each $direction in ( top bottom )
+    .space--#{$direction}-#{$amount}
+      +space-rule("margin-#{$direction}", $amount)
+
+    @each $name in ( desk )
+      .space--#{$direction}-#{$amount}-on-#{$name}
+        +at-breakpoint($name)
+          +space-rule("margin-#{$direction}", $amount)
+
+      .space--both-#{$amount}-on-#{$name}
+        +at-breakpoint($name)
+          +space-rule("margin-top", $amount)
+          +space-rule("margin-bottom", $amount)
+
+  .space--both-#{$amount}
+    +space-rule("margin-top", $amount)
+    +space-rule("margin-bottom", $amount)

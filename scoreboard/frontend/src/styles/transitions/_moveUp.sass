@@ -1,0 +1,24 @@
+.moveUp-enter
+  transition-duration: .3s
+  transition-property: transform, opacity
+  transition-timing-function: ease-out
+  transform: translate3d(0,10px,0)
+  position: absolute
+  z-index: 10000
+  opacity: .1
+
+.moveUp-enter.moveUp-enter-active
+  transform: translate3d(0,0,0)
+  opacity: 1
+
+.moveUp-leave
+  transition-duration: .3s
+  transition-property: transform, opacity
+  transition-timing-function: ease-out
+  transform: translate3d(0,0,0)
+  position: absolute
+  opacity: 0.1
+
+.moveUp-leave.moveUp-leave-active
+  transform: translate3d(0,-10px,0)
+  opacity: 0.1

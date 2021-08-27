@@ -1,0 +1,25 @@
+.state-table
+  width: auto !important
+  +font-size(milli)
+
+  th.state-table__th--big
+    white-space: nowrap
+    background-color: transparent
+    +font-size($base-font-size)
+
+  th.state-table__th--rotate
+    height: 140px
+    white-space: nowrap
+    background-color: transparent
+    & > div
+      /* Magic Numbers */
+      /* 45 is really 360 - 45 */
+      transform: translate(19px, 49px) rotate(315deg)
+      width: 30px
+      & > span
+        border-bottom: 1px solid rgba($text-color, .3)
+        padding: 5px 10px
+    &.is-down
+      color: $down-color
+  td
+    border-right: 1px solid rgba($text-color, .3)

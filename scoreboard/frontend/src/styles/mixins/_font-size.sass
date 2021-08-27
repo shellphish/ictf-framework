@@ -1,0 +1,13 @@
+@mixin font-size($unit)
+  @if type-of($unit) == "number" and unit($unit) == "px"
+    +rem-rule(font-size, $unit)
+
+  @else if type-of($unit) == "string"
+    @if map-has-key($all-font-sizes, $unit)
+      +rem-rule(font-size, map-get($all-font-sizes, $unit))
+    @else
+      @warn "size ‘#{$unit}’ does not exist"
+
+  @else
+    @warn "size ‘#{$unit}’ invalid"
+

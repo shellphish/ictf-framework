@@ -1,0 +1,17 @@
+.state-tag
+  display: inline-block
+  +size(14px)
+  border-radius: 3px
+  transition: all .3s ease-out
+  cursor: pointer
+  &:hover
+    opacity: .6
+
+  &.is-up
+    background-color: $up-color
+
+  &.is-down
+    background-color: $down-color
+
+  &.is-untested
+    background-color: $untested-color

@@ -1,0 +1,5 @@
+@each $size in $sizes
+  @each $break in $size-breakpoints
+    .width--#{$size}-on-#{$break}
+      +at-breakpoint($break)
+        width: #{$size}px

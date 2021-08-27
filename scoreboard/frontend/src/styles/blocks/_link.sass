@@ -1,0 +1,23 @@
+.link
+  padding: 0 .5em
+  text-decoration: underline
+  display: inline-block
+  white-space: nowrap
+  font-family: inherit
+  cursor: pointer
+  background-color: transparent
+  -webkit-appearance: none
+  border-radius: 0
+  box-sizing: border-box
+  transition: color 0.3s $material-ease
+
+  color: $text-color
+  &:visited, &:active, &:link
+    color: $text-color
+
+.link--active
+  @extend .link
+  color: $accent-color
+  &:visited, &:active, &:link
+    color: $accent-color
+  border-color: $accent-color

@@ -1,0 +1,91 @@
+@function round-decimals($number)
+  @return round($number * 1000) / 1000
+
+@mixin width-setup($namespace: "")
+  .#{$namespace}fill
+    width: 100%
+
+  @each $total in $grid-cols
+    @for $size from 1 to $total
+      .#{$namespace}#{$size}-#{$total}
+        width: round-decimals($size / $total * 100%)
+
+@mixin shift-setup($rule, $namespace: "")
+  .#{$namespace}0
+    #{$rule}: 0
+
+  @each $total in $grid-cols
+    @for $size from 1 to $total
+      .#{$namespace}#{$size}-#{$total}
+        position: relative
+        #{$rule}: round-decimals($size / $total * 100%)
+
+.grid
+  +grid
+
+.grid__item
+  +grid-item
+
+.grid--rev
+  @extend .grid
+  direction: rtl
+  text-align: left
+  > .grid__item
+    direction: ltr
+    text-align: left
+
+.grid--full
+  @extend .grid
+  margin-left: 0
+  > .grid__item
+    padding-left: 0
+
+.grid--right
+  @extend .grid
+  text-align: right
+  > .grid__item
+    text-align: left
+
+.grid--center
+  @extend .grid
+  text-align: center
+  > .grid__item
+    text-align: left
+
+.grid--middle
+  @extend .grid
+  > .grid__item
+    vertical-align: middle
+
+.grid--bottom
+  @extend .grid
+  > .grid__item
+    vertical-align: bottom
+
+.grid--narrow
+  @extend .grid
+  margin-left: -($grid-gutter / 2)
+  > .grid__item
+    padding-left: $grid-gutter / 2
+
+.grid--wide
+  @extend .grid
+  margin-left: -($grid-gutter * 2)
+  > .grid__item
+    padding-left: $grid-gutter * 2
+
++width-setup("width-")
+
+@each $name in $grid-breakpoints
+  +at-breakpoint($name)
+    +width-setup("#{$name}-")
+
+@if length($grid-breakpoints) > 0
+  +shift-setup(right, "pull-")
+  +shift-setup(left, "push-")
+
+  @each $name in $grid-breakpoints
+    +at-breakpoint($name)
+      +shift-setup(left, "#{$name}-push-")
+      +shift-setup(right, "#{$name}-pull-")
+

@@ -6,7 +6,7 @@
     - SCOREBOARD_DEPLOY_PATH: "/opt/ictf/scoreboard"
     - SCOREBOARD_ASSETS_VERSION: "1.1.1"
     - ICTF_API_SECRET: "{{ lookup('file', '/opt/ictf/secrets/database-api/secret') }}"
-    - NODE_VERSION: 6
+    - NODE_VERSION: 14
 
   tasks:
     - name: create user (home directory will be created by default)

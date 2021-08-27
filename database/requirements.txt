@@ -11,6 +11,7 @@ Flask==0.12.2
 uWSGI==2.0.15
 PyYAML==3.12
 boto3==1.4.8
+mysql-connector-python
 cache
 coloredlogs
 -e /opt/ictf/scoring_ictf

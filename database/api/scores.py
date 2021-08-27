@@ -5,8 +5,8 @@ import collections
 import json
 
 from . import app, mysql
-from utils import requires_auth, get_current_tick
-from teams import teams_info
+from .utils import requires_auth, get_current_tick
+from .teams import teams_info
 from flask import request
 
 

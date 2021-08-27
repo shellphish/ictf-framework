@@ -3,8 +3,8 @@ from datetime import datetime
 
 import coloredlogs
 
-from game_state_interface import GameStateInterface
-from simple_lru_cache import LRUCache
+from .game_state_interface import GameStateInterface
+from .simple_lru_cache import LRUCache
 
 
 class ScoringInterface(object):

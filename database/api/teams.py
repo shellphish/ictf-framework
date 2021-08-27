@@ -13,7 +13,7 @@ import string
 from flask import request
 
 from . import app, mysql, db_helpers
-from utils import requires_auth, get_current_tick
+from .utils import requires_auth, get_current_tick
 
 
 #@app.route("/teams_ping")
@@ -550,7 +550,7 @@ def team_key_get(team_id):
         #to_return["port"] = key_cursor["port"]
         return json.dumps(to_return)
 
-    except Exception, e:
+    except Exception as e:
         print(e)
         return json.dumps({"result": "failure", "reason": str(e)})
 
@@ -578,7 +578,7 @@ def team_vm_get(team_id):
         #to_return["port"] = key_cursor["port"]
         return json.dumps(to_return)
 
-    except Exception, e:
+    except Exception as e:
         print(e)
         return json.dumps({"result": "failure", "reason": str(e)})
 
@@ -621,7 +621,7 @@ def team_update_keys(team_id):
         mysql.database.commit()
 
         return json.dumps({"result": "success", "team_id": team_id})
-    except Exception, e:
+    except Exception as e:
         print(e)
         return json.dumps({"result": "failure", "reason": str(e)})
 
@@ -663,7 +663,7 @@ def team_add_keys(team_id):
         mysql.database.commit()
 
         return json.dumps({"result": "success", "team_id": result_team_id})
-    except Exception, e:
+    except Exception as e:
         print(e)
         return json.dumps({"result": "failure", "reason": str(e)})
 
@@ -991,7 +991,7 @@ def team_vote_services():
                 return json.dumps({"result": "failure", "reason": "cannot vote for own service"})
 
             services[service_name] = curr_row["id"]
-        except Exception, e:
+        except Exception as e:
             return json.dumps({"result": "failure", "reason": str(e)})
 
     try:
@@ -1006,7 +1006,7 @@ def team_vote_services():
                         services[request.form.get("service_2")],
                         services[request.form.get("service_3")]))
         mysql.database.commit()
-    except Exception, e:
+    except Exception as e:
         return json.dumps({"result": "failure", "reason": str(e)})
     return json.dumps({"result": "success"})
 
@@ -1045,7 +1045,7 @@ def team_dashboard_submit():
                         name,
                         archive))
         mysql.database.commit()
-    except Exception, e:
+    except Exception as e:
         return json.dumps({"result": "failure", "reason": str(e)})
     return json.dumps({"result": "success"})
 

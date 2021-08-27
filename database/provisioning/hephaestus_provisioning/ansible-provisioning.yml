@@ -76,15 +76,6 @@
         user=root
         job="mysqldump ictf | gzip > /media/backups/ictf/$(date '+\%Y\%m\%d-\%H\%M.\%S').sql.gz"
 
-    - name: install mysql-connector
-      # We have to install mysql-connector manually because the current
-      # version cannot be installed with pip without a patch:
-      # - https://bugs.mysql.com/bug.php?id=79766
-      # - https://github.com/mysql/mysql-connector-python/pull/9
-      pip:
-        name=/opt/ictf/database/support/mysql-connector-python-2.1.3/
-        virtualenv=/opt/ictf/venv/database
-
     - name: nginx - allow worker processes, 4 per core
       lineinfile:
         dest=/etc/nginx/nginx.conf

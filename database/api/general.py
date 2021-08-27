@@ -3,7 +3,7 @@ import json
 from flask import request, abort
 
 from . import app, mysql
-from utils import requires_auth, get_current_tick
+from .utils import requires_auth, get_current_tick
 
 
 # @app.route("/general_ping")

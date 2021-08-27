@@ -6,7 +6,7 @@ import json
 from flask import request, abort
 
 from . import app, mysql
-from utils import requires_auth
+from .utils import requires_auth
 
 
 #@app.route("/uploads_ping")

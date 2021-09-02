@@ -13,7 +13,7 @@ export default class Flag extends Component {
 
   render() {
     return (
-      <img src={ `/flags/${this.props.country.toUpperCase()}.png` } alt={`flag of this.props.country`} width={ this.props.size }/>
+      <img src={ process.env.PUBLIC_URL + `/flags/${this.props.country.toUpperCase()}.png` } alt={`flag of ${this.props.country.toUpperCase()}`} width={ this.props.size }/>
     );
   }
 }

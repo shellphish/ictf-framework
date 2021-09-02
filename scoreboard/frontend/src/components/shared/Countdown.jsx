@@ -77,11 +77,11 @@ class Countdown extends Component {
       <div className="space--bottom-1">
         <span className="countdown__label">Game ends in</span>
         <span className="countdown__time--small">
-          <span ref="gameHours">{ pad(gameHours, 2) }</span>
+          <span id="gameHours">{ pad(gameHours, 2) }</span>
           :
-          <span ref="gameMinutes">{ pad(gameMinutes, 2) }</span>
+          <span id="gameMinutes">{ pad(gameMinutes, 2) }</span>
           :
-          <span ref="gameSeconds">{ pad(gameSeconds, 2) }</span>
+          <span id="gameSeconds">{ pad(gameSeconds, 2) }</span>
         </span>
       </div>
 
@@ -95,9 +95,9 @@ class Countdown extends Component {
         <div>
           <span className="countdown__label">next in about</span>
           <span className="countdown__time">
-            <span ref="minutes">{ pad(minutes, 2) }</span>
+            <span id="minutes">{ pad(minutes, 2) }</span>
             :
-            <span ref="seconds">{ pad(seconds, 2) }</span>
+            <span id="seconds">{ pad(seconds, 2) }</span>
           </span>
         </div>
       </div>

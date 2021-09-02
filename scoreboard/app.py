@@ -88,5 +88,5 @@ def init_connections(config_file="config.json"):
 init_connections()
 
 if __name__ == '__main__':
-    print "[*] Starting"
+    print("[*] Starting")
     app.run(use_reloader=False, port=8080, host='0.0.0.0', debug=True, processes=24)

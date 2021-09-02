@@ -1,98 +1,93 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import React from 'react';
+import { NavLink, useLocation, Route } from 'react-router-dom';
 import _ from 'underscore';
+import { useEffect, useState } from 'react';
+import { SWRConfig } from 'swr';
 
 import SetIntervalMixin from '../mixins/SetIntervalMixin';
-import api from '../sources/api';
+import {useGameState} from '../sources/api_hooks'
 /* import AcademicSwitch from './AcademicSwitch'; */
 import Countdown from './shared/Countdown';
+import useInterval from '../hooks/useInterval';
+
+import Scores from './Scores';
+import ServiceExploits from './ServiceExploits';
+import Services from './Services';
+import ServiceState from './ServiceStates';
+import Teams from './Teams';
+
 
 const POLLING_INTERVAL = 10 * 1000;
 
-class App extends Component {
-  state = {
-    title: '',
-    staticdata: {},
-    dynamicData: [],
-    teams: [],
-    services: []
+
+
+const views = [
+  // { title: 'Scoreboard',        path: '/scores',            component: (props) => <Scores {...props}/>},
+  { title: 'Service List',      path: '/services',          component: Services},
+  { title: 'Service Status',    path: '/service-states',    component: ServiceState},
+  { title: 'Service Exploits',  path: '/service-exploits',  component: ServiceExploits},
+  { title: 'Teams',             path: '/teams',             component: Teams}
+]
+
+
+const filterAcademicTeams = (teams, academiconly) => {
+  if (!academiconly)
+  {
+    return teams;
   }
-
-  filterAcademicTeams(teams, academiconly) {
-    return _.values(teams).filter(t => !t.academiconly || t.academic_team === 1)
-  }
-
-  loadData() {
-    api.get('/game/state').then(res => {
-      this.setState({
-        staticData: res.body.static,
-        dynamicData: res.body.dynamic,
-        services: res.body.static.services,
-        teams: this.filterAcademicTeams(
-          res.body.static.teams,
-          this.props.location.query.academiconly
-        )
-      });
-    });
-  }
-
-  componentDidMount() {
-    this.loadData();
-    this.setInterval(() => this.loadData(), POLLING_INTERVAL);
-    this.setState({title: document.title});
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      teams: this.filterAcademicTeams(
-        this.state.staticData.teams,
-        nextProps.location.query.academiconly
-      )
-    });
-  }
-
-  render() {
-    const pathname = this.props.location.pathname;
-    return (
-      <div className="wrap space--both-2">
-
-        <header className="main-header">
-          <Link className="logo" to="/">
-            <span className="logo__name">{ this.state.title }</span>
-          </Link>
-          {/* <AcademicSwitch location={ this.props.location } /> */}
-          <Countdown/>
-          <nav className="navigation">
-            <Link to="/scores" query={ this.props.location.query } activeClassName="is-active">Scoreboard</Link>
-            <Link to="/services" query={ this.props.location.query } activeClassName="is-active">Service List</Link>
-            <Link to="/service-states" query={ this.props.location.query } activeClassName="is-active">Service Status</Link>
-            <Link to="/service-exploits" query={ this.props.location.query } activeClassName="is-active">Service Exploits</Link>
-            <Link to="/teams" query={ this.props.location.query } activeClassName="is-active">Teams</Link>
-          </nav>
-        </header>
-
-        <div className="main-content">
-          <ReactCSSTransitionGroup transitionName="moveUp"
-                                      transitionEnterTimeout={300}
-                                      transitionLeaveTimeout={300}>
-            {
-              React.cloneElement(
-                this.props.children || <div />,
-                {
-                  dynamicData: this.state.dynamicData,
-                  teams: this.state.teams,
-                  services: this.state.services,
-                  key: pathname
-                }
-              )
-            }
-          </ReactCSSTransitionGroup>
-        </div>
-
-      </div>
-    );
-  }
+  return _.values(teams).filter(t => !t.academiconly || t.academic_team === 1);
 }
-App = SetIntervalMixin(App);
+
+const App = SetIntervalMixin((props) => {
+  const [title, setTitle] = useState('');
+  
+  // const [curTeams, setCurTeams] = useState([]);
+
+  let location = useLocation();
+  // let { academic_only=false } = location.state || {};
+  
+  let {gamestate, loading, error} = useGameState();
+  console.log(gamestate, loading, error);
+
+  return (
+    <div className="wrap space--both-2">
+
+      <header className="main-header">
+        <NavLink className="logo" to="/">
+          <span className="logo__name">{ title }</span>
+        </NavLink>
+        <Countdown/>
+        <nav className="navigation">
+          {
+            views.map((view) => <NavLink 
+                                  key={view.title}
+                                  to={{pathname: view.path, state: location.state}}
+                                  activeClassName="is-active"
+                                >
+                                    {view.title}
+                                </NavLink>)
+          }
+        </nav>
+      </header>
+      <div className="main-content">
+        {
+          gamestate && views.map((view) => <Route 
+                                exact 
+                                strict 
+                                path={view.path} 
+                              > 
+                                <view.component
+                                  staticdata={gamestate.static}
+                                  dynamicdata={gamestate.dynamic}
+                                  teams={gamestate.static.teams}
+                                  services={gamestate.static.services}
+                                  key={view.path}
+                                />
+                              </Route>)
+        }
+      </div>
+    </div>
+  );
+})
+
 export default App;

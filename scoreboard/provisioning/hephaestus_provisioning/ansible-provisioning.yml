@@ -20,7 +20,7 @@
       tags: [skip_ansible_lint]
     
     - name: "nvm"
-      shell: curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh > /home/deploy/install.sh
+      shell: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh > /home/deploy/install.sh
       args:
         chdir: /home/deploy
     
@@ -38,35 +38,35 @@
     - name: frontend - install npm packages
       shell: sudo -u deploy bash -c "source /home/deploy/.nvm/nvm.sh && nvm use {{ NODE_VERSION }} && npm install || true"
       args:
-        chdir: "{{ SCOREBOARD_DEPLOY_PATH }}"
+        chdir: "{{ SCOREBOARD_DEPLOY_PATH }}/frontend"
       environment:
         HOME: /home/deploy
       tags: [skip_ansible_lint]
     
-    - name: frontend - rebuild node-sass for compatibility with linux
-      shell: sudo -u deploy bash -c "source /home/deploy/.nvm/nvm.sh && nvm use {{ NODE_VERSION }} && npm rebuild node-sass"
-      args:
-        chdir: "{{ SCOREBOARD_DEPLOY_PATH }}"
-      environment:
-        HOME: /home/deploy
-      tags: [skip_ansible_lint]
+    # - name: frontend - rebuild node-sass for compatibility with linux
+    #   shell: sudo -u deploy bash -c "source /home/deploy/.nvm/nvm.sh && nvm use {{ NODE_VERSION }} && npm rebuild node-sass"
+    #   args:
+    #     chdir: "{{ SCOREBOARD_DEPLOY_PATH }}/frontend"
+    #   environment:
+    #     HOME: /home/deploy
+    #   tags: [skip_ansible_lint]
     
-    - name: frontend - compile CSS and JS assets
-      shell: sudo -u deploy bash -c "source /home/deploy/.nvm/nvm.sh && nvm use {{ NODE_VERSION }} && npm run build"
-      become: true
-      args:
-        chdir: "{{ SCOREBOARD_DEPLOY_PATH }}"
-      tags: [skip_ansible_lint]
+    # - name: frontend - compile CSS and JS assets
+    #   shell: sudo -u deploy bash -c "source /home/deploy/.nvm/nvm.sh && nvm use {{ NODE_VERSION }} && npm run build"
+    #   become: true
+    #   args:
+    #     chdir: "{{ SCOREBOARD_DEPLOY_PATH }}/frontend"
+    #   tags: [skip_ansible_lint]
     
-    - name: frontend - set assets version (index.html)
-      template:
-        src: "{{ ICTF_FRAMEWORK_DIR_HOST }}/scoreboard/app/public/index.html.j2"
-        dest: "{{ SCOREBOARD_DEPLOY_PATH }}/_static/index.html"
-        owner: deploy
+    # - name: frontend - set assets version (index.html)
+    #   template:
+    #     src: "{{ ICTF_FRAMEWORK_DIR_HOST }}/scoreboard/app/public/index.html.j2"
+    #     dest: "{{ SCOREBOARD_DEPLOY_PATH }}/_static/index.html"
+    #     owner: deploy
     
-    - name: frontend - set assets version - FIXME
-      shell: "cp {{ SCOREBOARD_DEPLOY_PATH }}/_static/index.js {{ SCOREBOARD_DEPLOY_PATH }}/_static/index.{{ SCOREBOARD_ASSETS_VERSION }}.js && cp {{ SCOREBOARD_DEPLOY_PATH }}/_static/main.css {{ SCOREBOARD_DEPLOY_PATH }}/_static/main.{{ SCOREBOARD_ASSETS_VERSION }}.css"
-      tags: [skip_ansible_lint]
+    # - name: frontend - set assets version - FIXME
+    #   shell: "cp {{ SCOREBOARD_DEPLOY_PATH }}/_static/index.js {{ SCOREBOARD_DEPLOY_PATH }}/_static/index.{{ SCOREBOARD_ASSETS_VERSION }}.js && cp {{ SCOREBOARD_DEPLOY_PATH }}/_static/main.css {{ SCOREBOARD_DEPLOY_PATH }}/_static/main.{{ SCOREBOARD_ASSETS_VERSION }}.css"
+    #   tags: [skip_ansible_lint]
     
     - name: frontend - set owner to deploy for _static/
       file:

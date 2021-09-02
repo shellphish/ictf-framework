@@ -24,7 +24,7 @@ export default class Teams extends Component {
   }
 
   tableRows() {
-    return this.props.teams.map(team => {
+    return Object.values(this.props.teams).map(team => {
       return {
         logo: this.renderLogo(team.logo),
         name: team.name,

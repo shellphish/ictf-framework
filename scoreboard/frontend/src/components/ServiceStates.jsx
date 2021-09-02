@@ -17,7 +17,7 @@ export default class ServiceStates extends Component {
   }
 
   parseDataAndSetState(props) {
-    let lastData = props.dynamicData[0];
+    let lastData = props.dynamicdata[0];
     if (lastData === undefined) { return; }
     this.setState({
       serviceStates: lastData.service_states,

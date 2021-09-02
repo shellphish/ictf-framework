@@ -2,7 +2,7 @@ FROM ictf_base
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y nginx git redis-server build-essential
-RUN apt-get update && apt-get install -y sudo uwsgi
+RUN apt-get update && apt-get install -y sudo uwsgi daemon
 
 RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get update && apt-get install -y nodejs

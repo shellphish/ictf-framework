@@ -69,8 +69,13 @@ class AbstractApi {
 
         if (response.status !== 204) {
           return response.json()
-          .then(function(body) {
+          .then(body => {
             responseClone.body = body;
+            return responseClone;
+          })
+          .catch(x => { 
+            console.log("json error: " + x)
+            responseClone.body = false;
             return responseClone;
           });
         } else {

@@ -24,9 +24,9 @@ export default class Services extends Component {
   }
 
   tableRows() {
-    return _.map(this.props.services, service => {
+    return _.filter(this.props.services, service => {
       if (service.state === 'enabled') {
-        return service;
+        return true;
       }
     });
   }

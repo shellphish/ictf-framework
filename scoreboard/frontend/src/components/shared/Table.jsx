@@ -1,5 +1,5 @@
-import React, { Button, Component } from 'react';
-import cx from 'classnames';
+import React, { Component } from 'react';
+import classNames from 'classnames';
 import _ from 'underscore';
 import PropTypes from 'prop-types'
 
@@ -58,7 +58,7 @@ export default class Table extends Component {
 
   render() {
     return (
-      <table className={ `table ${this.props.className}` }>
+      <table className={ classNames('table', this.props.className) }>
         <thead>
           <tr>
             { this.renderHeaders() }
@@ -75,12 +75,13 @@ export default class Table extends Component {
     return this.props.headers.map(h => {
       return (
         <th key={ `th-${h.id}` } className={ h.className }>
-          <Button 
-             className={ cx({'is-sorted': this.state.sortAttr === h.id, 'is-desc': this.state.sortDesc}) }
+          <button // TODO: find out why this was Button, was this material-ui? should it be??
+             className={ classNames({'is-sorted': this.state.sortAttr === h.id, 'is-desc': this.state.sortDesc}) }
              onClick={ this.handleSortColumn.bind(this, h.id) }
             >
             { h.label }
-          </Button>
+            
+          </button>
         </th>
       );
     });

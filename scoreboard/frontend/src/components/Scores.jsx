@@ -22,13 +22,14 @@ class Scores extends Component {
     /* don't use state for scores, c3 is rendered outside React */
     super();
     this.ticks = [];
+    this.chart_ref = React.createRef();
   }
 
   /* FIXME: double fetch, check App component */
   loadTicks(ticksCount) {
     api.get('/game/state', {n_ticks: ticksCount}).then(res => {
       let lastTick = this.ticks[this.ticks.length-1];
-      if (!lastTick || lastTick.tick.tick_id !== res.body.dynamic[0].tick.tick_id) {
+      if (res.body.dynamic.length > 0 && (!lastTick || lastTick.tick.tick_id !== res.body.dynamic[0].tick.tick_id)) {
         let lastScores = _.values(res.body.dynamic[0].scores);
         let attackMax = Math.max(_.chain(lastScores).pluck('attack_points').max().value(), 1);
         let serviceMax = Math.max(_.chain(lastScores).pluck('service_points').max().value(), 1);
@@ -57,13 +58,14 @@ class Scores extends Component {
   componentDidMount() {
     this.loadTicks(20);
     this.chart = c3.generate({
-      bindto: findDOMNode(this.refs.chart),
+      bindto: findDOMNode(this.chart),
       legend: {
         show: true
       },
       data: {
         x: 'x',
-        rows: ['x']
+        rows: [['x']]
+
       },
       tooltip: {
         show: false
@@ -159,7 +161,7 @@ class Scores extends Component {
     return (
       <div>
         <h3 className="title">Scoreboard</h3>
-        <div className="chart" ref="chart"/>
+        <div className="chart" ref={this.chart_ref}/>
         <nav className="chart-controls">
           {/* <a href="#" onClick={ this.handleChartToggle.bind(this, 'all') }>Show all</a>
               <span> - </span>

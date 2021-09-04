@@ -1,14 +1,11 @@
-import React from 'react';
 import { NavLink, useLocation, Route } from 'react-router-dom';
 import _ from 'underscore';
-import { useEffect, useState } from 'react';
-import { SWRConfig } from 'swr';
+import { useState, useEffect } from 'react';
 
-import SetIntervalMixin from '../mixins/SetIntervalMixin';
+
 import {useGameState} from '../sources/api_hooks'
 /* import AcademicSwitch from './AcademicSwitch'; */
 import Countdown from './shared/Countdown';
-import useInterval from '../hooks/useInterval';
 
 import Scores from './Scores';
 import ServiceExploits from './ServiceExploits';
@@ -17,12 +14,8 @@ import ServiceState from './ServiceStates';
 import Teams from './Teams';
 
 
-const POLLING_INTERVAL = 10 * 1000;
-
-
-
 const views = [
-  // { title: 'Scoreboard',        path: '/scores',            component: (props) => <Scores {...props}/>},
+  { title: 'Scoreboard',        path: '/scores',            component: Scores},
   { title: 'Service List',      path: '/services',          component: Services},
   { title: 'Service Status',    path: '/service-states',    component: ServiceState},
   { title: 'Service Exploits',  path: '/service-exploits',  component: ServiceExploits},
@@ -38,10 +31,13 @@ const filterAcademicTeams = (teams, academiconly) => {
   return _.values(teams).filter(t => !t.academiconly || t.academic_team === 1);
 }
 
-const App = SetIntervalMixin((props) => {
+const App = (props) => {
   const [title, setTitle] = useState('');
   
   // const [curTeams, setCurTeams] = useState([]);
+  useEffect(() => {
+    setTitle(document.title)
+  }, [document.title])
 
   let location = useLocation();
   // let { academic_only=false } = location.state || {};
@@ -60,7 +56,7 @@ const App = SetIntervalMixin((props) => {
         <nav className="navigation">
           {
             views.map((view) => <NavLink 
-                                  key={view.title}
+                                  key={"link-" + view.path}
                                   to={{pathname: view.path, state: location.state}}
                                   activeClassName="is-active"
                                 >
@@ -75,19 +71,20 @@ const App = SetIntervalMixin((props) => {
                                 exact 
                                 strict 
                                 path={view.path} 
+                                key={"route" + view.path}
                               > 
                                 <view.component
                                   staticdata={gamestate.static}
                                   dynamicdata={gamestate.dynamic}
                                   teams={gamestate.static.teams}
                                   services={gamestate.static.services}
-                                  key={view.path}
+                                  key={"component" + view.path}
                                 />
                               </Route>)
         }
       </div>
     </div>
   );
-})
+}
 
 export default App;

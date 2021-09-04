@@ -7,9 +7,10 @@ const api_fetcher = (url, n_ticks=1,) => {
   return api.get(url, {n_ticks: n_ticks}).then(r => r.body)
 }
 
+const STATE_POLLING_INTERVAL = 10 * 1000;
 export function useGameState (n_ticks=1, swr_config={}) 
 {
-  var config = {refreshInterval: 10000, dedupingInterval: 10000, ...swr_config};
+  var config = {refreshInterval: STATE_POLLING_INTERVAL, dedupingInterval: STATE_POLLING_INTERVAL, ...swr_config};
   
   const { data, error } = useSWR(
     [`/game/state`, n_ticks], 
@@ -24,6 +25,12 @@ export function useGameState (n_ticks=1, swr_config={})
     isError: error
   }
 }
+export function useLatestGameState() {
+  const {gs, loading, error} = useGameState();
+  let latest_dynamic = gs && gs.dynamic && gs.dynamic[0];
+  return {latest_dynamic, static: gs.static, loading, error}
+
+}
 function sortScores(scores, sortAttribute) {
   let sortedScores = _.chain(scores).values().sortBy(sortAttribute).reverse().value();
   return sortedScores;
@@ -33,7 +40,7 @@ export function useTicksScores(n_ticks=1) {
   const {gamestate, loading, error} = useGameState(n_ticks=1);
   var lastScores = [];
   var lastScoresSorted = [];
-  if (!gamestate)
+  if (!gamestate || gamestate.dynamic.length < 1)
   {
     return {ticks: undefined, lastScores, lastScoresSorted, loading, error}
   }
@@ -50,7 +57,7 @@ export function useTicksScores(n_ticks=1) {
       s.team_name = gamestate.static.teams[s.team_id] && gamestate.static.teams[s.team_id].name;
       return s;
     });
-
+    lastScoresSorted = sortScores(lastScores, 'total_points');
     setTicks(ticks.concat(gamestate.dynamic));
   }
   return {ticks, lastScores, lastScoresSorted, loading, error}

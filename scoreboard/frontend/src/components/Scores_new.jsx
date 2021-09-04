@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { findDOMNode } from 'react-dom';
 import c3 from 'c3';
 import _ from 'underscore';
@@ -8,22 +8,40 @@ import SetIntervalMixin from '../mixins/SetIntervalMixin';
 import round from '../utils/round';
 import Table from './shared/Table';
 import Flag from './shared/Flag';
-import { useGameState } from '../sources/api_hooks';
+import { useGameState, useTicksScores } from '../sources/api_hooks';
 
 const Scores = (props) => {
-  let [teamsShown, setTeamsShown] = useState('top');
-  let [chart, setChart] = useState(undefined);
-  const {ticks, lastScores, lastScoresSorted, loading, error} = useGameState();
+  const [teamsShown, setTeamsShown] = useState('top');
+  const [chart, setChart] = useState(undefined);
+  const chart_ref = useRef(null);
+  const {ticks, lastScores, lastScoresSorted, loading, error} = useTicksScores();
+  const {gamestate, state_loading, state_error} = useGameState();
+
+  let teamsNames = _.pluck(_.first(lastScoresSorted, 10), 'team_name');
+  let teamsIds = _.pluck(_.first(lastScoresSorted, 10), 'team_id');
+  let _scores = (ticks || []).map(tick => {
+    var pickedScores = [];
+    for (var idx in teamsIds) {
+      pickedScores.push(tick.scores[teamsIds[idx]]);
+    }
+    let points = _.pluck(pickedScores, 'total_points');
+    return [tick.tick.tick_id].concat(points);
+  });
+  _scores.unshift(
+    ['x'].concat(teamsNames)
+  );
 
   useEffect(() => {
     setChart(c3.generate({
-      bindto: findDOMNode(this.refs.chart),
+      // bindto: findDOMNode(chart),
+      bindto: '#chart',
+      // bindto: chart_ref,
       legend: {
         show: true
       },
       data: {
         x: 'x',
-        rows: ['x']
+        rows: _scores
       },
       tooltip: {
         show: false
@@ -37,56 +55,41 @@ const Scores = (props) => {
         }
       }
     }))
-  })
+  }, [chart, _scores])
 
   useEffect(
     () => {
-      let teamsNames = _.pluck(_.first(lastScoresSorted, 10), 'team_name');
-      let teamsIds = _.pluck(_.first(lastScoresSorted, 10), 'team_id');
-      let scores = ticks.map(tick => {
-        var pickedScores = [];
-        for (var idx in teamsIds) {
-          pickedScores.push(tick.scores[teamsIds[idx]]);
+      function chartShowTeams() {
+        if (teamsShown === 'all') {
+          chart && chart.show && chart.show();
         }
-        let points = _.pluck(pickedScores, 'total_points');
-        return [tick.tick.tick_id].concat(points);
-      });
-      scores.unshift(
-        ['x'].concat(teamsNames)
-      );
-      chart.load({
-        rows: scores
-      });
+        else if (teamsShown === 'none') {
+          chart && chart.hide && chart.hide() && chart.hide();
+        } else if (teamsShown === 'top') {
+          chartShowTop();
+        }
+      }
+    
+      function chartShowTop() {
+        chart && chart.hide();
+        let firstScores = _.first(lastScoresSorted, 10);
+        let teamNames = firstScores.map(k => {
+          let team = _.find(gamestate.static.teams, f => {
+            if (f.id === k.team_id) {
+              return true;
+            }
+          });
+          return team && team.name;
+        });
+        chart && chart.show(teamNames);
+      }
+
       chartShowTeams();
     },
-    [chart, ticks, lastScoresSorted, lastScores, teamsShown]
+    [chart, ticks, lastScoresSorted, lastScores, teamsShown, gamestate.static.teams]
   )
 
 
-  function chartShowTeams() {
-    if (teamsShown === 'all') {
-      chart.show && chart.show();
-    }
-    else if (teamsShown === 'none') {
-      chart.hide && chart.hide() && chart.hide();
-    } else if (teamsShown === 'top') {
-      chartShowTop();
-    }
-  }
-
-  function chartShowTop() {
-    chart.hide();
-    let firstScores = _.first(lastScoresSorted, 10);
-    let teamNames = firstScores.map(k => {
-      let team = _.find(this.props.teams, f => {
-        if (f.id === k.team_id) {
-          return true;
-        }
-      });
-      return team && team.name;
-    });
-    chart.show(teamNames);
-  }
 
   // function handleChartToggle(type, e) {
   //   e.preventDefault();
@@ -103,10 +106,10 @@ const Scores = (props) => {
   }
 
   function tableRows() {
-    return this.state.lastScoresSorted.filter(score => {
-      return this.props.teams.find(t => t.id === score.team_id);
+    return lastScoresSorted.filter(score => {
+      return gamestate.static.teams.find(t => t.id === score.team_id);
     }).map((s, i) => {
-      let team = this.props.teams.find(t => t.id === s.team_id);
+      let team = gamestate.static.teams.find(t => t.id === s.team_id);
       let teamNameTag = <span><Flag country={ team.country } size="16"/> { team.name }</span>;
       return {
         team_rank: i + 1,
@@ -121,7 +124,7 @@ const Scores = (props) => {
   return (
     <div>
       <h3 className="title">Scoreboard</h3>
-      <div className="chart" ref="chart"/>
+      <div className="chart" ref={chart_ref}/>
       <nav className="chart-controls">
         {/* <a href="#" onClick={ this.handleChartToggle.bind(this, 'all') }>Show all</a>
             <span> - </span>

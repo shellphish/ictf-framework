@@ -24,10 +24,7 @@ def game_state():
             'teams': TEAMS,
             'services': SERVICES,
         },
-        'dynamic': 
-        {
-
-        }
+        'dynamic': []
     }
 
 @app.route("/api/tick")

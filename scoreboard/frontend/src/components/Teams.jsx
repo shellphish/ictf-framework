@@ -6,11 +6,11 @@ import Table from './shared/Table';
 
 export default class Teams extends Component {
   static propTypes = {
-    teams: PropTypes.array.isRequired
+    teams: PropTypes.object.isRequired
   }
 
   static defaultProps = {
-    teams: []
+    teams: {}
   }
 
   tableHeaders() {

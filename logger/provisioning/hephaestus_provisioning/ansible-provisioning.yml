@@ -17,6 +17,8 @@
         name:
         - grafana
         - prometheus
+        - libnss3
+        - libnss3-dev
 
     - name: configure prometheus
       template:

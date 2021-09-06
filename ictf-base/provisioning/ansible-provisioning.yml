@@ -20,6 +20,7 @@
           - openjdk-16-jdk
           - openjdk-16-jdk-headless
           - openjdk-16-jre
+          - daemon
   
     - name: install docker-compose
       get_url:

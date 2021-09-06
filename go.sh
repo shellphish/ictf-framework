@@ -12,7 +12,7 @@ echo build_infra
 cd ./hephaestus/docker && ./build_infra.sh && cd - 
 
 echo 'Adjusting max memory for elasticsearch'
-sysctl -w vm.max_map_count=262144
+sudo sysctl -w vm.max_map_count=262144
 
 echo deploy_infra
 cd ./ares/docker && ./deploy_infra.py ../../game_config.json ../../secrets && cd ../../

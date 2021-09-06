@@ -290,7 +290,7 @@ class ScriptsFacade:
                 service_state = "down"
                 updating_reason = default_reason
                 if (curr_team in scripts_run_stats) and (curr_service in scripts_run_stats[curr_team]):
-                    print scripts_run_stats[curr_team][curr_service]
+                    print(scripts_run_stats[curr_team][curr_service])
                     success = int(scripts_run_stats[curr_team][curr_service][0])
                     scheduled = int(scripts_run_stats[curr_team][curr_service][1])
                     not_ran = int(scripts_run_stats[curr_team][curr_service][2])

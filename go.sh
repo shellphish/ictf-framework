@@ -21,4 +21,5 @@ echo compose down
 cd ./ares/docker && docker-compose -f docker-compose-local.generated.yml down -v --remove-orphans && cd ../../
  
 echo compose up
-cd ./ares/docker && docker-compose -f docker-compose-local.generated.yml up && cd ../../
+cd ./ares/docker && docker-compose -f docker-compose-local.generated.yml up -d && cd ../../
+# start game: http://localhost:5000/game/insert?secret=JPG1pD8Zr2rT5fjgY_D_MyJPY

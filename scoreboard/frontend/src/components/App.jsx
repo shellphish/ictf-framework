@@ -1,5 +1,4 @@
-import { NavLink, useLocation, Route } from 'react-router-dom';
-import _ from 'underscore';
+import { Redirect, NavLink, useLocation, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 
@@ -22,27 +21,16 @@ const views = [
   { title: 'Teams',             path: '/teams',             component: Teams}
 ]
 
-
-const filterAcademicTeams = (teams, academiconly) => {
-  if (!academiconly)
-  {
-    return teams;
-  }
-  return _.values(teams).filter(t => !t.academiconly || t.academic_team === 1);
-}
-
 const App = (props) => {
   const [title, setTitle] = useState('');
-  
+  let location = useLocation();
+  let {gamestate, loading, error} = useGameState();
+
   // const [curTeams, setCurTeams] = useState([]);
   useEffect(() => {
     setTitle(document.title)
-  }, [document.title])
+  }, [location])
 
-  let location = useLocation();
-  // let { academic_only=false } = location.state || {};
-  
-  let {gamestate, loading, error} = useGameState();
   console.log(gamestate, loading, error);
 
   return (
@@ -54,6 +42,9 @@ const App = (props) => {
         </NavLink>
         <Countdown/>
         <nav className="navigation">
+          <Route key='route-redirect' exact strict path='/'>
+            <Redirect to='/scores' />
+          </Route>
           {
             views.map((view) => <NavLink 
                                   key={"link-" + view.path}

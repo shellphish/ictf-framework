@@ -55,13 +55,17 @@ def should_get_data(game_db):
 
     try:
         data = game_db.get(db_endpoint + tick_endpoint, params=db_request_params)
-    except ConnectionError:
+    except ConnectionError as ex:
+        log.info(f"No data to get connection error: {db_endpoint=} {tick_endpoint=} with {params=}: {ex}")
         return False
 
     if data.status_code != 200:
+        log.info(f"No data to get, tick endpoint returned non-200 code: {data.status_code} => {resp.content}")
         return False
-
+    
     data = data.json()
+    log.info(f"Tick endpoint returned {data=}")
+    log.info
     recv_tick = data[tick_key] if tick_key else data
 
     # decide whether to query the db or not
@@ -69,12 +73,14 @@ def should_get_data(game_db):
         # When the game starts we have to show something
         query_db = True
         init_web_interface = False
+        log.info(f"Should query db since we're still waiting for tick 1: {init_web_interface=} {recv_tick=}")
     elif current_tick != recv_tick:
         if DEBUG:
             log.info("[*] Tick Changed: " + str(recv_tick))
         last_tick = recv_tick - 1
         current_tick = recv_tick
         query_db = True
+        log.info(f"Should query db since we hit a new tick: {init_web_interface=} {recv_tick=}, {current_tick=} {recv_tick=}")
 
     return query_db
 

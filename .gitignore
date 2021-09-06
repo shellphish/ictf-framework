@@ -92,3 +92,4 @@ basehost/iso/*
 **/game_config.json
 /**/vpnkeys
 **/aws_vars_*.env
+scoreboard/_static/

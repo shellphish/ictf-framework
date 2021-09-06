@@ -31,8 +31,6 @@ const App = (props) => {
     setTitle(document.title)
   }, [location])
 
-  console.log(gamestate, loading, error);
-
   return (
     <div className="wrap space--both-2">
 

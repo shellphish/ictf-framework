@@ -167,7 +167,9 @@ class Scores extends Component {
               <span> - </span>
               <a href="#" onClick={ this.handleChartToggle.bind(this, 'none') }>Hide all</a>
               <span> - </span> */}
-          <button onClick={ this.handleChartToggle.bind(this, 'top') }>Top 10</button>
+          <a href='#top10' onClick={ this.handleChartToggle.bind(this, 'top') }>
+            Top 10
+          </a>
         </nav>
 
         <Table headers={ this.tableHeaders() }

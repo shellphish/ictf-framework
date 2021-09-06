@@ -75,13 +75,14 @@ export default class Table extends Component {
     return this.props.headers.map(h => {
       return (
         <th key={ `th-${h.id}` } className={ h.className }>
-          <button // TODO: find out why this was Button, was this material-ui? should it be??
+          <a 
+             href="#sort"
              className={ classNames({'is-sorted': this.state.sortAttr === h.id, 'is-desc': this.state.sortDesc}) }
              onClick={ this.handleSortColumn.bind(this, h.id) }
             >
             { h.label }
             
-          </button>
+          </a>
         </th>
       );
     });

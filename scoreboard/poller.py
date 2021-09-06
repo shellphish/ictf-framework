@@ -135,7 +135,7 @@ def should_update_game_static_info(game_db):
 
     data = data.json()
     # decide whether to refresh game info or not
-    if config['game_start']['key'] in data and  data[config['game_start']['key']]=="621":
+    if config['game_start']['key'] in data and data[config['game_start']['key']]=="621":
         query_db=False
     else:
         if DEBUG:
@@ -153,11 +153,13 @@ def set_game_static_info(cache, game_db):
         tmp = game_db.get(db_endpoint + v, params=db_request_params).json()
         log.info(tmp)
         data.update(tmp)
+    log.debug(f'Setting "static": {data}')
     cache.set('static', json.dumps(data))
 
 #@guard
 def set_game_tick(cache, game_db):
     data = game_db.get(db_endpoint + config['tick_endpoint']['e'], params=db_request_params).json()
+    log.debug(f'Setting "tick": {data}')
     cache.set('tick', json.dumps(data))
     log.info("[*] Updated tick " + str(data['tick_id']))
 

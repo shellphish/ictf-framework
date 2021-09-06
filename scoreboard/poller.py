@@ -211,8 +211,8 @@ LOGSTASH_IP = "localhost"
 
 log = logging.getLogger('scoreboard_poller')
 log.setLevel(MAIN_LOG_LEVEL)
-log_handler = logging.StreamHandler()
-log.addHandler(log_handler)
+log.addHandler(logging.StreamHandler(sys.stderr))
+log.addHandler(logging.FileHandler('poller.logs'))
 log.addHandler(logstash.TCPLogstashHandler(LOGSTASH_IP, LOGSTASH_PORT, version=1))
 
 

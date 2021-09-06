@@ -5,6 +5,7 @@ from flask import Flask, Response, request
 from flask_cors import CORS
 import redis
 import ujson as json
+import sys
 
 app = Flask(__name__, static_folder='_static')
 CORS(app, origins=['http://127.0.0.1:5000'])
@@ -61,6 +62,8 @@ def get_all(endpoint):
 
     last_data_str = get_game_stats(n_ticks)
     static_data_str = db_list.get('static')
+    if static_data_str is None or last_data_str is None:
+        raise ValueError(f"Can't jsonize: {static_data_str=} {last_data_str=}")
     encoded = '{"static": ' + static_data_str + ', "dynamic": ' + last_data_str + '}'
     return Response(encoded, mimetype='application/json')
 

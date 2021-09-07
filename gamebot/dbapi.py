@@ -90,8 +90,8 @@ class DBApi:
         """
         target_url = self.__build_url(DBApi.PING_DBAPI)
         try:
-            ping_response = urllib.urlopen(target_url[0]).read()
-            return ping_response == 'lareneg'
+            ping_response = urllib.request.urlopen(target_url[0]).read()
+            return ping_response == b'lareneg'
         except IOError:
             return False
 

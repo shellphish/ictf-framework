@@ -32,7 +32,7 @@ def jsonize(f):
 
 # Retrieves the static info of the game.
 def get_game_info():
-    static_data = db_list.get('static')
+    static_data = db_list.get('static').decode()
     static_data = json.loads(static_data)
     return static_data
 
@@ -44,7 +44,7 @@ def get_game_stats(n_ticks=1):
     output_json = '['
     n_ticks = min(n_ticks, config['max_requested_ticks'], db_list.llen(config['redis_db_id']))
     for i in range(n_ticks):
-        last_data = db_list.lindex(str(config['redis_db_id']), i)
+        last_data = db_list.lindex(str(config['redis_db_id']), i).decode()
         output_json += last_data + ','
 
     output_json = output_json.rstrip(',') + ']'
@@ -52,7 +52,7 @@ def get_game_stats(n_ticks=1):
 
 @app.route('/api/tick')
 def get_tick():
-    tick_data_json = db_list.get('tick')
+    tick_data_json = db_list.get('tick').decode()
     return Response(tick_data_json, mimetype='application/json')
 
 @app.route('/api/<path:endpoint>')
@@ -61,7 +61,7 @@ def get_all(endpoint):
     n_ticks = int(request.args.get('n_ticks') or '1')
 
     last_data_str = get_game_stats(n_ticks)
-    static_data_str = db_list.get('static')
+    static_data_str = db_list.get('static').decode()
     if static_data_str is None or last_data_str is None:
         raise ValueError(f"Can't jsonize: {static_data_str=} {last_data_str=}")
     encoded = '{"static": ' + static_data_str + ', "dynamic": ' + last_data_str + '}'

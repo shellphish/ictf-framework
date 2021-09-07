@@ -56,7 +56,7 @@ def should_get_data(game_db):
     try:
         data = game_db.get(db_endpoint + tick_endpoint, params=db_request_params)
     except ConnectionError as ex:
-        log.info(f"No data to get connection error: {db_endpoint=} {tick_endpoint=} with {params=}: {ex}")
+        log.info(f"No data to get, connection error: {db_endpoint=} {tick_endpoint=} with {db_request_params=}: {ex}")
         return False
 
     if data.status_code != 200:

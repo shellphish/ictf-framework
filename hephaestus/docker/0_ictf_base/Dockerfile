@@ -11,5 +11,6 @@ RUN apt-get -y install --only-upgrade python3 python3.8
 
 COPY ./secrets /opt/ictf/secrets
 COPY ./ictf-base/provisioning/ansible-provisioning.yml /root
+COPY ./ictf-base/provisioning/requirements-ansible-roles.yml /tmp
 
 RUN ansible-playbook /root/ansible-provisioning.yml

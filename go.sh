@@ -1,8 +1,9 @@
 #!/bin/bash
 
+# Exits if any command exits with non-zero status
 set -euo pipefail
-# ensure that secrets were already generated
 
+# Ensures that secrets were already generated
 if [ ! -d ./secrets ]; then
     echo -e '\e[31mERROR\e[0m: You must first generate secrets. Try ./make_secrets.sh' 1>&2;
     exit 1;

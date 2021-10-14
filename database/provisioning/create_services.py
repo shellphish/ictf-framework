@@ -47,6 +47,7 @@ def register_service(db_api_url_base, db_secret, service_name, service_info):
                     script_type = os.path.basename(script)
 
                     if script_type in {'setflag', 'getflag', 'benign', 'exploit'}:
+                        print (f"Uploading script {filename} [{script_type}]")
                         data = {"upload_id": upload_id, "filename": script, "type": script_type,
                                 "state":     service_info['state'], "service_id": service_id}
                         result = requests.post(db_api_url_base + "/script/new", data=data, params={'secret': db_secret})

@@ -7,16 +7,16 @@ set -euo pipefail
 if [ ! -d ./secrets ]; then
     echo -e '\e[31mERROR\e[0m: You must first generate secrets. Try ./make_secrets.sh' 1>&2;
     exit 1;
-fi;
+fi
 
-echo build_infra
-cd ./hephaestus/docker && ./build_infra.sh && cd - 
-
-echo 'Adjusting max memory for elasticsearch'
+echo 'Adjusting max memory for elasticsearch, unfortunately for a local deploy we have to do this outside of docker for now'
 sudo sysctl -w vm.max_map_count=262144
 
+echo build_infra
+(cd ./hephaestus/docker && ./build_infra.sh && cd -) | tee logs_build_infra.txt
+
 echo deploy_infra
-cd ./ares/docker && ./deploy_infra.py ../../game_config.json ../../secrets && cd ../../
+(cd ./ares/docker && ./deploy_infra.py ../../game_config.json ../../secrets && cd ../../) | tee logs_deploy_infra.txt
  
 echo compose down
 cd ./ares/docker && docker-compose -f docker-compose-local.generated.yml down -v --remove-orphans && cd ../../

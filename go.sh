@@ -26,5 +26,5 @@ cd ./ares/docker && docker-compose -f docker-compose-local.generated.yml up -d &
 
 sleep 5;
 echo "Registering teams and services"
-(cd ./ares/docker && register_services_and_teams.sh ../../game_config.json && cd -) | tee logs_register_teams_services.txt
+(cd ./ares/docker && ./register_services_and_teams.sh ../../game_config.json && cd -) | tee logs_register_teams_services.txt
 # start game: http://localhost:5000/game/insert?secret=JPG1pD8Zr2rT5fjgY_D_MyJPY

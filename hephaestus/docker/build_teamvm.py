@@ -52,7 +52,7 @@ def build_teamvm(game_config_path):
             'docker-compose',
             '-f', './docker-compose-teamvm.yml',
             'build',
-            '--build-arg', "services='{}'".format(json.dumps({'SERVICES': active_services})),
+            '--build-arg', "services={}".format(json.dumps({'SERVICES': active_services})),
         ]
     )
 

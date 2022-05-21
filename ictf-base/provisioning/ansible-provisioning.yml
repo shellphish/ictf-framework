@@ -39,3 +39,6 @@
     - name: install logstash using remote .deb
       apt:
        deb: https://artifacts.elastic.co/downloads/logstash/logstash-7.14.0-amd64.deb
+
+    - name: install ansible roles
+      shell: ansible-galaxy install -r /tmp/requirements-ansible-roles.yml

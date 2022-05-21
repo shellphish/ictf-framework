@@ -36,6 +36,11 @@
       "script": "./install_ansible.sh"
     },
     {
+      "type": "file",
+      "source": "../../ictf-base/provisioning/requirements-ansible-roles.yml",
+      "destination": "/tmp/"
+    },
+    {
       "type": "ansible-local",
       "playbook_file": "./ictf_base/ansible-provisioning.yml",
       "extra_arguments": [

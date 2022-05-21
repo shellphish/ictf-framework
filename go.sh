@@ -22,4 +22,7 @@ cd ./ares/docker && docker-compose -f docker-compose-local.generated.yml down -v
  
 echo compose up
 cd ./ares/docker && docker-compose -f docker-compose-local.generated.yml up -d && cd ../../
+
+sleep 3
+cd ./ares/docker && ./register_services_and_teams.sh ../../game_config.json && cd ../../
 # start game: http://localhost:5000/game/insert?secret=JPG1pD8Zr2rT5fjgY_D_MyJPY

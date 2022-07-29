@@ -4,7 +4,7 @@ Flask-HTTPAuth==2.7.0
 Flask-RESTful==0.3.4
 Flask==0.10.1
 GeoIP
-Jinja2==2.8
+Jinja2==2.11.3
 Pillow==9.0.1
 Werkzeug==0.10.4
 aniso8601==1.0.0

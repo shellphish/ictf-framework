@@ -34,7 +34,8 @@ python ./build_teamvm.py ../../game_config.json
 
 This will spit out a `docker-compose` command for you to run, do that now!
 
-E.g. ```bash
+E.g.
+```bash
 docker-compose -f ./docker-compose-teamvm.yml build --build-arg services='{"SERVICES": ["atm_machine", "sharing", "tweety_bird"]}'
 ```
 

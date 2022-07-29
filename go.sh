@@ -13,10 +13,12 @@ echo 'Adjusting max memory for elasticsearch, unfortunately for a local deploy w
 sudo sysctl -w vm.max_map_count=262144
 
 echo build_infra
-(cd ./hephaestus/docker && ./build_infra.sh && cd -) | tee logs_build_infra.txt
+echo "`date` | starting build_infra" >> logs_build_infra.txt
+(cd ./hephaestus/docker && ./build_infra.sh && cd -) | tee -a logs_build_infra.txt
 
 echo deploy_infra
-(cd ./ares/docker && ./deploy_infra.py ../../game_config.json ../../secrets && cd ../../) | tee logs_deploy_infra.txt
+echo "`date` | starting deploy_infra" >> logs_deploy_infra.txt
+(cd ./ares/docker && ./deploy_infra.py ../../game_config.json ../../secrets && cd ../../) | tee -a logs_deploy_infra.txt
  
 echo compose down
 cd ./ares/docker && docker-compose -f docker-compose-local.generated.yml down -v --remove-orphans && cd ../../
@@ -26,5 +28,6 @@ cd ./ares/docker && docker-compose -f docker-compose-local.generated.yml up -d &
 
 sleep 5;
 echo "Registering teams and services"
-(cd ./ares/docker && ./register_services_and_teams.sh ../../game_config.json && cd -) | tee logs_register_teams_services.txt
+echo "`date` | starting deploy_infra" >> logs_register_teams_services.txt
+(cd ./ares/docker && ./register_services_and_teams.sh ../../game_config.json && cd -) | tee -a logs_register_teams_services.txt
 # start game: http://localhost:5000/game/insert?secret=JPG1pD8Zr2rT5fjgY_D_MyJPY

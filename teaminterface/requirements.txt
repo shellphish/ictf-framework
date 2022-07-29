@@ -6,7 +6,7 @@ Flask==0.10.1
 GeoIP
 Jinja2==2.8
 Pillow==9.0.1
-Werkzeug==0.10.4
+Werkzeug==0.15.3
 aniso8601==1.0.0
 argparse==1.2.1
 backports.ssl-match-hostname==3.4.0.2

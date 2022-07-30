@@ -68,7 +68,7 @@ AWS_KEY_TEMPLATE = Template('resource "aws_key_pair" "$keyname" { \n\
 }\n')
 
 # Define the Vms
-VM_NAMES = ['database', 'router', 'gamebot', 'scoreboard', 'teaminterface', 'scriptbot', 'teamvmmaster', 'dispatcher', 'logger']
+VM_NAMES = ['database', 'router', 'gamebot', 'scoreboard', 'teaminterface', 'scriptbot', 'teamvmmain', 'dispatcher', 'logger']
 
 def _execute_terraform_output(args, terraform_path):
     tf_output_process = subprocess.run(
@@ -125,7 +125,7 @@ def generate_ssh_config(terraform_path):
                     write_host_entry(scriptbot_num, scriptbot_ip, "scriptbot")
             elif instance_name == 'teamvms':
                 for teamvm_num, teamvm_ip in instance_values["value"].items():
-                    write_host_entry(teamvm_num, teamvm_ip, "teamvmmaster")
+                    write_host_entry(teamvm_num, teamvm_ip, "teamvmmain")
             elif instance_name in VM_NAMES:
                 write_host_entry(instance_name, instance_values["value"], instance_name)
             else:

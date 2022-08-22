@@ -11,12 +11,12 @@
       apt_key:
         id:  30EBF4E73CCE63EEE124DD278E6DA8B4E158C569
         url: https://swupdate.openvpn.net/repos/repo-public.gpg
-      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'focal'
 
     - name: add openvpn repo
       apt_repository:
-        repo: deb http://build.openvpn.net/debian/openvpn/release/2.4 xenial main
-      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial'
+        repo: deb http://build.openvpn.net/debian/openvpn/release/2.4 focal main
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'focal'
 
     - name: install openvpn
       apt:

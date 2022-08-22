@@ -58,7 +58,7 @@ def scores_get(tick_id=None):
 
     if tick_id is None:
         tick_id, _, _, _ = get_current_tick(cursor=mysql.cursor())
-    scores_new = scoring.get_scores_for_tick(tick_id - 1)
+    scores_new = scoring.get_scores_for_tick((tick_id - 1) if tick_id > 0 else 0)
 
     if scores_new != scores_old:
         print("OLD: {}" + str(scores_old))

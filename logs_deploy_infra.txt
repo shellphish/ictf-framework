@@ -1,0 +1,11 @@
+
+Configuration for docker-compose successfully generated in ./docker-compose-local.generated.yml
+
+Spawn the infrastructure locally with the following command:
+    - docker-compose -f docker-compose-local.generated.yml up
+
+Destroy the infrastructure locally with the following command:
+    - docker-compose -f docker-compose-local.generated.yml down -v --remove-orphans
+
+To start the game: http://localhost:5000/game/insert?secret=jxCsP8b6XE5HYY2Do_bTGoknO
+    

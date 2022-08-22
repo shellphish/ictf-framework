@@ -7,7 +7,7 @@ ndg-httpsclient
 pyasn1
 setuptools-rust
 wheel
-Flask==0.12.2
+Flask==2.2.2
 uWSGI==2.0.15
 PyYAML==3.12
 boto3==1.4.8

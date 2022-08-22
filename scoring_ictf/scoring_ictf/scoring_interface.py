@@ -63,7 +63,10 @@ class ScoringInterface(object):
             self.log.debug("Tick 0 requested, providing default value!")
             # this is treated as immutable, so one instance is fine :)
             default = self._default_value()
-            self._total_scores[0] = {tid: default for tid in self.gsi.team_id_to_name_map.keys()}
+            if self.gsi.team_id_to_name_map == None:
+                self._total_scores[0] = {}
+            else:
+                self._total_scores[0] = {tid: default for tid in self.gsi.team_id_to_name_map.keys()}
 
         if tick not in self._total_scores:
             t1 = datetime.now()

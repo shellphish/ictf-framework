@@ -6,6 +6,6 @@ unzip -d /etc/openvpn/ /etc/openvpn/openvpn.zip
 
 service openvpn start
 
-python ictf-tcpdump.py &
+python3 ictf-tcpdump.py &
 
-python ictf-pcap-s3.py 
+python3 ictf-pcap-s3.py

@@ -6,6 +6,7 @@ import sys
 import string
 import yaml
 import json
+import time
 
 rnd = random.SystemRandom()
 
@@ -91,6 +92,8 @@ def add_teams_info(db_api_base_url, db_secret, game_config):
 
 
 if __name__== "__main__":
+    print("Waiting for database container to finish startup.")
+    time.sleep(10)
     game_config = json.load(open(sys.argv[2], 'r'))
     db_api = sys.argv[1] # passed from terraform script
     database_api_secret_path = SECRETS_FOLDER+"database-api/secret"
@@ -102,10 +105,3 @@ if __name__== "__main__":
         add_teams_info('http://' + db_api, db_secret, game_config)
     else:
         raise Exception("Missing database secrets!")
-
-
-
-
-
-
-

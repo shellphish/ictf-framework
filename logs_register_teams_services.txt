@@ -1,0 +1,30 @@
+Waiting for database container to finish startup.
+http://127.0.0.1:5000/teams/info
+{'teams': {}}
+b'{"result": "success", "team_id": 1, "fail_reason": null}'
+Team 1 successfully created and validated
+b'{"result": "success", "team_id": 2, "fail_reason": null}'
+Team 2 successfully created and validated
+/home/ubuntu/ictf-test-ctf-1-master/atm_machine
+Uploading script setflag [setflag]
+Unknown script type Dockerfile skipping Dockerfile
+Unknown script type ._accounts.txt skipping ._accounts.txt
+Uploading script benign [benign]
+Uploading script exploit [exploit]
+Unknown script type test_everything.py skipping test_everything.py
+Unknown script type createDB.py skipping createDB.py
+Uploading script getflag [getflag]
+Unknown script type accounts.txt skipping accounts.txt
+/home/ubuntu/ictf-test-ctf-1-master/sharing
+Uploading script setflag [setflag]
+Unknown script type Dockerfile skipping Dockerfile
+Uploading script benign [benign]
+Uploading script exploit [exploit]
+Uploading script getflag [getflag]
+/home/ubuntu/ictf-test-ctf-1-master/tweety_bird
+Uploading script setflag [setflag]
+Unknown script type Dockerfile skipping Dockerfile
+Uploading script benign [benign]
+Uploading script exploit [exploit]
+Uploading script getflag [getflag]
+/home/ubuntu/ictf-framework

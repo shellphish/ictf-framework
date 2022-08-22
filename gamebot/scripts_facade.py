@@ -224,7 +224,7 @@ class ScriptsFacade:
                     benign_scripts.extend(list(random.choice(non_exploit_scripts[curr_service]["benign"])
                                           for _ in range(num_benign)))
                 # Get all exploit scripts for this service, not submitted from current team
-                curr_service_exploit_script.extend(value[curr_service]["exploit"] for key, value in exploit_scripts.iteritems()
+                curr_service_exploit_script.extend(value[curr_service]["exploit"] for key, value in exploit_scripts.items()
                                                    if key != curr_team and (curr_service in value))
                 # Flatten the list
                 curr_service_exploit_script = flatten_list(curr_service_exploit_script)

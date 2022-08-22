@@ -21,27 +21,74 @@ Step 7/7 : RUN ansible-playbook /root/ansible-provisioning.yml
 
 Successfully built 0cabdeab89dc
 Successfully tagged ictf_base:latest
-Step 1/6 : FROM rabbitmq:management
- ---> 321a17c29307
-Step 2/6 : ENV RABBITMQ_PID_FILE /var/lib/rabbitmq/mnesia/rabbitmq
+Step 1/8 : FROM ictf_base
+Step 1/13 : FROM ictf_base
+ ---> 0cabdeab89dc
+Step 2/8 : RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends iptraf python3 python3-pip python3-dev build-essential awscli iptables-persistent iftop libcurl4-openssl-dev libssl-dev python3-apt zip unzip openvpn python3-setuptools python3-wheel
+ ---> 0cabdeab89dc
+Step 2/13 : ENV DEBIAN_FRONTEND=noninteractive
  ---> Using cache
- ---> 2655892c5868
-Step 3/6 : COPY ./dispatcher /opt/ictf/dispatcher
+ ---> b196a60c4431
+Step 3/8 : COPY ./router /opt/ictf/router
  ---> Using cache
- ---> beb9a1b2cee0
-Step 4/6 : WORKDIR /opt/ictf/dispatcher
+ ---> 2f9d82f3ffd9
+Step 3/13 : RUN apt-get update && apt-get install -y nginx git redis-server build-essential
  ---> Using cache
- ---> 21b22e96aee7
-Step 5/6 : RUN chmod +x ./start.sh
+ ---> 9b99adbbfc25
+Step 4/8 : WORKDIR /opt/ictf/router
  ---> Using cache
- ---> 99a175e979fc
-Step 6/6 : ENTRYPOINT ./start.sh
+ ---> 91355d09b17d
+Step 4/13 : RUN apt-get update && apt-get install -y sudo uwsgi daemon
  ---> Using cache
- ---> 26364e2a1a60
+ ---> 9b5578c6dc5e
+Step 5/13 : RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+ ---> Using cache
+ ---> 809563d1b92a
+Step 5/8 : RUN pip install -r requirements3.txt
+ ---> Using cache
+ ---> a124d9ec37aa
+Step 6/13 : RUN apt-get update && apt-get install -y nodejs
+ ---> Using cache
+ ---> d898a1a95858
+Step 6/8 : RUN ansible-playbook provisioning/hephaestus_provisioning/ansible-provisioning.yml --become
+ ---> Using cache
+ ---> 0b54ac056290
+Step 7/13 : RUN apt-get update && apt-get install -y python3-pip python3-virtualenv python3-dev uwsgi-plugin-python3 python3-setuptools python3-wheel
+ ---> Using cache
+ ---> 817aeda275ce
+Step 7/8 : RUN chmod +x ./start.sh
+ ---> Using cache
+ ---> 69f6466cf7df
+Step 8/13 : COPY ./scoreboard /opt/ictf/scoreboard
+ ---> Using cache
+ ---> 06d316ec2e21
+Step 8/8 : ENTRYPOINT ./start.sh
+ ---> Using cache
+ ---> 6726981fb9f8
 
-Successfully built 26364e2a1a60
+ ---> Using cache
+ ---> 478f66ea1162
+Step 9/13 : WORKDIR /opt/ictf/scoreboard
+ ---> Using cache
+ ---> c0ba46f898b6
+Step 10/13 : RUN pip install -r requirements.txt
+Step 1/8 : FROM ictf_base
+ ---> 0cabdeab89dc
+Step 2/8 : RUN DEBIAN_FRONTEND=noninteractive apt-get install -y nginx python3-pip python3-virtualenv python3-dev libjpeg8 libjpeg-dev zlib1g zlib1g-dev libpng-dev libmemcached-dev libmemcached-tools libgeoip1 libgeoip-dev geoip-bin geoip-database redis-server
+ ---> Using cache
+ ---> 6fcde0df0a58
+ ---> Using cache
+ ---> 1e5140cf78b1
+Step 11/13 : RUN ansible-playbook provisioning/hephaestus_provisioning/ansible-provisioning.yml --become --extra-vars ICTF_USER="root" --extra-vars ICTF_FRAMEWORK_DIR_HOST="/opt/ictf"  --extra-vars ICTF_API_ADDRESS="database.ictf"
+Step 3/8 : COPY ./teaminterface /opt/ictf/teaminterface
+ ---> Using cache
+ ---> 9ed67e11f8c0
+Step 12/13 : RUN chmod +x ./start.sh
 Step 1/9 : FROM ictf_base
  ---> 0cabdeab89dc
+ ---> Using cache
+ ---> fa2097412a8f
+Step 13/13 : ENTRYPOINT ./start.sh
 Step 2/9 : RUN DEBIAN_FRONTEND=noninteractive apt-get install -y python3-pip python3-virtualenv python3 python3-dev git libssl-dev libffi-dev build-essential libc6-dev-i386
  ---> Using cache
  ---> 82239dba4157
@@ -53,116 +100,20 @@ Step 4/9 : WORKDIR /opt/ictf/scriptbot
  ---> c005b43f5cd8
 Step 5/9 : COPY ./common/hephaestus_provisioning/teamhosts ./teamhosts
  ---> Using cache
- ---> cc5fcb075bf2
-Step 6/9 : RUN pip3 install -r requirements.txt
+ ---> f3621945ca6c
+Step 4/8 : WORKDIR /opt/ictf/teaminterface
  ---> Using cache
- ---> 34016535702f
-Step 7/9 : RUN ansible-playbook provisioning/hephaestus_provisioning/ansible-provisioning.yml
- ---> Using cache
- ---> cacc08817262
-Step 8/9 : RUN chmod +x ./start.sh && chmod +x ./start_idle_mode.sh
- ---> Using cache
- ---> 76f21420d0c9
-Step 9/9 : ENTRYPOINT ./start.sh
- ---> Using cache
- ---> d998ad48c56d
-
-Successfully tagged ictf_dispatcher:latest
-Step 1/8 : FROM ictf_base
- ---> 0cabdeab89dc
-Step 2/8 : RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3-pip python3-wheel
- ---> Using cache
- ---> d096f32f65c1
-Step 3/8 : COPY ./gamebot /opt/ictf/gamebot
- ---> Using cache
- ---> c592e46a9638
-Step 4/8 : WORKDIR /opt/ictf/gamebot
- ---> Using cache
- ---> 5b1dd5b61645
+ ---> cc01211f96da
 Step 5/8 : RUN pip install -r requirements.txt
- ---> Using cache
- ---> ffdc3d4b806a
-Step 6/8 : RUN chmod +x ./start.sh
- ---> Using cache
- ---> fbf83d307a12
-Step 7/8 : RUN ansible-playbook ./provisioning/hephaestus_provisioning/ansible-provisioning.yml --extra-vars ICTF_API_ADDRESS="database.ictf"
- ---> Using cache
- ---> 2c5e97fbd9c6
-Step 8/8 : ENTRYPOINT ./start.sh
- ---> Using cache
- ---> 6c681b1a486a
-
-Step 1/13 : FROM ictf_base
- ---> 0cabdeab89dc
-Step 2/13 : ENV DEBIAN_FRONTEND=noninteractive
- ---> Using cache
- ---> 2f9d82f3ffd9
-Step 3/13 : RUN apt-get update && apt-get install -y nginx git redis-server build-essential
- ---> Using cache
- ---> 91355d09b17d
-Step 4/13 : RUN apt-get update && apt-get install -y sudo uwsgi daemon
- ---> Using cache
- ---> 9b5578c6dc5e
-Step 5/13 : RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
- ---> Using cache
- ---> a124d9ec37aa
-Step 6/13 : RUN apt-get update && apt-get install -y nodejs
- ---> Using cache
- ---> 0b54ac056290
-Step 7/13 : RUN apt-get update && apt-get install -y python3-pip python3-virtualenv python3-dev uwsgi-plugin-python3 python3-setuptools python3-wheel
- ---> Using cache
- ---> 69f6466cf7df
-Step 8/13 : COPY ./scoreboard /opt/ictf/scoreboard
- ---> Using cache
- ---> 478f66ea1162
-Step 9/13 : WORKDIR /opt/ictf/scoreboard
- ---> Using cache
- ---> c0ba46f898b6
-Step 10/13 : RUN pip install -r requirements.txt
- ---> Using cache
- ---> 1e5140cf78b1
-Step 11/13 : RUN ansible-playbook provisioning/hephaestus_provisioning/ansible-provisioning.yml --become --extra-vars ICTF_USER="root" --extra-vars ICTF_FRAMEWORK_DIR_HOST="/opt/ictf"  --extra-vars ICTF_API_ADDRESS="database.ictf"
- ---> Using cache
- ---> 9ed67e11f8c0
-Step 12/13 : RUN chmod +x ./start.sh
- ---> Using cache
- ---> fa2097412a8f
-Step 13/13 : ENTRYPOINT ./start.sh
  ---> Using cache
  ---> a65b12846144
 
-Successfully built d998ad48c56d
-Successfully tagged ictf_scriptbot:latest
-Successfully built 6c681b1a486a
-Successfully built a65b12846144
-Successfully tagged ictf_gamebot:latest
-Successfully tagged ictf_scoreboard:latest
-Step 1/8 : FROM ictf_base
- ---> 0cabdeab89dc
-Step 2/8 : RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends iptraf python3 python3-pip python3-dev build-essential awscli iptables-persistent iftop libcurl4-openssl-dev libssl-dev python3-apt zip unzip openvpn python3-setuptools python3-wheel
  ---> Using cache
- ---> b196a60c4431
-Step 3/8 : COPY ./router /opt/ictf/router
+ ---> cc5fcb075bf2
+Step 6/9 : RUN pip3 install -r requirements.txt
  ---> Using cache
- ---> 9b99adbbfc25
-Step 4/8 : WORKDIR /opt/ictf/router
- ---> Using cache
- ---> 809563d1b92a
-Step 5/8 : RUN pip install -r requirements3.txt
- ---> Using cache
- ---> d898a1a95858
-Step 6/8 : RUN ansible-playbook provisioning/hephaestus_provisioning/ansible-provisioning.yml --become
- ---> Using cache
- ---> 817aeda275ce
-Step 7/8 : RUN chmod +x ./start.sh
- ---> Using cache
- ---> 06d316ec2e21
-Step 8/8 : ENTRYPOINT ./start.sh
- ---> Using cache
- ---> 6726981fb9f8
-
-Successfully built 6726981fb9f8
-Successfully tagged ictf_router:latest
+ ---> fe28c9ff298c
+Step 6/8 : RUN ansible-playbook provisioning/hephaestus_provisioning/ansible-provisioning.yml --become  --extra-vars ICTF_DB_API_ADDRESS="database.ictf"
 Step 1/8 : FROM ictf_base
  ---> 0cabdeab89dc
 Step 2/8 : RUN DEBIAN_FRONTEND=noninteractive apt-get install -y nginx uwsgi uwsgi-plugin-python3 mysql-server python3-pip python3-virtualenv python3-mysqldb python3-dev python3-setuptools python3-wheel cron daemon
@@ -173,28 +124,81 @@ Step 3/8 : RUN pip install --upgrade pip
  ---> fca8b017f7b8
 Step 4/8 : COPY ./database /opt/ictf/database
  ---> Using cache
- ---> a4b800b1dd80
+ ---> 33f926123590
 Step 5/8 : COPY ./scoring_ictf /opt/ictf/scoring_ictf
  ---> Using cache
- ---> 00073f2844f6
+ ---> 34016535702f
+Step 7/9 : RUN ansible-playbook provisioning/hephaestus_provisioning/ansible-provisioning.yml
+ ---> Using cache
+ ---> c6cd00b82763
+Step 7/8 : RUN chmod +x ./start.sh
+ ---> Using cache
+ ---> 2c7c731c879b
 Step 6/8 : WORKDIR /opt/ictf/database
  ---> Using cache
- ---> 85ef25e9720d
+ ---> cacc08817262
+Step 8/9 : RUN chmod +x ./start.sh && chmod +x ./start_idle_mode.sh
+ ---> Using cache
+ ---> Using cache
+ ---> 92e9744ef0a2
+Step 8/8 : ENTRYPOINT ./start.sh
+ ---> 5f62ae3742ef
 Step 7/8 : RUN chmod +x ./start.sh && ansible-playbook ./provisioning/hephaestus_provisioning/ansible-provisioning.yml
  ---> Using cache
- ---> 775cd2e600bf
+ ---> 76f21420d0c9
+Step 9/9 : ENTRYPOINT ./start.sh
+ ---> Using cache
+ ---> e2cda82891b0
+
+ ---> Using cache
+ ---> c2ad0aea0f9f
 Step 8/8 : ENTRYPOINT ./start.sh
  ---> Using cache
- ---> 99c4d513a85b
+ ---> d998ad48c56d
 
-Successfully built 99c4d513a85b
+ ---> Using cache
+ ---> 8287accb475c
+
+Successfully built 6726981fb9f8
+Successfully tagged ictf_router:latest
+Successfully built a65b12846144
+Successfully built e2cda82891b0
+Successfully built d998ad48c56d
+Successfully tagged ictf_teaminterface:latest
+Successfully tagged ictf_scoreboard:latest
+Successfully tagged ictf_scriptbot:latest
+Successfully built 8287accb475c
 Successfully tagged ictf_database:latest
-Step 1/8 : FROM ubuntu:18.04
+Step 1/8 : FROM ubuntu:18.04Step 1/6 : FROM rabbitmq:management
+ ---> 321a17c29307
+Step 2/6 : ENV RABBITMQ_PID_FILE /var/lib/rabbitmq/mnesia/rabbitmq
+ ---> Using cache
+ ---> 2655892c5868
+Step 3/6 : COPY ./dispatcher /opt/ictf/dispatcher
+Step 1/8 : FROM ictf_base
+
  ---> 8d5df41c547b
 Step 2/8 : RUN DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade &&     apt-get update -y &&     apt-get -y install software-properties-common &&     apt-add-repository ppa:ansible/ansible &&     apt-get -y update && apt -y install ansible git wget curl vim iputils-ping python-pip python-dev python3-dev build-essential htop
+ ---> 0cabdeab89dc
+Step 2/8 : RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends python3-pip python3-wheel
+ ---> Using cache
+ ---> beb9a1b2cee0
+Step 4/6 : WORKDIR /opt/ictf/dispatcher
+ ---> Using cache
+ ---> 21b22e96aee7
+Step 5/6 : RUN chmod +x ./start.sh
+ ---> Using cache
+ ---> 99a175e979fc
+Step 6/6 : ENTRYPOINT ./start.sh
  ---> Using cache
  ---> 7b4045115698
 Step 3/8 : COPY ./secrets /opt/ictf/secrets
+ ---> Using cache
+ ---> 26364e2a1a60
+
+ ---> Using cache
+ ---> d096f32f65c1
+Step 3/8 : COPY ./gamebot /opt/ictf/gamebot
  ---> Using cache
  ---> 87cc403ef32f
 Step 4/8 : COPY ./logger /opt/ictf/logger
@@ -213,32 +217,95 @@ Step 8/8 : ENTRYPOINT ./start.sh
  ---> Using cache
  ---> 554f7987b11b
 
-Step 1/8 : FROM ictf_base
- ---> 0cabdeab89dc
-Step 2/8 : RUN DEBIAN_FRONTEND=noninteractive apt-get install -y nginx python3-pip python3-virtualenv python3-dev libjpeg8 libjpeg-dev zlib1g zlib1g-dev libpng-dev libmemcached-dev libmemcached-tools libgeoip1 libgeoip-dev geoip-bin geoip-database redis-server
- ---> Using cache
- ---> 6fcde0df0a58
-Step 3/8 : COPY ./teaminterface /opt/ictf/teaminterface
- ---> Using cache
- ---> f3621945ca6c
-Step 4/8 : WORKDIR /opt/ictf/teaminterface
- ---> Using cache
- ---> cc01211f96da
-Step 5/8 : RUN pip install -r requirements.txt
- ---> Using cache
- ---> fe28c9ff298c
-Step 6/8 : RUN ansible-playbook provisioning/hephaestus_provisioning/ansible-provisioning.yml --become  --extra-vars ICTF_DB_API_ADDRESS="database.ictf"
- ---> Using cache
- ---> c6cd00b82763
-Step 7/8 : RUN chmod +x ./start.sh
- ---> Using cache
- ---> 92e9744ef0a2
-Step 8/8 : ENTRYPOINT ./start.sh
- ---> Using cache
- ---> e2cda82891b0
-
+Successfully built 26364e2a1a60
+Successfully tagged ictf_dispatcher:latest
 Successfully built 554f7987b11b
 Successfully tagged ictf_logger:latest
-Successfully built e2cda82891b0
-Successfully tagged ictf_teaminterface:latest
+ ---> a9643e1f621c
+Step 4/8 : WORKDIR /opt/ictf/gamebot
+ ---> Running in e8b382e93bab
+Removing intermediate container e8b382e93bab
+ ---> cf6f138a8b86
+Step 5/8 : RUN pip install -r requirements.txt
+ ---> Running in 71ae1c8cc68c
+Requirement already satisfied: wheel in /usr/lib/python3/dist-packages (from -r requirements.txt (line 1)) (0.34.2)
+Collecting coloredlogs==7.3.1
+  Downloading coloredlogs-7.3.1-py2.py3-none-any.whl (37 kB)
+Collecting requests==2.18.4
+  Downloading requests-2.18.4-py2.py3-none-any.whl (88 kB)
+Collecting setuptools==44.0.0
+  Downloading setuptools-44.0.0-py2.py3-none-any.whl (583 kB)
+Collecting python-logstash
+  Downloading python-logstash-0.4.8.tar.gz (7.1 kB)
+Collecting pika
+  Downloading pika-1.3.0-py3-none-any.whl (155 kB)
+Collecting humanfriendly>=3.2
+  Downloading humanfriendly-10.0-py2.py3-none-any.whl (86 kB)
+Collecting idna<2.7,>=2.5
+  Downloading idna-2.6-py2.py3-none-any.whl (56 kB)
+Requirement already satisfied: chardet<3.1.0,>=3.0.2 in /usr/lib/python3/dist-packages (from requests==2.18.4->-r requirements.txt (line 3)) (3.0.4)
+Collecting urllib3<1.23,>=1.21.1
+  Downloading urllib3-1.22-py2.py3-none-any.whl (132 kB)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/lib/python3/dist-packages (from requests==2.18.4->-r requirements.txt (line 3)) (2019.11.28)
+Building wheels for collected packages: python-logstash
+  Building wheel for python-logstash (setup.py): started
+  Building wheel for python-logstash (setup.py): finished with status 'done'
+  Created wheel for python-logstash: filename=python_logstash-0.4.8-py3-none-any.whl size=8415 sha256=5ba973ce639dde1f044b74c9f3ddad851b74885ae16afeccbdeae06f4641a424
+  Stored in directory: /root/.cache/pip/wheels/eb/e4/85/edb12495360894b52ab9161f28d348250b41095ee4a322c16e
+Successfully built python-logstash
+Installing collected packages: humanfriendly, coloredlogs, idna, urllib3, requests, setuptools, python-logstash, pika
+  Attempting uninstall: idna
+    Found existing installation: idna 2.8
+    Not uninstalling idna at /usr/lib/python3/dist-packages, outside environment /usr
+    Can't uninstall 'idna'. No files were found to uninstall.
+  Attempting uninstall: urllib3
+    Found existing installation: urllib3 1.25.8
+    Not uninstalling urllib3 at /usr/lib/python3/dist-packages, outside environment /usr
+    Can't uninstall 'urllib3'. No files were found to uninstall.
+  Attempting uninstall: requests
+    Found existing installation: requests 2.22.0
+    Not uninstalling requests at /usr/lib/python3/dist-packages, outside environment /usr
+    Can't uninstall 'requests'. No files were found to uninstall.
+  Attempting uninstall: setuptools
+    Found existing installation: setuptools 45.2.0
+    Not uninstalling setuptools at /usr/lib/python3/dist-packages, outside environment /usr
+    Can't uninstall 'setuptools'. No files were found to uninstall.
+Successfully installed coloredlogs-7.3.1 humanfriendly-10.0 idna-2.6 pika-1.3.0 python-logstash-0.4.8 requests-2.18.4 setuptools-44.0.0 urllib3-1.22
+Removing intermediate container 71ae1c8cc68c
+ ---> a7ad1493259f
+Step 6/8 : RUN chmod +x ./start.sh
+ ---> Running in d22703acc5f5
+Removing intermediate container d22703acc5f5
+ ---> 50283d77377c
+Step 7/8 : RUN ansible-playbook ./provisioning/hephaestus_provisioning/ansible-provisioning.yml --extra-vars ICTF_API_ADDRESS="database.ictf"
+ ---> Running in 62631a2a4af9
+[91m[WARNING]: provided hosts list is empty, only localhost is available. Note that
+the implicit localhost does not match 'all'
+[0m
+PLAY [localhost] ***************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+
+TASK [ictf-database database connection settings.py configuration - set ICTF_API_ADDRESS] ***
+changed: [localhost]
+
+TASK [ictf-database database connection config.json configuration - set API_SECRET] ***
+changed: [localhost]
+
+TASK [logstash - config] *******************************************************
+changed: [localhost]
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=4    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+Removing intermediate container 62631a2a4af9
+ ---> 90e28801a83f
+Step 8/8 : ENTRYPOINT ./start.sh
+ ---> Running in 16513a208fa4
+Removing intermediate container 16513a208fa4
+ ---> 7e6bd0eace41
+
+Successfully built 7e6bd0eace41
+Successfully tagged ictf_gamebot:latest
 /home/ubuntu/ictf-framework

@@ -27,5 +27,5 @@ sendgrid==3.6.3
 six==1.9.0
 tornado==4.2.1
 uwsgi
-setuptools==44.0.0
+setuptools==65.5.1
 python-logstash

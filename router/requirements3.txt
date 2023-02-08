@@ -1,5 +1,5 @@
 setuptools-rust
-cryptography==3.2
+cryptography==39.0.1
 wheel
 requests
 awscli
